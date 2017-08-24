@@ -1,0 +1,15 @@
+即时比分接口
+http://vpn.gooooal.com:8023/api/sports.xml?v=1&uId=now&pwd=pccw&sport=snk&target=snk_score
+http://vpn.gooooal.com:8023/api/sports.json?v=1&uId=now&pwd=pccw&sport=snk&target=snk_score
+联赛接口
+http://vpn.gooooal.com:8023/api/sports.xml?v=1&uId=now&pwd=pccw&sport=snk&target=snk_league
+http://vpn.gooooal.com:8023/api/sports.json?v=1&uId=now&pwd=pccw&sport=snk&target=snk_league
+球员世界排名接口
+http://vpn.gooooal.com:8023/api/sports.xml?v=1&uId=now&pwd=pccw&sport=snk&target=snk_rank
+http://vpn.gooooal.com:8023/api/sports.json?v=1&uId=now&pwd=pccw&sport=snk&target=snk_rank
+球员信息接口
+http://vpn.gooooal.com:8023/api/sports.xml?v=1&uId=now&pwd=pccw&sport=snk&target=snk_person
+http://vpn.gooooal.com:8023/api/sports.json?v=1&uId=now&pwd=pccw&sport=snk&target=snk_person
+赛程赛果接口
+http://vpn.gooooal.com:8023/api/sports.xml?v=1&uId=now&pwd=pccw&sport=snk&target=snk_matchlist
+http://vpn.gooooal.com:8023/api/sports.json?v=1&uId=now&pwd=pccw&sport=snk&target=snk_matchlist
