@@ -1,0 +1,81 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+						   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+                           http://www.springframework.org/schema/tx
+                           http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+                           http://www.springframework.org/schema/aop
+                           http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context-4.0.xsd
+						   http://www.springframework.org/schema/task  
+						   http://www.springframework.org/schema/task/spring-task-4.0.xsd"
+	default-autowire="byName">
+
+	<!-- App Properties -->
+	<bean id="propertyConfigurer" class="com.pccw.ott.util.CustomizedPropertyConfigurer">
+		<property name="locations">
+			<list>
+				<value>/WEB-INF/config/app.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- Scans the classpath of this application for @Components to deploy as 
+		beans -->
+	<context:component-scan base-package="com.pccw.ott.*">
+		<context:exclude-filter type="regex"
+			expression="com.pccw.ott.controller.*" />
+	</context:component-scan>
+
+	<!-- Anotation Transaction -->
+	<tx:annotation-driven transaction-manager="hibernateTransactionManager" />
+
+	<!-- 配置c3p0数据源 -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close" p:driverClass="${jdbc.driverClassName}"
+		p:jdbcUrl="${jdbc.url}" p:user="${jdbc.username}" p:password="${jdbc.password}"
+		p:minPoolSize="2" p:maxPoolSize="20" p:maxIdleTime="1800"
+		p:acquireIncrement="2" p:maxStatements="100" p:initialPoolSize="3"
+		p:idleConnectionTestPeriod="1800" p:acquireRetryAttempts="30"
+		p:breakAfterAcquireFailure="true" p:testConnectionOnCheckout="false" />
+
+<!-- 	<bean id="myP6DataSource" class="com.p6spy.engine.spy.P6DataSource">   -->
+<!--         <constructor-arg ref="dataSource"></constructor-arg>   -->
+<!--     </bean>  -->
+		
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+				<prop key="hibernate.format_sql">${hibernate.format_sql}</prop>
+				<prop key="hibernate.generate_statistics">${hibernate.generate_statistics}</prop>
+				<prop key="hibernate.jdbc.batch_size">${hibernate.jdbc.batch_size}</prop>
+				<prop key="hibernate.transaction.factory_class">${hibernate.transaction.factory_class}</prop>
+<!-- 				<prop key="hibernate.current_session_context_class">${hibernate.current_session_context_class}</prop> -->
+			</props>
+		</property>
+
+		<!-- setting "packagesToScan" property can automatic search all "@Entity 
+			class" annotation under some package -->
+		<property name="packagesToScan" value="com.pccw.ott.model" />
+	</bean>
+
+<!-- 配置一个事务管理器 -->
+    <bean id="hibernateTransactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    
+<!-- 	<task:scheduler id="scheduler" pool-size="5" /> -->
+<!-- 	<task:annotation-driven/> -->
+<!-- 	<bean id="myTask" class="com.pccw.ott.schedual.OttSchedualTask"></bean> -->
+<!-- 	<task:scheduled-tasks> -->
+<!-- 		<task:scheduled ref="myTask" method="retrieveSnookerRankData" cron="${task.cron}" /> -->
+<!-- 	</task:scheduled-tasks>     -->
+<!-- 	<context:component-scan base-package="com.pccw.ott.schedual" />       -->
+
+</beans>

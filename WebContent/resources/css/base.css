@@ -1,0 +1,9 @@
+*{font-family:Arial, Helvetica, sans-serif; font-size:12px}
+.base_error {color:red;padding:5px}
+.base_menu a{color:#999;}
+.base_menu a:link{color:gray;}
+.base_menu a:visited{color:gray;}
+.base_menu a:hover{color:#06c;}
+.base_menu a:active{color:gray;}
+
+.base_upload {width:300px;}
