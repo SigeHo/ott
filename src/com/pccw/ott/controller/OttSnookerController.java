@@ -25,6 +25,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pccw.ott.model.OttSnookerPoint;
 import com.pccw.ott.model.OttSnookerRank;
 import com.pccw.ott.service.OttSnookerService;
+import com.pccw.ott.util.CustomizedPropertyConfigurer;
+import com.pccw.ott.util.HttpClientUtil;
+import com.pccw.ott.util.JsonUtil;
 
 @Controller
 @RequestMapping("/snooker")
@@ -51,8 +54,6 @@ public class OttSnookerController {
 		int first = (page - 1) * rows;
 		int max = rows;
 		List<OttSnookerRank> list = snookerService.findSnookerRankList(playerName, first, max, sort, order);
-		List<OttSnookerPoint> pointList = list.get(0).getSnookerPointList();
-		OttSnookerPoint point = pointList.get(0);
 		Long total = snookerService.findSnookerRankListSize(playerName);
 		returnMap.put("rows", list);
 		returnMap.put("total", total);
@@ -91,6 +92,23 @@ public class OttSnookerController {
 		List<OttSnookerPoint> list = snookerService.findSnookerPointList(playerId);
 		returnMap.put("rows", list);
 		return returnMap;
+	}
+	
+	@RequestMapping("/rank/save.html")
+	public void save() {
+		String response = HttpClientUtil.getInstance().sendHttpPost(CustomizedPropertyConfigurer.getContextProperty("api.snooker_rank"));
+//	 	String response = HttpClientUtil.readFile("e:/desktop/json.txt");
+	 	if (StringUtils.isNotBlank(response)) {
+		 	List<OttSnookerRank> list = JsonUtil.parseJson2SnookerRank(response);
+		 	snookerService.batchSaveSnookerRankList(list);
+	 	} else {
+	 		logger.error("OttSchedualTask.retrieveSnookerRankData() failed.");
+	 	}
+	}
+	
+	@RequestMapping("/rank/cleanUp.html")
+	public void cleanUp() {
+		snookerService.flushSnookerRankData(null);
 	}
 	
 	@RequestMapping("/fixture/goToListFixturePage.html")

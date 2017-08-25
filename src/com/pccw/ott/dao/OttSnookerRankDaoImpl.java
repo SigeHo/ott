@@ -93,4 +93,18 @@ public class OttSnookerRankDaoImpl extends HibernateDaoSupport implements OttSno
 		this.getHibernateTemplate().delete(rank);
 	}
 
+	@Override
+	public void deleteAllSnookerRank() {
+		this.getHibernateTemplate().execute(new HibernateCallback<Object>() {
+			@Override
+			public Object doInHibernate(Session session) throws HibernateException {
+				Query query = session.createQuery("delete from OttSnookerPoint");
+				query.executeUpdate();
+				query = session.createQuery("delete from OttSnookerRank");
+				query.executeUpdate();
+				return null;
+			}
+		});
+	}
+
 }

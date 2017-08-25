@@ -14,7 +14,7 @@ import javax.persistence.Table;
 public class OttSnookerRankPoint implements Serializable {
 
 	private Long id;
-	private String playerId;
+	private Long playerId;
 	private Long pointId;
 
 	@Id
@@ -29,11 +29,11 @@ public class OttSnookerRankPoint implements Serializable {
 	}
 
 	@Column(name = "player_id")
-	public String getPlayerId() {
+	public Long getPlayerId() {
 		return playerId;
 	}
 
-	public void setPlayerId(String playerId) {
+	public void setPlayerId(Long playerId) {
 		this.playerId = playerId;
 	}
 

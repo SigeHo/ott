@@ -63,7 +63,7 @@ div.centent span {
 	function dateFormatter(value, row, index) {
 		if (value != "") {
 			var date = new Date(value);
-			return date.format("yyyy-MM-dd hh:mm:ss");
+			return date.format("MM/dd/yyyy hh:mm:ss");
 		} else {
 			return "";
 		}
@@ -95,15 +95,24 @@ div.centent span {
 
 	function save() {
 		if ($("#rank_dg").datagrid("getChanges").length) {
-			debugger;
+			var inserted = $("#rank_dg").datagrid('getChanges', 'inserted');
 			var updated = $("#rank_dg").datagrid('getChanges', 'updated');
+			var deleted = $("#rank_dg").datagrid('getChanges', 'deleted');
 			var effectRow = new Object();
-			effectRow['updated'] = JSON.stringify(updated);
+			if(inserted.length) {
+				effectRow['inserted'] = JSON.stringify(inserted);
+			}
+			if(updated.length) {
+				effectRow['updated'] = JSON.stringify(updated);
+			}
+			if(deleted.length) {
+				effectRow['deleted'] = JSON.stringify(deleted);
+			}
 			$.post("${ctx}/snooker/rank/batchUpdateRank.html", effectRow,
 					function(response) {
 						if (response.success) {
 							$("#saveBtn").linkbutton('disable');
-							$.messager.alert("", "Save success .", "error");
+							$.messager.alert("", "Save changes successfully .", "info");
 						}
 					}, 'JSON').error(function() {
 				$.messager.alert("", "Failed to save the changes.", "error");
@@ -175,7 +184,7 @@ div.centent span {
 				<th colspan="3">Point</th>
 				<th field="ptcPoint" rowspan="2" editor="numberbox" >PTC Point</th>
 				<th field="totalPoint" rowspan="2" editor="numberbox" >Total Point</th>
-				<th field="lastUpdatedTime" rowspan="2" formatter="dateFormatter" editor="datetimebox">Last Updated Time</th>
+				<th field="lastUpdatedTime" rowspan="2" formatter="dateFormatter">Last Updated Time</th>
 			</tr>
 			<tr>
 				<th field="point1" editor="numberbox">Season 1</th>

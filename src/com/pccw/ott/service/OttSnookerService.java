@@ -8,6 +8,8 @@ import com.pccw.ott.model.OttSnookerRank;
 public interface OttSnookerService {
 
 	public void batchSaveSnookerRankList(List<OttSnookerRank> list);
+	
+	public void flushSnookerRankData(List<OttSnookerRank> list);
 
 	public List<OttSnookerRank> findSnookerRankList(String playerName, int first, int max);
 

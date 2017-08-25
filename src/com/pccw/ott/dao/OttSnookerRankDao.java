@@ -19,4 +19,6 @@ public interface OttSnookerRankDao {
 
 	public void deleteById(Long rankId);
 
+	public void deleteAllSnookerRank();
+
 }

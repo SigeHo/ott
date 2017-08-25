@@ -181,7 +181,7 @@ public class OttSnookerRank implements Serializable {
 		this.lastUpdatedTime = lastUpdatedTime;
 	}
 
-	@OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
+	@OneToMany(cascade = { CascadeType.ALL}, fetch = FetchType.EAGER)
 	@JoinTable(name = "ott_snooker_rank_point", joinColumns = {
 			@JoinColumn(name = "player_id", referencedColumnName = "player_id") }, inverseJoinColumns = {
 					@JoinColumn(name = "point_id", referencedColumnName = "point_id") })
@@ -192,11 +192,5 @@ public class OttSnookerRank implements Serializable {
 	public void setSnookerPointList(List<OttSnookerPoint> snookerPointList) {
 		this.snookerPointList = snookerPointList;
 	}
-
-	/*
-	 * public void addSnookerPoint(OttSnookerPoint snookerPoint) {
-	 * snookerPoint.setSnookerRank(this);
-	 * this.snookerPointList.add(snookerPoint); }
-	 */
 
 }

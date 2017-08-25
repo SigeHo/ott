@@ -14,7 +14,7 @@ import com.pccw.ott.model.OttSnookerRank;
 @Service("ottSnookerService")
 @Transactional
 public class OttSnookerServiceImpl implements OttSnookerService {
-	
+
 	@Autowired
 	private OttSnookerRankDao ottSnookerRankDao;
 
@@ -46,6 +46,16 @@ public class OttSnookerServiceImpl implements OttSnookerService {
 	@Override
 	public void deleteSnookerRankById(Long rankId) {
 		ottSnookerRankDao.deleteById(rankId);
+	}
+
+	@Override
+	public void flushSnookerRankData(List<OttSnookerRank> list) {
+		cleanUpOldData();
+		batchSaveSnookerRankList(list);
+	}
+
+	private void cleanUpOldData() {
+		ottSnookerRankDao.deleteAllSnookerRank();
 	}
 
 }
