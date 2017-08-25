@@ -87,4 +87,10 @@ public class OttSnookerRankDaoImpl extends HibernateDaoSupport implements OttSno
 				.find("from OttSnookerPoint p where p.pointId in (select rp.pointId from OttSnookerRankPoint rp where rp.playerId = ?)", playerId);
 	}
 
+	@Override
+	public void deleteById(Long rankId) {
+		OttSnookerRank rank = this.getHibernateTemplate().load(OttSnookerRank.class, rankId);
+		this.getHibernateTemplate().delete(rank);
+	}
+
 }

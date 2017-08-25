@@ -17,4 +17,6 @@ public interface OttSnookerRankDao {
 
 	public List<OttSnookerRank> findByPlayerName(String playerName, int first, int max, String sort, String order);
 
+	public void deleteById(Long rankId);
+
 }

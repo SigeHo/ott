@@ -17,5 +17,5 @@ public interface OttSnookerService {
 
 	public List<OttSnookerRank> findSnookerRankList(String playerName, int first, int max, String sort, String order);
 
-	public void deleteSnookerRankById(String deleteId);
+	public void deleteSnookerRankById(Long rankId);
 }

@@ -79,7 +79,7 @@ public class OttSnookerController {
 		Map<String, Object> returnMap = new HashMap<String, Object>();
 		String deleteId = request.getParameter("rankId");
 		if (StringUtils.isNotBlank(deleteId)) {
-			snookerService.deleteSnookerRankById(deleteId);
+			snookerService.deleteSnookerRankById(Long.valueOf(deleteId));
 		}
 		return returnMap;
 	}
@@ -93,6 +93,10 @@ public class OttSnookerController {
 		return returnMap;
 	}
 	
-	
+	@RequestMapping("/fixture/goToListFixturePage.html")
+	public ModelAndView goToListFixturePage() {
+		ModelAndView mv = new ModelAndView("snooker_fixture");
+		return mv;
+	}
 
 }

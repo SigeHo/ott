@@ -44,8 +44,8 @@ public class OttSnookerServiceImpl implements OttSnookerService {
 	}
 
 	@Override
-	public void deleteSnookerRankById(String deleteId) {
-		
+	public void deleteSnookerRankById(Long rankId) {
+		ottSnookerRankDao.deleteById(rankId);
 	}
 
 }
