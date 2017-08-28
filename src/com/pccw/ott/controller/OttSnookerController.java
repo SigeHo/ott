@@ -36,7 +36,7 @@ public class OttSnookerController {
 	private static Logger logger = LoggerFactory.getLogger(OttSnookerController.class);
 
 	@Autowired
-	private OttSnookerService snookerService;
+	private OttSnookerService ottSnookerService;
 
 	@RequestMapping("/rank/goToListRankPage.html")
 	public ModelAndView goToListRankPage(HttpServletRequest request) {
@@ -53,24 +53,38 @@ public class OttSnookerController {
 		String order = request.getParameter("order");
 		int first = (page - 1) * rows;
 		int max = rows;
-		List<OttSnookerRank> list = snookerService.findSnookerRankList(playerName, first, max, sort, order);
-		Long total = snookerService.findSnookerRankListSize(playerName);
+		List<OttSnookerRank> list = ottSnookerService.findSnookerRankList(playerName, first, max, sort, order);
+		Long total = ottSnookerService.findSnookerRankListSize(playerName);
 		returnMap.put("rows", list);
 		returnMap.put("total", total);
 		return returnMap;
 	}
 	
-	@RequestMapping("/rank/batchUpdateRank.html")
+	@RequestMapping("/rank/saveChanges.html")
 	@ResponseBody
-	public Map<String, Object> batchUpdateRank(HttpServletRequest request) throws JsonParseException, JsonMappingException, IOException {
+	public Map<String, Object> saveChanges(HttpServletRequest request) throws JsonParseException, JsonMappingException, IOException {
 		Map<String, Object> returnMap = new HashMap<String, Object>();
+		String inserted = request.getParameter("inserted");
 		String updated = request.getParameter("updated");
-		if (StringUtils.isNotBlank(updated)) {
-			ObjectMapper mapper = new ObjectMapper();
-			JavaType javaType = mapper.getTypeFactory().constructParametricType(ArrayList.class, OttSnookerRank.class); 
-			List<OttSnookerRank> list = mapper.readValue(updated, javaType);
-			
+		String deleted = request.getParameter("deleted");
+		ObjectMapper mapper = new ObjectMapper();
+		JavaType javaType = mapper.getTypeFactory().constructParametricType(ArrayList.class, OttSnookerRank.class); 
+		if (StringUtils.isNotBlank(inserted)) {
+			List<OttSnookerRank> insertedList = mapper.readValue(inserted, javaType);
+			if (insertedList.size() > 0)
+				ottSnookerService.batchSaveSnookerRankList(insertedList);
 		}
+		if (StringUtils.isNotBlank(updated)) {
+			List<OttSnookerRank> updatedList = mapper.readValue(updated, javaType);
+			if (updatedList.size() > 0)
+				ottSnookerService.batchUpdateSnookerRankList(updatedList);
+		}
+		if (StringUtils.isNotBlank(deleted)) {
+			List<OttSnookerRank> deletedList = mapper.readValue(deleted, javaType);
+			if (deletedList.size() > 0)
+				ottSnookerService.batchDeleteSnookerRankList(deletedList);
+		}
+		returnMap.put("success", true);
 		return returnMap;
 	}
 	
@@ -80,7 +94,7 @@ public class OttSnookerController {
 		Map<String, Object> returnMap = new HashMap<String, Object>();
 		String deleteId = request.getParameter("rankId");
 		if (StringUtils.isNotBlank(deleteId)) {
-			snookerService.deleteSnookerRankById(Long.valueOf(deleteId));
+			ottSnookerService.deleteSnookerRankById(Long.valueOf(deleteId));
 		}
 		return returnMap;
 	}
@@ -89,7 +103,7 @@ public class OttSnookerController {
 	@ResponseBody
 	public Map<String, Object> listPoint(HttpServletRequest request, @RequestParam String playerId) {
 		Map<String, Object> returnMap = new HashMap<String, Object>();
-		List<OttSnookerPoint> list = snookerService.findSnookerPointList(playerId);
+		List<OttSnookerPoint> list = ottSnookerService.findSnookerPointList(playerId);
 		returnMap.put("rows", list);
 		return returnMap;
 	}
@@ -100,7 +114,7 @@ public class OttSnookerController {
 //	 	String response = HttpClientUtil.readFile("e:/desktop/json.txt");
 	 	if (StringUtils.isNotBlank(response)) {
 		 	List<OttSnookerRank> list = JsonUtil.parseJson2SnookerRank(response);
-		 	snookerService.batchSaveSnookerRankList(list);
+		 	ottSnookerService.batchSaveSnookerRankList(list);
 	 	} else {
 	 		logger.error("OttSchedualTask.retrieveSnookerRankData() failed.");
 	 	}
@@ -108,7 +122,7 @@ public class OttSnookerController {
 	
 	@RequestMapping("/rank/cleanUp.html")
 	public void cleanUp() {
-		snookerService.flushSnookerRankData(null);
+		ottSnookerService.flushSnookerRankData(null);
 	}
 	
 	@RequestMapping("/fixture/goToListFixturePage.html")

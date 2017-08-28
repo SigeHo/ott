@@ -21,4 +21,8 @@ public interface OttSnookerRankDao {
 
 	public void deleteAllSnookerRank();
 
+	public void batchUpdateSnookerRankList(List<OttSnookerRank> updatedList);
+
+	public void batchDeleteSnookerRankList(List<OttSnookerRank> deletedList);
+
 }

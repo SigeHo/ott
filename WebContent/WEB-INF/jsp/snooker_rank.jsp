@@ -58,7 +58,21 @@ div.centent span {
 			}
 		} 
 	}
-
+	
+	function onEndEdit(index, row){
+		if ($("#rank_dg").datagrid("getChanges").length) {
+			$("#saveBtn").linkbutton("enable");
+		} else {
+			$("#saveBtn").linkbutton("disable");
+		}
+	}
+	
+	function onLoadSuccess(data) {
+		if ($("#rank_dg").datagrid("getChanges").length) {
+			$("#rank_dg").datagrid("rejectChanges");		
+		}
+		$("#saveBtn").linkbutton("disable");
+	}
 
 	function dateFormatter(value, row, index) {
 		if (value != "") {
@@ -94,6 +108,7 @@ div.centent span {
 	}
 
 	function save() {
+		console.log(editIndex);
 		if ($("#rank_dg").datagrid("getChanges").length) {
 			var inserted = $("#rank_dg").datagrid('getChanges', 'inserted');
 			var updated = $("#rank_dg").datagrid('getChanges', 'updated');
@@ -108,10 +123,12 @@ div.centent span {
 			if(deleted.length) {
 				effectRow['deleted'] = JSON.stringify(deleted);
 			}
-			$.post("${ctx}/snooker/rank/batchUpdateRank.html", effectRow,
+			$("#rank_dg").datagrid("acceptChanges");
+			$.post("${ctx}/snooker/rank/saveChanges.html", effectRow,
 					function(response) {
 						if (response.success) {
 							$("#saveBtn").linkbutton('disable');
+							$("#rank_dg").datagrid("reload");
 							$.messager.alert("", "Save changes successfully .", "info");
 						}
 					}, 'JSON').error(function() {
@@ -124,6 +141,7 @@ div.centent span {
 
 	function reset() {
 		$("#rank_dg").datagrid("rejectChanges");
+		$("#saveBtn").linkbutton("disable");
 	}
 
 	function addRank() {
@@ -168,7 +186,9 @@ div.centent span {
 				pageSize: 10,
 				url: '${ctx}/snooker/rank/listRank.html',
 				singleSelect: true,
-				onClickCell: onClickCell
+				onClickCell: onClickCell,
+				onEndEdit: onEndEdit,
+				onLoadSuccess: onLoadSuccess
 				">
 		<thead>
 			<tr>

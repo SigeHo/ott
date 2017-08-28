@@ -120,7 +120,7 @@ CREATE TABLE ott.ott_snooker_rank (
 
 CREATE TABLE IF NOT EXISTS ott.ott_snooker_rank (
 	rank_id INT AUTO_INCREMENT PRIMARY KEY, 
-	player_id INT,
+	player_id INT UNIQUE,
 	name_cn VARCHAR(50),
 	name_en VARCHAR(50),
 	name_tr VARCHAR(50),

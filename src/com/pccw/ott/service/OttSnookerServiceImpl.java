@@ -58,4 +58,14 @@ public class OttSnookerServiceImpl implements OttSnookerService {
 		ottSnookerRankDao.deleteAllSnookerRank();
 	}
 
+	@Override
+	public void batchUpdateSnookerRankList(List<OttSnookerRank> updatedList) {
+		ottSnookerRankDao.batchUpdateSnookerRankList(updatedList);
+	}
+
+	@Override
+	public void batchDeleteSnookerRankList(List<OttSnookerRank> deletedList) {
+		ottSnookerRankDao.batchDeleteSnookerRankList(deletedList);		
+	}
+
 }

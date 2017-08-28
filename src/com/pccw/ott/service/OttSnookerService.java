@@ -20,4 +20,8 @@ public interface OttSnookerService {
 	public List<OttSnookerRank> findSnookerRankList(String playerName, int first, int max, String sort, String order);
 
 	public void deleteSnookerRankById(Long rankId);
+
+	public void batchUpdateSnookerRankList(List<OttSnookerRank> updatedList);
+
+	public void batchDeleteSnookerRankList(List<OttSnookerRank> deletedList);
 }

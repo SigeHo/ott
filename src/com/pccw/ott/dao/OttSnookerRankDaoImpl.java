@@ -5,9 +5,6 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Restrictions;
 import org.hibernate.query.Query;
 import org.springframework.orm.hibernate5.HibernateCallback;
 import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
@@ -26,6 +23,51 @@ public class OttSnookerRankDaoImpl extends HibernateDaoSupport implements OttSno
 			public Object doInHibernate(Session session) throws HibernateException {
 				for (OttSnookerRank ottSnookerRank : list) {
 					session.save(ottSnookerRank);
+				}
+				session.flush();
+				session.clear();
+				return null;
+			}
+		});
+	}
+	
+	@Override
+	public void batchUpdateSnookerRankList(List<OttSnookerRank> updatedList) {
+		this.getHibernateTemplate().execute(new HibernateCallback<Object>() {
+			@Override
+			public Object doInHibernate(Session session) throws HibernateException {
+				for (OttSnookerRank ottSnookerRank : updatedList) {
+					OttSnookerRank rank = session.load(OttSnookerRank.class, ottSnookerRank.getRankId());
+					rank.setRankTitle(ottSnookerRank.getRankTitle());
+					rank.setRankYear(ottSnookerRank.getRankYear());
+					rank.setPlayerId(ottSnookerRank.getPlayerId());
+					rank.setNameCn(ottSnookerRank.getNameCn());
+					rank.setNameEn(ottSnookerRank.getNameEn());
+					rank.setNameTr(ottSnookerRank.getNameTr());
+					rank.setNationality(ottSnookerRank.getNationality());
+					rank.setRank(ottSnookerRank.getRank());
+					rank.setPoint1(ottSnookerRank.getPoint1());
+					rank.setPoint2(ottSnookerRank.getPoint2());
+					rank.setPoint3(ottSnookerRank.getPoint3());
+					rank.setPtcPoint(ottSnookerRank.getPtcPoint());
+					rank.setTotalPoint(ottSnookerRank.getTotalPoint());
+					session.update(rank);
+				}
+				session.flush();
+				session.clear();
+				return null;
+			}
+		});
+	}
+
+	@Override
+	public void batchDeleteSnookerRankList(List<OttSnookerRank> deletedList) {
+		this.getHibernateTemplate().execute(new HibernateCallback<Object>() {
+			@Override
+			public Object doInHibernate(Session session) throws HibernateException {
+				for (OttSnookerRank ottSnookerRank : deletedList) {
+					OttSnookerRank rank = session.load(OttSnookerRank.class, ottSnookerRank.getRankId());
+					session.delete(rank);
 				}
 				session.flush();
 				session.clear();

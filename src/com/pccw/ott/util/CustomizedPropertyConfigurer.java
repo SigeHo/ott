@@ -3,8 +3,8 @@ package com.pccw.ott.util;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import javax.servlet.ServletContext;
 

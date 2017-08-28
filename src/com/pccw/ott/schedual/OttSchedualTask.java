@@ -22,8 +22,8 @@ public class OttSchedualTask {
 	
 	 public void retrieveSnookerRankData(){  
 		 	logger.info("############ OttSchedualTask.retrieveSnookerRankData() ############");
-		 	String response = HttpClientUtil.getInstance().sendHttpPost(CustomizedPropertyConfigurer.getContextProperty("api.snooker_rank"));
-//		 	String response = HttpClientUtil.readFile("e:/desktop/json.txt");
+//		 	String response = HttpClientUtil.getInstance().sendHttpPost(CustomizedPropertyConfigurer.getContextProperty("api.snooker_rank"));
+		 	String response = HttpClientUtil.readFile("e:/desktop/json.txt");
 		 	if (StringUtils.isNotBlank(response)) {
 			 	List<OttSnookerRank> list = JsonUtil.parseJson2SnookerRank(response);
 			 	ottSnookerService.flushSnookerRankData(list);

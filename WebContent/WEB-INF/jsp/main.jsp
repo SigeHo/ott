@@ -189,16 +189,16 @@ ul li {
 				    </ul>
 			</tr>
 			
-           	<tr>
-				<td class="base_menu">
-					<c:if test="${hasAuditTrailPermission eq 'Y'}">
-			       	<span style="font-weight:bold;color:#06c">Audit History Management</span>
-					<ul>
-			   			<li><a href="javascript:void(0)" onclick="addTab('Audit trail', '${ctx}/audit_trail/goToListAuditTrailPage.html', ' ');return false;">Audit trail</a><br/></li>
-				    </ul>
-				    </c:if>				    
-				</td>
-			</tr>
+<!--            	<tr> -->
+<!-- 				<td class="base_menu"> -->
+<%-- 					<c:if test="${hasAuditTrailPermission eq 'Y'}"> --%>
+<!-- 			       	<span style="font-weight:bold;color:#06c">Audit History Management</span> -->
+<!-- 					<ul> -->
+<%-- 			   			<li><a href="javascript:void(0)" onclick="addTab('Audit trail', '${ctx}/audit_trail/goToListAuditTrailPage.html', ' ');return false;">Audit trail</a><br/></li> --%>
+<!-- 				    </ul> -->
+<%-- 				    </c:if>				     --%>
+<!-- 				</td> -->
+<!-- 			</tr> -->
 			
 			<tr>
             <c:if test="${!empty sessionScope.loginUser}">
