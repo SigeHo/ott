@@ -88,17 +88,6 @@ public class OttSnookerController {
 		return returnMap;
 	}
 	
-	@RequestMapping("/rank/deleteRank.html")
-	@ResponseBody
-	public Map<String, Object> deleteRank(HttpServletRequest request) {
-		Map<String, Object> returnMap = new HashMap<String, Object>();
-		String deleteId = request.getParameter("rankId");
-		if (StringUtils.isNotBlank(deleteId)) {
-			ottSnookerService.deleteSnookerRankById(Long.valueOf(deleteId));
-		}
-		return returnMap;
-	}
-
 	@RequestMapping("/rank/listPoint.html")
 	@ResponseBody
 	public Map<String, Object> listPoint(HttpServletRequest request, @RequestParam String playerId) {
@@ -108,22 +97,7 @@ public class OttSnookerController {
 		return returnMap;
 	}
 	
-	@RequestMapping("/rank/save.html")
-	public void save() {
-		String response = HttpClientUtil.getInstance().sendHttpPost(CustomizedPropertyConfigurer.getContextProperty("api.snooker_rank"));
-//	 	String response = HttpClientUtil.readFile("e:/desktop/json.txt");
-	 	if (StringUtils.isNotBlank(response)) {
-		 	List<OttSnookerRank> list = JsonUtil.parseJson2SnookerRank(response);
-		 	ottSnookerService.batchSaveSnookerRankList(list);
-	 	} else {
-	 		logger.error("OttSchedualTask.retrieveSnookerRankData() failed.");
-	 	}
-	}
-	
-	@RequestMapping("/rank/cleanUp.html")
-	public void cleanUp() {
-		ottSnookerService.flushSnookerRankData(null);
-	}
+	// ------------------ Snooker Fixture ------------------
 	
 	@RequestMapping("/fixture/goToListFixturePage.html")
 	public ModelAndView goToListFixturePage() {

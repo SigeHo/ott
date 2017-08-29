@@ -23,9 +23,6 @@ div.centent span {
 </style>
 
 <script type="text/javascript">
-	$(document).ready(function() {
-		//$('#rank_dg').datagrid().datagrid('enableCellEditing');
-	});
 	var editIndex = undefined;
 	
 	function endEditing() {
@@ -60,11 +57,7 @@ div.centent span {
 	}
 	
 	function onEndEdit(index, row){
-		if ($("#rank_dg").datagrid("getChanges").length) {
-			$("#saveBtn").linkbutton("enable");
-		} else {
-			$("#saveBtn").linkbutton("disable");
-		}
+		toggleSaveBtn();
 	}
 	
 	function onLoadSuccess(data) {
@@ -108,7 +101,8 @@ div.centent span {
 	}
 
 	function save() {
-		console.log(editIndex);
+		$("#rank_dg").datagrid("loading");
+		$("#rank_dg").datagrid("endEdit", editIndex);
 		if ($("#rank_dg").datagrid("getChanges").length) {
 			var inserted = $("#rank_dg").datagrid('getChanges', 'inserted');
 			var updated = $("#rank_dg").datagrid('getChanges', 'updated');
@@ -123,19 +117,21 @@ div.centent span {
 			if(deleted.length) {
 				effectRow['deleted'] = JSON.stringify(deleted);
 			}
-			$("#rank_dg").datagrid("acceptChanges");
 			$.post("${ctx}/snooker/rank/saveChanges.html", effectRow,
 					function(response) {
 						if (response.success) {
 							$("#saveBtn").linkbutton('disable');
 							$("#rank_dg").datagrid("reload");
 							$.messager.alert("", "Save changes successfully .", "info");
+							$("#rank_dg").datagrid("loaded");
 						}
 					}, 'JSON').error(function() {
 				$.messager.alert("", "Failed to save the changes.", "error");
+				$("#rank_dg").datagrid("loaded");
 			});
 		} else {
 			$.messager.alert("", "Nothing is changed.", "warning");
+			$("#rank_dg").datagrid("loaded");
 		}
 	}
 
@@ -151,30 +147,27 @@ div.centent span {
 			});
 			editIndex = $('#rank_dg').datagrid('getRows').length - 1;
 			$('#rank_dg').datagrid('selectRow', editIndex).datagrid('beginEdit', editIndex);
+			toggleSaveBtn();
 		}
 	}
-
+	
 	function deleteRank() {
-		/* var row = $("#rank_dg").datagrid("getSelected");
-		var rowIndex = $("#rank_dg").datagrid("getRowIndex", row);
-		if (row) {
-			$.messager.confirm('Confirm', 'Are you sure to delete this record?', function(r) {
-				if (r) {
-					$.post("${ctx}/snooker/rank/deleteRank.html", {rankId : row.rankId}, function(response) {
-						$('#rank_dg').datagrid("deleteRow", rowIndex);
-					}, 'JSON').error(function() {
-						$.messager.alert("", "Failed to delete this record.", "error");  
-					});
-				}
-			});
-		} else {
-			$.messager.alert("", "No record is selected.", "warning");
-		} */ 
 		if (editIndex == undefined) {
 			return
 		}
 		$('#rank_dg').datagrid('cancelEdit', editIndex).datagrid('deleteRow', editIndex);
 		editIndex = undefined;
+		toggleSaveBtn();
+	}
+	
+	function toggleSaveBtn() {
+		debugger;
+		var changes = $("#rank_dg").datagrid("getChanges");
+		if ($("#rank_dg").datagrid("getChanges").length) {
+			$("#saveBtn").linkbutton("enable");
+		} else {
+			$("#saveBtn").linkbutton("disable");
+		}
 	}
 </script>
 </head>
