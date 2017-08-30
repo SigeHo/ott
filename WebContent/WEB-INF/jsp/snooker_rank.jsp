@@ -20,6 +20,10 @@ div.centent span {
 	font-size: 12px;
 	color: white;
 }
+
+tr.changed-row {
+	background-color: yellow;
+}
 </style>
 
 <script type="text/javascript">
@@ -36,7 +40,8 @@ div.centent span {
 		}
 	}
 
-	function onClickCell(index,field,value) {
+	function onDblClickCell(index,field,value) {
+		$("#saveBtn").linkbutton("enable");
 		if (editIndex != index) {
 			if (endEditing()) {
 				$('#rank_dg').datagrid('selectRow', index).datagrid('beginEdit', index);
@@ -56,14 +61,14 @@ div.centent span {
 		} 
 	}
 	
-	function onEndEdit(index, row){
+	function onEndEdit(index, row, changes){
 		toggleSaveBtn();
+		var rankTable = $($(".datagrid-btable")[0]);
+		var changedRow = rankTable.find("tr")[index];
+		$(changedRow).addClass("changed-row");
 	}
 	
 	function onLoadSuccess(data) {
-		if ($("#rank_dg").datagrid("getChanges").length) {
-			$("#rank_dg").datagrid("rejectChanges");		
-		}
 		$("#saveBtn").linkbutton("disable");
 	}
 
@@ -101,7 +106,6 @@ div.centent span {
 	}
 
 	function save() {
-		$("#rank_dg").datagrid("loading");
 		$("#rank_dg").datagrid("endEdit", editIndex);
 		if ($("#rank_dg").datagrid("getChanges").length) {
 			var inserted = $("#rank_dg").datagrid('getChanges', 'inserted');
@@ -118,20 +122,22 @@ div.centent span {
 				effectRow['deleted'] = JSON.stringify(deleted);
 			}
 			$.post("${ctx}/snooker/rank/saveChanges.html", effectRow,
-					function(response) {
-						if (response.success) {
-							$("#saveBtn").linkbutton('disable');
+				function(response) {
+					if (response.success) {
+						$("#saveBtn").linkbutton('disable');
+						$.messager.alert("", "Save changes successfully .", "info", function() {
 							$("#rank_dg").datagrid("reload");
-							$.messager.alert("", "Save changes successfully .", "info");
-							$("#rank_dg").datagrid("loaded");
-						}
-					}, 'JSON').error(function() {
+						});
+					} else if (response.msg) {
+						$.messager.alert("", response.msg, "error");
+					} else {
+						$.messager.alert("", "Failed to save the changes.", "error");
+					}
+				}, 'JSON').error(function() {
 				$.messager.alert("", "Failed to save the changes.", "error");
-				$("#rank_dg").datagrid("loaded");
 			});
 		} else {
 			$.messager.alert("", "Nothing is changed.", "warning");
-			$("#rank_dg").datagrid("loaded");
 		}
 	}
 
@@ -161,8 +167,6 @@ div.centent span {
 	}
 	
 	function toggleSaveBtn() {
-		debugger;
-		var changes = $("#rank_dg").datagrid("getChanges");
 		if ($("#rank_dg").datagrid("getChanges").length) {
 			$("#saveBtn").linkbutton("enable");
 		} else {
@@ -179,30 +183,30 @@ div.centent span {
 				pageSize: 10,
 				url: '${ctx}/snooker/rank/listRank.html',
 				singleSelect: true,
-				onClickCell: onClickCell,
-				onEndEdit: onEndEdit,
+				onDblClickCell: onDblClickCell,
+				onAfterEdit: onEndEdit,
 				onLoadSuccess: onLoadSuccess
 				">
 		<thead>
 			<tr>
-				<th field="rankId" rowspan="2" editor="text" hidden="true">Rank Id</th>
-				<th field="rankTitle" rowspan="2" editor="text">Rank Title</th>
-				<th field="rankYear" rowspan="2" editor="text">Season</th>
-				<th field="playerId" rowspan="2" editor="numberbox" sortable="true">Player ID</th>
-				<th field="nameCn" rowspan="2" editor="text">Player Name CN</th>
-				<th field="nameEn" rowspan="2" editor="text" sortable="true">Player Name EN</th>
-				<th field="nameTr" rowspan="2" editor="text">Player Name TR</th>
-				<th field="nationality" rowspan="2" editor="text">Nationality</th>
-				<th field="rank" rowspan="2" editor="numberbox" sortable="true">Rank</th>
+				<th field="rankId" rowspan="2" editor="text" hidden="true" width="150px">Rank Id</th>
+				<th field="rankTitle" rowspan="2" editor="text" width="150px">Rank Title</th>
+				<th field="rankYear" rowspan="2" editor="text" width="100px">Season</th>
+				<th field="playerId" rowspan="2" editor="numberbox" sortable="true" width="100px">Player ID</th>
+				<th field="nameCn" rowspan="2" editor="text" width="150px">Player Name CN</th>
+				<th field="nameEn" rowspan="2" editor="text" sortable="true" width="150px">Player Name EN</th>
+				<th field="nameTr" rowspan="2" editor="text" width="150px">Player Name TR</th>
+				<th field="nationality" rowspan="2" editor="text" width="150px">Nationality</th>
+				<th field="rank" rowspan="2" editor="numberbox" sortable="true" width="100px">Rank</th>
 				<th colspan="3">Point</th>
-				<th field="ptcPoint" rowspan="2" editor="numberbox" >PTC Point</th>
-				<th field="totalPoint" rowspan="2" editor="numberbox" >Total Point</th>
-				<th field="lastUpdatedTime" rowspan="2" formatter="dateFormatter">Last Updated Time</th>
+				<th field="ptcPoint" rowspan="2" editor="numberbox" width="100px">PTC Point</th>
+				<th field="totalPoint" rowspan="2" editor="numberbox" width="100px">Total Point</th>
+				<th field="lastUpdatedTime" rowspan="2" formatter="dateFormatter" width="150px">Last Updated Time</th>
 			</tr>
 			<tr>
-				<th field="point1" editor="numberbox">Season 1</th>
-				<th field="point2" editor="numberbox">Season 2</th>
-				<th field="point3" editor="numberbox">Season 3</th>
+				<th field="point1" editor="numberbox" width="100px">Season 1</th>
+				<th field="point2" editor="numberbox" width="100px">Season 2</th>
+				<th field="point3" editor="numberbox" width="100px">Season 3</th>
 			</tr>
 		</thead>
 	</table>
@@ -217,7 +221,7 @@ div.centent span {
 				<th field="leagueId" >League ID</th>
 				<th field="leagueNameCn" >League Name CN</th>
 				<th field="leagueNameEn" >League Name EN</th>
-				<th field="leagueNameTR" >League Name TR</th>
+				<th field="leagueNameTr" >League Name TR</th>
 				<th field="sn" >SN</th>
 				<th field="lastUpdatedTime" formatter="dateFormatter">Last Updated Time</th>
 			</tr>
@@ -245,7 +249,7 @@ div.centent span {
 	<div id="point_toolbar" style="padding:5px;height:auto;margin-bottom:5px">
 		<table width="100%">
 			<tr>
-				<a href="#" class="easyui-linkbutton" plain="false" onclick="loadData()">Load Data</a>
+				<a href="#" class="easyui-linkbutton" iconCls="icon-reload" plain="true" onclick="loadData()">Load Data</a>
 			</tr>
 		</table>
 	</div>

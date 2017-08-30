@@ -17,11 +17,12 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
-@Table(name = "ott_snooker_rank")
+@Table(name = "ott_snooker_rank", uniqueConstraints = {@UniqueConstraint(columnNames = {"player_id"})})
 public class OttSnookerRank implements Serializable {
 
 	private static final long serialVersionUID = -4292442577103526145L;

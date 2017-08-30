@@ -12,6 +12,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,9 +26,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pccw.ott.model.OttSnookerPoint;
 import com.pccw.ott.model.OttSnookerRank;
 import com.pccw.ott.service.OttSnookerService;
-import com.pccw.ott.util.CustomizedPropertyConfigurer;
-import com.pccw.ott.util.HttpClientUtil;
-import com.pccw.ott.util.JsonUtil;
 
 @Controller
 @RequestMapping("/snooker")
@@ -59,35 +57,47 @@ public class OttSnookerController {
 		returnMap.put("total", total);
 		return returnMap;
 	}
-	
+
 	@RequestMapping("/rank/saveChanges.html")
 	@ResponseBody
-	public Map<String, Object> saveChanges(HttpServletRequest request) throws JsonParseException, JsonMappingException, IOException {
+	public Map<String, Object> saveChanges(HttpServletRequest request) {
 		Map<String, Object> returnMap = new HashMap<String, Object>();
 		String inserted = request.getParameter("inserted");
 		String updated = request.getParameter("updated");
 		String deleted = request.getParameter("deleted");
 		ObjectMapper mapper = new ObjectMapper();
-		JavaType javaType = mapper.getTypeFactory().constructParametricType(ArrayList.class, OttSnookerRank.class); 
-		if (StringUtils.isNotBlank(inserted)) {
-			List<OttSnookerRank> insertedList = mapper.readValue(inserted, javaType);
-			if (insertedList.size() > 0)
-				ottSnookerService.batchSaveSnookerRankList(insertedList);
+		JavaType javaType = mapper.getTypeFactory().constructParametricType(ArrayList.class, OttSnookerRank.class);
+		try {
+			if (StringUtils.isNotBlank(inserted)) {
+				List<OttSnookerRank> insertedList = mapper.readValue(inserted, javaType);
+				if (insertedList.size() > 0)
+					ottSnookerService.batchSaveSnookerRankList(insertedList);
+			}
+			if (StringUtils.isNotBlank(updated)) {
+				List<OttSnookerRank> updatedList = mapper.readValue(updated, javaType);
+				if (updatedList.size() > 0)
+					ottSnookerService.batchUpdateSnookerRankList(updatedList);
+			}
+			if (StringUtils.isNotBlank(deleted)) {
+				List<OttSnookerRank> deletedList = mapper.readValue(deleted, javaType);
+				if (deletedList.size() > 0)
+					ottSnookerService.batchDeleteSnookerRankList(deletedList);
+			}
+			returnMap.put("success", true);
+		} catch (DataIntegrityViolationException e) {
+			logger.error(e.toString());
+			returnMap.put("success", false);
+			returnMap.put("msg", "Failed to save changes. Duplicate player id is not allowed.");
+		} catch (JsonParseException | JsonMappingException e) {
+			logger.error(e.toString());
+			returnMap.put("success", false);
+		} catch (IOException e) {
+			logger.error(e.toString());
+			returnMap.put("success", false);
 		}
-		if (StringUtils.isNotBlank(updated)) {
-			List<OttSnookerRank> updatedList = mapper.readValue(updated, javaType);
-			if (updatedList.size() > 0)
-				ottSnookerService.batchUpdateSnookerRankList(updatedList);
-		}
-		if (StringUtils.isNotBlank(deleted)) {
-			List<OttSnookerRank> deletedList = mapper.readValue(deleted, javaType);
-			if (deletedList.size() > 0)
-				ottSnookerService.batchDeleteSnookerRankList(deletedList);
-		}
-		returnMap.put("success", true);
 		return returnMap;
 	}
-	
+
 	@RequestMapping("/rank/listPoint.html")
 	@ResponseBody
 	public Map<String, Object> listPoint(HttpServletRequest request, @RequestParam String playerId) {
@@ -96,9 +106,9 @@ public class OttSnookerController {
 		returnMap.put("rows", list);
 		return returnMap;
 	}
-	
+
 	// ------------------ Snooker Fixture ------------------
-	
+
 	@RequestMapping("/fixture/goToListFixturePage.html")
 	public ModelAndView goToListFixturePage() {
 		ModelAndView mv = new ModelAndView("snooker_fixture");
