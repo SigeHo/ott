@@ -14,4 +14,6 @@ public interface OttPermissionDao {
 	public void updatePermission(OttPermission permission);
 
 	public void deletePermissionById(Long permissionId);
+
+	public List<OttPermission> findAllPermission();
 }

@@ -61,4 +61,10 @@ public class OttPermissionDaoImpl extends HibernateDaoSupport implements OttPerm
 		this.getHibernateTemplate().delete(originalPermission);
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<OttPermission> findAllPermission() {
+		return (List<OttPermission>) this.getHibernateTemplate().find("from OttPermission");
+	}
+
 }

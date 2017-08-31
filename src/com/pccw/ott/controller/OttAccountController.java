@@ -30,9 +30,9 @@ import com.pccw.ott.util.MD5Util;
 
 @Controller
 @RequestMapping("/accountmanagement")
-public class AccountController {
+public class OttAccountController {
 
-	private static Logger logger = LoggerFactory.getLogger(AccountController.class);
+	private static Logger logger = LoggerFactory.getLogger(OttAccountController.class);
 
 	@Autowired
 	private OttUserService ottUserService;
@@ -235,7 +235,7 @@ public class AccountController {
 
 	@RequestMapping("/role/addRole.html")
 	@ResponseBody
-	public Map<String, Object> addRole(OttRole role, HttpServletRequest request) throws Exception {
+	public Map<String, Object> addRole(OttRole role, @RequestParam String permissions, HttpServletRequest request) throws Exception {
 		Map<String, Object> map = new HashMap<String, Object>();
 		try {
 			OttUser loginUser = (OttUser) request.getSession().getAttribute("loginUser");
@@ -243,7 +243,6 @@ public class AccountController {
 				map.put("success", false);
 				map.put("msg", "Add role failed!");
 			} else {
-				// save url role
 				if (StringUtils.isBlank(role.getRoleName())) {
 					map.put("success", false);
 					map.put("msg", "Add failed! Please complete the form.");
@@ -331,6 +330,13 @@ public class AccountController {
 			map.put("msg", "Delete failed! Please try again.");
 		}
 		return map;
+	}
+	
+	@RequestMapping("/role/listAllPermission.html")
+	@ResponseBody
+	public List<OttPermission> listAllPermission() {
+		List<OttPermission> list = ottPermissionService.findAllPermission();
+		return list;
 	}
 
 	@RequestMapping("/role/listRolePermissions.html")

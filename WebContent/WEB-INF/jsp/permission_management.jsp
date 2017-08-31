@@ -60,8 +60,6 @@
 					showUpdatePermission(rowIndex, rowData);
 				}
 			}});
-			$('#dg').datagrid('options').url = "${ctx}/accountmanagement/permission/listPermission.html";
-			$('#dg').datagrid('reload');
 		});	 
 	    
 	    function showUpdatePermission2() {
@@ -270,9 +268,9 @@
 			var permissionNameForSearch = $('#permissionNameForSearch').val();
 			permissionNameForSearch = permissionNameForSearch.Trim();
 			$('#permissionNameForSearch').val(permissionNameForSearch);
-			url = '${ctx}/accountmanagement/permission/listPermission.html?permissionNameForSearch='+permissionNameForSearch;
-			$('#dg').datagrid('options').url = url;
-			$('#dg').datagrid('reload');
+			$('#dg').datagrid('load', {
+				permissionNameForSearch : permissionNameForSearch
+			});
 		}
 		
 	    function clearForm() {
@@ -292,6 +290,7 @@
 			toolbar="#toolbar" pagination="true"
 			pageSize="10" pageList="[10,20,30,40]"
 			rownumbers="false" fitColumns="true" 
+			url="${ctx}/accountmanagement/permission/listPermission.html"
 			singleSelect="true">
 		<thead>
 			<tr>
@@ -303,30 +302,29 @@
 	</table>	
 
 	<div id="toolbar" style="padding:5px;height:auto;margin-bottom:5px">
-	<table width="100%">
-		<tr>
-			<td>
-				<c:if test="${canAddPermission eq 'Y'}">
-					<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="showAddPermission()">Add Permission</a>
-					</c:if>
-					<c:if test="${canUpdatePermission eq 'Y'}">
-					<a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="showUpdatePermission2()">Edit Permission</a>
-					</c:if>
-					<c:if test="${canDeletePermission eq 'Y'}">
-					<a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="deletePermission()">Delete Permission</a>
-					</c:if>
-			</td>
-			<td align="right">
-				<span style="padding-left:20px">Permission name: <input type="text" id="permissionNameForSearch" name="permissionNameForSearch" style="width:150px"/></span>
-						<input type="hidden" id="permissionTypeForSearch" name="permissionTypeForSearch" value="URL">
-						<a href="#" class="easyui-linkbutton" iconCls="icon-search" plain="true" onclick="doSearch()">Search</a>
-						<a href="#" class="easyui-linkbutton" iconCls="icon-reload" plain="true" onclick="clearSearch()" style="margin-left: 5px;">Reset</a>
-			</td>
-		</tr>
-	</table>
-		
-
+		<table width="100%">
+			<tr>
+				<td>
+					<c:if test="${canAddPermission eq 'Y'}">
+						<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="showAddPermission()">Add Permission</a>
+						</c:if>
+						<c:if test="${canUpdatePermission eq 'Y'}">
+						<a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="showUpdatePermission2()">Edit Permission</a>
+						</c:if>
+						<c:if test="${canDeletePermission eq 'Y'}">
+						<a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="deletePermission()">Delete Permission</a>
+						</c:if>
+				</td>
+				<td align="right">
+					<span style="padding-left:20px">Permission name: <input type="text" id="permissionNameForSearch" name="permissionNameForSearch" style="width:150px"/></span>
+							<input type="hidden" id="permissionTypeForSearch" name="permissionTypeForSearch" value="URL">
+							<a href="#" class="easyui-linkbutton" iconCls="icon-search" plain="true" onclick="doSearch()">Search</a>
+							<a href="#" class="easyui-linkbutton" iconCls="icon-reload" plain="true" onclick="clearSearch()" style="margin-left: 5px;">Reset</a>
+				</td>
+			</tr>
+		</table>
 	</div>
+	
 	<div id="permission_add_update_div" style="padding:15px 10px; display:none" >
 		<form id="fm" method="post">
 			<input id="permissionId" name="permissionId" type="hidden" />

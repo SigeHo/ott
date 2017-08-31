@@ -27,7 +27,7 @@ public class OttRoleDaoImpl extends HibernateDaoSupport implements OttRoleDao {
 	@SuppressWarnings("unchecked")
 	@Override
 	public OttRole queryByRoleName(String roleName) {
-		List<OttRole> list = (List<OttRole>) this.getHibernateTemplate().find("from OttRole r where r = ?", roleName);
+		List<OttRole> list = (List<OttRole>) this.getHibernateTemplate().find("from OttRole r where r.roleName = ?", roleName);
 		if (list.size() == 1) {
 			return list.get(0);
 		} else {
@@ -42,7 +42,7 @@ public class OttRoleDaoImpl extends HibernateDaoSupport implements OttRoleDao {
 
 	@Override
 	public void updateRole(OttRole role) {
-		OttRole originalRole = this.getHibernateTemplate().get(OttRole.class, role.getRoleId());
+		OttRole originalRole = this.getHibernateTemplate().load(OttRole.class, role.getRoleId());
 		originalRole.setRoleName(role.getRoleName());
 		originalRole.setRoleDesc(role.getRoleDesc());
 		this.getHibernateTemplate().update(originalRole);
@@ -50,7 +50,7 @@ public class OttRoleDaoImpl extends HibernateDaoSupport implements OttRoleDao {
 
 	@Override
 	public void deleteRole(Long roleId) {
-		OttRole role = this.getHibernateTemplate().get(OttRole.class, roleId);
+		OttRole role = this.getHibernateTemplate().load(OttRole.class, roleId);
 		this.getHibernateTemplate().delete(role);
 	}
 

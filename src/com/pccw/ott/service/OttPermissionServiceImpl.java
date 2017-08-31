@@ -41,4 +41,9 @@ public class OttPermissionServiceImpl implements OttPermissionService {
 		ottPermissionDao.deletePermissionById(permissionId);
 	}
 
+	@Override
+	public List<OttPermission> findAllPermission() {
+		return ottPermissionDao.findAllPermission();
+	}
+
 }

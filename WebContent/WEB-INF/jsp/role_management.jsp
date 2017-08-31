@@ -25,10 +25,12 @@
 		var isUpdateOrAdd = true;
 		var isFirstTime = true;
 		var rowIndexTag = -1;
+		var isInitPermissionList = false;
 		
 		function doClose() {
 			isUpdateOrAdd = true;
 			rowIndexTag = -1;
+			$("#permissionDl").datalist("clearSelections");
 			$('#role_add_update_div').css("display", "none");// hide input form
 		}
 		
@@ -105,6 +107,7 @@
 				$('#addSpan').css("display", "inline");
 				$('#updateSpan').css("display", "none");
 				url = '${ctx}/accountmanagement/role/addRole.html';
+				initPermissionList();
 				return;
 			}
 			if(!isUpdateOrAdd) {// haven't saved data
@@ -136,6 +139,13 @@
 		}
 		
 		function doAddRole() {
+			debugger;
+			var rows = $("#permissionDl").datalist("getSelections");
+			var permissions = [];
+			for (var i=0; i<rows.length; i++) {
+				permissions.push(rows[i].permissionId);
+			}
+			$("#permissions").val(permissions);
 			$('#fm').form('submit',{
 				url: url,
 				onSubmit: function(){
@@ -202,13 +212,9 @@
 					if (result.success){
 						isUpdateOrAdd = true;
 						$.messager.alert('',result.msg);						
-						//$('#dg').datagrid('reload'); // reload the role data
-						$('#dg').datagrid('getRows')[rowIndexTag].roleName = $('#roleName').val();
-						$('#dg').datagrid('getRows')[rowIndexTag].roleDesc = $('#roleDesc').val();
-						$('#dg').datagrid('updateRow',{
-							index:rowIndexTag,
-							row:$('#dg').datagrid('getRows')[rowIndexTag]
-						});
+						$('#dg').datagrid('reload');	// reload the role data
+						isUpdateOrAdd = true;
+						$('#role_add_update_div').css("display", "none");// hide input form
 						rowIndexTag = -1;
 					} else {
 						$.messager.alert('',result.msg);
@@ -243,6 +249,22 @@
 		}
 		</c:if>
 		
+		function initPermissionList() {
+			if (!isInitPermissionList) {
+				$("#permissionDl").datalist({
+					url : '${ctx}/accountmanagement/role/listAllPermission.html',
+					checkbox : true,
+					lines : true,
+					valueField : 'permissionId',
+					singleSelect : false,
+					textFormatter : function(value,row,index) {
+						return row.permissionName + "(" + row.permissionUrl + ")";
+					}
+				});
+				isInitPermissionList = true;
+			}
+		}
+		
 		function doSearch() {
 			isUpdateOrAdd = true;
 			rowIndexTag = -1;
@@ -251,9 +273,9 @@
 			var roleNameForSearch = $('#roleNameForSearch').val();
 			roleNameForSearch = roleNameForSearch.Trim();
 			$('#roleNameForSearch').val(roleNameForSearch);
-			url = '${ctx}/accountmanagement/role/listRole.html?roleNameForSearch='+roleNameForSearch;
-			$('#dg').datagrid('options').url = url;
-			$('#dg').datagrid('reload');
+			$('#dg').datagrid('load', {
+				roleNameForSearch : roleNameForSearch
+			});
 		}
 		
 		<c:if test="${canEditRolePermissions eq 'Y'}">
@@ -261,8 +283,7 @@
 	    function editPermissions() {
 	    	var row = $('#dg').datagrid('getSelected');
 			if (row){
-				document.getElementById("currentSelectRoleId").value= row.roleId;
-				//alert(document.getElementById("currentSelectRoleId").value);
+				$("#currentSelectRoleId").val(row.roleId);
 				$('#dlg-permission-edit').dialog('open')
 				$('#dlg-permission-edit').dialog('setTitle','Edit Role\'s Permissions');
 				
@@ -270,7 +291,7 @@
 					$('#dg-role-permissions').datagrid({
 			    		title:'Current role:' +row.roleName,
 					    iconCls:'',
-					    url:'${ctx}/accountmanagement/role/listRolePermissions.html?roleId='+row.roleId,
+					    url:'${ctx}/accountmanagement/permission/listPermission.html',
 					    idField:'permissionId',
 					    height:200,
 					    pagination:false,
@@ -378,9 +399,9 @@
 						<c:if test="${canDeleteRole eq 'Y'}">
 						<a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="deleteRole()">Delete Role</a>
 						</c:if>
-						<c:if test="${canEditRolePermissions eq 'Y'}">
-						<a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editPermissions()">Edit Role's Permissions</a>
-						</c:if>
+<%-- 						<c:if test="${canEditRolePermissions eq 'Y'}"> --%>
+<!-- 						<a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editPermissions()">Edit Role's Permissions</a> -->
+<%-- 						</c:if> --%>
 				</td>
 				<td align="right">
 					<span style="padding-left:20px">Role name: <input type="text" id="roleNameForSearch" name="roleNameForSearch" /></span>
@@ -391,9 +412,9 @@
 		</table>
 	</div>
 	
-	<div id="role_add_update_div" style="padding:15px 10px; display:none" >
+	<div id="role_add_update_div" style="padding:15px 10px; display:none;" >
 		<form id="fm" method="post">
-			<input name="roleId" type="hidden" />
+			<input id="roleId" name="roleId" type="hidden" />
 			<table style="border-collapse: separate; border-spacing: 10px;">
 				<tr>
 					<td>Role Name:</td>
@@ -402,6 +423,13 @@
 				<tr>
 					<td style="vertical-align: top">Description:</td>
 					<td><textarea id="roleDesc" name="roleDesc" maxlength="100" class="easyui-validatebox" rows="3" data-options="validateOnCreate:false" style="width:200px"></textarea></td>
+				</tr>
+				<tr>
+					<td style="vertical-align: top">Permissions:</td>
+					<td>
+						<ul id="permissionDl" style="height:150px; width:300px;"></ul>
+						<input id="permissions" name="permissions" hidden="true">
+					</td>
 				</tr>
 				<tr>
 					<td colspan="2" style="text-align:right">

@@ -16,6 +16,8 @@ public interface OttPermissionService {
 
 	public void deletePermission(Long permissionId);
 
+	public List<OttPermission> findAllPermission();
+
 
 
 }

@@ -161,24 +161,24 @@ ul li {
 <body class="easyui-layout">
         <div region="west" split="true" title="Boot Server Management System" style="width:240px;padding:10px;overflow:hidden;">
         	<table border="0" cellpadding="5" cellspacing="0">
-<!-- 			<tr> -->
-<!-- 				<td class="base_menu"> -->
-<%-- 					<c:if test="${hasUserPermission eq 'Y'|| hasRolePermission eq 'Y'|| hasPermission eq 'Y'}"> --%>
-<!-- 			       	<span style="font-weight:bold;color:#06c">Account Management</span> -->
-<!-- 					<ul> -->
-<%-- 						<c:if test="${hasUserPermission eq 'Y'}"> --%>
-<%-- 			   			<li><a href="javascript:void(0)" onclick="addTab('User', '${ctx}/accountmanagement/user/goToListUserPage.html', ' ');return false;">User</a><br/></li> --%>
-<%-- 						</c:if> --%>
-<%-- 						<c:if test="${hasRolePermission eq 'Y'}"> --%>
-<%-- 			   			<li><a href="javascript:void(0)" onclick="addTab('Role', '${ctx}/accountmanagement/role/goToListRolePage.html', ' ');return false;">Role</a><br/></li> --%>
-<%-- 						</c:if> --%>
-<%-- 						<c:if test="${hasPermission eq 'Y'}"> --%>
-<%-- 			   			<li><a href="javascript:void(0)" onclick="addTab('Permission', '${ctx}/accountmanagement/permission/goToListPermissionPage.html', ' ');return false;">Permission</a><br/></li> --%>
-<%-- 						</c:if> --%>
-<!-- 				    </ul> -->
-<%-- 				    </c:if>				     --%>
-<!-- 				</td> -->
-<!-- 			</tr> -->
+			<tr>
+				<td class="base_menu">
+					<c:if test="${hasUserPermission eq 'Y'|| hasRolePermission eq 'Y'|| hasPermission eq 'Y'}">
+			       	<span style="font-weight:bold;color:#06c">Account Management</span>
+					<ul>
+						<c:if test="${hasUserPermission eq 'Y'}">
+			   			<li><a href="javascript:void(0)" onclick="addTab('User', '${ctx}/accountmanagement/user/goToListUserPage.html', ' ');return false;">User</a><br/></li>
+						</c:if>
+						<c:if test="${hasRolePermission eq 'Y'}">
+			   			<li><a href="javascript:void(0)" onclick="addTab('Role', '${ctx}/accountmanagement/role/goToListRolePage.html', ' ');return false;">Role</a><br/></li>
+						</c:if>
+						<c:if test="${hasPermission eq 'Y'}">
+			   			<li><a href="javascript:void(0)" onclick="addTab('Permission', '${ctx}/accountmanagement/permission/goToListPermissionPage.html', ' ');return false;">Permission</a><br/></li>
+						</c:if>
+				    </ul>
+				    </c:if>				    
+				</td>
+			</tr>
 			
 			<tr>
 				<td class="base_menu">

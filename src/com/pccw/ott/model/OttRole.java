@@ -2,16 +2,23 @@ package com.pccw.ott.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -27,10 +34,12 @@ public class OttRole implements Serializable {
 	private Date createDate;
 	private Long updatedBy;
 	private Date updateDate;
+	private List<OttPermission> permissionList;
+
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "role_id")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	public Long getRoleId() {
 		return roleId;
 	}
@@ -95,6 +104,18 @@ public class OttRole implements Serializable {
 
 	public void setUpdateDate(Date updateDate) {
 		this.updateDate = updateDate;
+	}
+
+	@OneToMany(cascade = { CascadeType.ALL}, fetch = FetchType.EAGER)
+	@JoinTable(name = "ott_role_permission", joinColumns = {
+			@JoinColumn(name = "role_id", referencedColumnName = "role_id") }, inverseJoinColumns = {
+					@JoinColumn(name = "permission_id", referencedColumnName = "permission_id") })
+	public List<OttPermission> getPermissionList() {
+		return permissionList;
+	}
+
+	public void setPermissionList(List<OttPermission> permissionList) {
+		this.permissionList = permissionList;
 	}
 
 }

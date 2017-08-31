@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS ott.ott_user (
 );
   	
 CREATE TABLE IF NOT EXISTS ott.ott_role (
-    role_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    role_id INT AUTO_INCREMENT PRIMARY KEY,
     role_name VARCHAR(50) NOT NULL,
     role_desc VARCHAR(100),
    	created_by INT NOT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS ott.ott_role (
 );
  	
 CREATE TABLE IF NOT EXISTS ott.ott_permission (
-    permission_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    permission_id INT AUTO_INCREMENT PRIMARY KEY,
     permission_name VARCHAR(100) NOT NULL,
     permission_desc VARCHAR(200) NULL,
     permission_url VARCHAR(200) NOT NULL,
@@ -44,11 +44,7 @@ CREATE TABLE IF NOT EXISTS ott.ott_user_role (
 CREATE TABLE IF NOT EXISTS ott.ott_role_permission (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     role_id INT NOT NULL,
-    persission_id INT NOT NULL,
-   	created_by INT NOT NULL,
-   	create_date TIMESTAMP NOT NULL DEFAULT current_timestamp,
-   	updated_by INT,
-   	update_date TIMESTAMP NULL
+    permission_id INT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS ott.ott_audit_trail (
