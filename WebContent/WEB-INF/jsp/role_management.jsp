@@ -30,8 +30,8 @@
 		function doClose() {
 			isUpdateOrAdd = true;
 			rowIndexTag = -1;
-			$("#permissionDl").datalist("clearSelections");
 			$('#role_add_update_div').css("display", "none");// hide input form
+			$("#permissionDl").datalist("unselectAll");
 		}
 		
 		<c:if test="${canUpdateRole eq 'Y'}">
@@ -40,7 +40,7 @@
 	    										if(isFirstTime) {
 	    											isFirstTime = false;
 	    											isUpdateOrAdd = false;
-	    											showUpdateRole(rowIndex, rowData);
+	    											initUpdateDiv(rowIndex, rowData);
 	    											return;
 	    										}
 	    										if(!isUpdateOrAdd && (rowIndexTag != rowIndex)) {// haven't saved data and not the same record
@@ -50,7 +50,7 @@
 																				return ;
 																			} else {
 																			    isUpdateOrAdd = false;
-																				showUpdateRole(rowIndex, rowData);
+																			    initUpdateDiv(rowIndex, rowData);
 																			}
 																		 }
 																      );
@@ -63,14 +63,14 @@
 	    					 });
 	    });
 	    
-	    function showUpdateRole2() {
+	    function showUpdateRole() {
 	    	var rowData = $('#dg').datagrid('getSelected');
-			if (rowData){
+			if (rowData) {
 				var rowIndex = $('#dg').datagrid('getRowIndex', rowData);
 		  		if(isFirstTime) {
 					isFirstTime = false;
 					isUpdateOrAdd = false;
-					showUpdateRole(rowIndex, rowData);
+					initUpdateDiv(rowIndex, rowData);
 					return;
 				}
 				if(!isUpdateOrAdd && (rowIndexTag != rowIndex)) {// haven't saved data and not the same record
@@ -80,14 +80,14 @@
 								return ;
 							} else {
 							    isUpdateOrAdd = false;
-								showUpdateRole(rowIndex, rowData);
+							    initUpdateDiv(rowIndex, rowData);
 							}
 						 }
 					 );
 					
 				} else {
 				    isUpdateOrAdd = false;
-					showUpdateRole(rowIndex, rowData);
+				    initUpdateDiv(rowIndex, rowData);
 				}
 			} else {
 				$.messager.alert('',"Please select one role to edit.");
@@ -123,6 +123,7 @@
 													url = '${ctx}/accountmanagement/role/addRole.html';
 													$('#addSpan').css("display", "inline");
 													$('#updateSpan').css("display", "none");
+													$("#permissionDl").datalist("clearSelections");
 												}
 										  }
 				);
@@ -135,13 +136,13 @@
 				url = '${ctx}/accountmanagement/role/addRole.html';
 				$('#addSpan').css("display", "inline");
 				$('#updateSpan').css("display", "none");
+				$("#permissionDl").datalist("clearSelections");
 			}
 		}
 		
 		function doAddRole() {
-			debugger;
 			var rows = $("#permissionDl").datalist("getSelections");
-			var permissions = [];
+			var permissions = new Array();
 			for (var i=0; i<rows.length; i++) {
 				permissions.push(rows[i].permissionId);
 			}
@@ -177,9 +178,10 @@
 		</c:if>
 		
 		<c:if test="${canUpdateRole eq 'Y'}">
-		function showUpdateRole(rowIndex, rowData) {
+		function initUpdateDiv(rowIndex, rowData) {
 			var row = $('#dg').datagrid('getSelected');
 			if (row){
+				initPermissionList();
 				$('#updateBtn').linkbutton('enable');
 			    $('#role_add_update_div').css("display", "block");
 			    if(rowIndexTag != rowIndex) {
@@ -250,18 +252,33 @@
 		</c:if>
 		
 		function initPermissionList() {
+			var row = $("#dg").datagrid("getSelected");
 			if (!isInitPermissionList) {
 				$("#permissionDl").datalist({
 					url : '${ctx}/accountmanagement/role/listAllPermission.html',
-					checkbox : true,
 					lines : true,
+					idField : 'permissionId',
 					valueField : 'permissionId',
 					singleSelect : false,
 					textFormatter : function(value,row,index) {
 						return row.permissionName + "(" + row.permissionUrl + ")";
+					},
+					onLoadSuccess : function(data) {
+						if ( row && row.permissionList && row.permissionList.length > 0) {
+							for (var i = 0; i < row.permissionList.length; i++) {
+								$("#permissionDl").datalist("selectRecord", row.permissionList[i].permissionId);
+							}
+						} 
 					}
 				});
 				isInitPermissionList = true;
+			} else {
+				$("#permissionDl").datalist("clearSelections");
+				if ( row && row.permissionList && row.permissionList.length > 0) {
+					for (var i = 0; i < row.permissionList.length; i++) {
+						$("#permissionDl").datalist("selectRecord", row.permissionList[i].permissionId);
+					}
+				} 
 			}
 		}
 		
@@ -393,7 +410,7 @@
 						<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="showAddRole()">Add Role</a>
 						</c:if>
 						<c:if test="${canUpdateRole eq 'Y'}">
-						<a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="showUpdateRole2()">Edit Role</a>
+						<a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="showUpdateRole()">Edit Role</a>
 						</c:if>
 						
 						<c:if test="${canDeleteRole eq 'Y'}">
@@ -428,7 +445,8 @@
 					<td style="vertical-align: top">Permissions:</td>
 					<td>
 						<ul id="permissionDl" style="height:150px; width:300px;"></ul>
-						<input id="permissions" name="permissions" hidden="true">
+						<input id="permissions" name="permissions" hidden>
+						<div id="hiddenPermissionDiv" style="display:none;"></div>
 					</td>
 				</tr>
 				<tr>

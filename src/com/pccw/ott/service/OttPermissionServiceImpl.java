@@ -46,4 +46,9 @@ public class OttPermissionServiceImpl implements OttPermissionService {
 		return ottPermissionDao.findAllPermission();
 	}
 
+	@Override
+	public OttPermission loadPermissionById(Long permissionId) {
+		return ottPermissionDao.loadPermissionById(permissionId);
+	}
+
 }

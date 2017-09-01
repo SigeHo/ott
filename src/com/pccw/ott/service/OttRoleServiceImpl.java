@@ -43,8 +43,8 @@ public class OttRoleServiceImpl implements OttRoleService {
 	}
 
 	@Override
-	public List<OttPermission> listRolePermissions(Long roleId) {
-		return null;
+	public Long findCountByRoleName(String roleName) {
+		return ottRoleDao.findCountByRoleName(roleName);
 	}
 
 }

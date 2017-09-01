@@ -7,6 +7,8 @@ import com.pccw.ott.model.OttRole;
 public interface OttRoleDao {
 
 	public List<OttRole> findRoleList(String roleName, int first, int max);
+	
+	public Long findCountByRoleName(String roleName);
 
 	public OttRole queryByRoleName(String roleName);
 

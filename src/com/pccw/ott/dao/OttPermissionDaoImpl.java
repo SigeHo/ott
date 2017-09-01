@@ -67,4 +67,9 @@ public class OttPermissionDaoImpl extends HibernateDaoSupport implements OttPerm
 		return (List<OttPermission>) this.getHibernateTemplate().find("from OttPermission");
 	}
 
+	@Override
+	public OttPermission loadPermissionById(Long permissionId) {
+		return getHibernateTemplate().load(OttPermission.class, permissionId);
+	}
+
 }

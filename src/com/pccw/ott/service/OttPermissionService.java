@@ -18,6 +18,6 @@ public interface OttPermissionService {
 
 	public List<OttPermission> findAllPermission();
 
-
+	public OttPermission loadPermissionById(Long valueOf);
 
 }

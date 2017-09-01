@@ -1,6 +1,8 @@
 package com.pccw.ott.controller;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,8 +15,11 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -228,8 +233,9 @@ public class OttAccountController {
 		int first = (page - 1) * rows;
 		int max = page * rows;
 		List<OttRole> list = ottRoleService.findRoleList(roleName, first, max);
+		Long totalCount = ottRoleService.findCountByRoleName(roleName);
 		returnMap.put("rows", list);
-		returnMap.put("total", list.size());
+		returnMap.put("total", totalCount);
 		return returnMap;
 	}
 
@@ -254,6 +260,16 @@ public class OttAccountController {
 					} else {// Not exists
 						role.setCreatedBy(loginUser.getUserId());
 						role.setUpdatedBy(loginUser.getUserId());
+						if (StringUtils.isNotBlank(permissions)) {
+							String[] permissionIds = permissions.split(",");
+							OttPermission permission = null;
+							List<OttPermission> permisionList = new ArrayList<>();
+							for (int i = 0; i < permissionIds.length; i++) {
+								permission = ottPermissionService.loadPermissionById(Long.valueOf(permissionIds[i]));
+								permisionList.add(permission);
+							}
+							role.setPermissionList(permisionList);
+						}
 						ottRoleService.saveOttRole(role);
 						map.put("success", true);
 						map.put("msg", "Add successfully!");
@@ -337,26 +353,5 @@ public class OttAccountController {
 	public List<OttPermission> listAllPermission() {
 		List<OttPermission> list = ottPermissionService.findAllPermission();
 		return list;
-	}
-
-	@RequestMapping("/role/listRolePermissions.html")
-	@ResponseBody
-	public Map<String, Object> listRolePermissions(Model model, OttRole role) throws Exception {
-		Map<String, Object> returnMap = new HashMap<String, Object>();
-
-		try {
-			if (null == role) {
-				returnMap.put("total", 0);
-				returnMap.put("rows", new ArrayList<OttPermission>());
-			} else {
-				List<OttPermission> permissions = ottRoleService.listRolePermissions(role.getRoleId());
-				returnMap.put("total", permissions.size());
-				returnMap.put("rows", permissions);
-			}
-		} catch (Exception e) {
-			logger.error("", e);
-		}
-
-		return returnMap;
 	}
 }
