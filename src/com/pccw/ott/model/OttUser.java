@@ -3,11 +3,16 @@ package com.pccw.ott.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -29,6 +34,7 @@ public class OttUser implements Serializable {
 	private Long createdBy;
 	private Date updateDate;
 	private Long updatedBy;
+	private OttRole role;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -115,6 +121,18 @@ public class OttUser implements Serializable {
 
 	public void setUpdateDate(Date updateDate) {
 		this.updateDate = updateDate;
+	}
+
+	@OneToOne(cascade = { CascadeType.PERSIST}, fetch = FetchType.EAGER)
+	@JoinTable(name = "ott_user_role", joinColumns = {
+			@JoinColumn(name = "user_id", referencedColumnName = "user_id") }, inverseJoinColumns = {
+					@JoinColumn(name = "role_id", referencedColumnName = "role_id") })
+	public OttRole getRole() {
+		return role;
+	}
+
+	public void setRole(OttRole role) {
+		this.role = role;
 	}
 
 }

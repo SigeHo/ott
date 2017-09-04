@@ -1,8 +1,6 @@
 package com.pccw.ott.controller;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,11 +13,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -109,8 +103,9 @@ public class OttAccountController {
 		int first = (page - 1) * rows;
 		int max = page * rows;
 		List<OttPermission> list = ottPermissionService.findPermissionList(permissionName, first, max);
+		Long totalCount = ottPermissionService.findCountByPermissionName(permissionName);
 		returnMap.put("rows", list);
-		returnMap.put("total", list.size());
+		returnMap.put("total", totalCount);
 		return returnMap;
 	}
 
@@ -352,6 +347,112 @@ public class OttAccountController {
 	@ResponseBody
 	public List<OttPermission> listAllPermission() {
 		List<OttPermission> list = ottPermissionService.findAllPermission();
+		return list;
+	}
+	
+	// ----------------- User Management -----------------
+	@RequestMapping("/user/goToListUserPage.html")
+	public ModelAndView goToListUserPage() {
+		ModelAndView mv = new ModelAndView("user_management");
+		mv.addObject("canAddUser", "Y");
+		mv.addObject("canUpdateUser", "Y");
+		mv.addObject("canDeleteUser", "Y");
+		mv.addObject("canEditUserRole", "Y");
+		return mv;
+	}
+	
+	@RequestMapping("/user/listUser.html")
+	@ResponseBody
+	public Map<String, Object> listUser(HttpServletRequest request, @RequestParam int page, @RequestParam int rows) {
+		Map<String, Object> returnMap = new HashMap<>();
+		String usernameForSearch = request.getParameter("usernameForSearch");
+		int first = (page - 1) * rows;
+		int max = page * rows;
+		List<OttUser> list = ottUserService.findUserByUserName(usernameForSearch, first, max);
+		Long totalCount = ottUserService.findCountByUserName(usernameForSearch);
+		returnMap.put("rows", list);
+		returnMap.put("page", totalCount);
+		return returnMap;
+	}
+	
+	@RequestMapping("/user/addUser.html")
+	@ResponseBody
+	public Map<String, Object> addUser(OttUser user, @RequestParam String userRole, HttpServletRequest request) throws Exception {
+		Map<String, Object> map = new HashMap<String, Object>();
+		try {
+			OttUser loginUser = (OttUser) request.getSession().getAttribute("loginUser");
+			if (null == user) {
+				map.put("success", false);
+				map.put("msg", "Add user failed!");
+			} else {
+				if (StringUtils.isBlank(user.getUsername()) || StringUtils.isNotBlank(user.getUserEmail())) {
+					map.put("success", false);
+					map.put("msg", "Add failed! Please complete the form.");
+				} else {
+					OttUser ottUser = ottUserService.findExactByUsername(user.getUsername());
+					if (null != ottUser) {// Already exists
+						map.put("success", false);
+						map.put("msg", "User name already exists! Please check and then try again.");
+					} else {// Not exists
+						user.setCreatedBy(loginUser.getUserId());
+						user.setUpdatedBy(loginUser.getUserId());
+						if (StringUtils.isNotBlank(userRole)) {
+							OttRole role = ottRoleService.findRoleById(Long.valueOf(userRole));
+							if (role != null) {
+								user.setRole(role);
+							}
+						}
+						ottUserService.saveOttUser(user);
+						map.put("success", true);
+						map.put("msg", "Add successfully!");
+					}
+				}
+			}
+		} catch (Exception e) {
+			logger.error("", e);
+			map.put("success", false);
+			map.put("msg", "Add failed!");
+		}
+		return map;
+	}
+	
+	@RequestMapping("/user/updateUser.html")
+	@ResponseBody
+	public Map<String, Object> updateUser(OttUser user, HttpServletRequest request) throws Exception {
+		Map<String, Object> map = new HashMap<String, Object>();
+		OttUser loginUser = (OttUser) request.getSession().getAttribute("loginUser");
+		return map;
+	}
+
+	@RequestMapping("/user/deleteUser.html")
+	@ResponseBody
+	public Map<String, Object> deleteUser(OttUser user, HttpServletRequest request) throws Exception {
+		Map<String, Object> map = new HashMap<String, Object>();
+		OttUser loginUser = (OttUser) request.getSession().getAttribute("loginUser");
+		try {
+			if (null == user) {
+				map.put("success", false);
+				map.put("msg", "Delete failed! Please try again.");
+			} else if (loginUser.getUserId() == user.getUserId()) {
+				map.put("success", false);
+				map.put("msg", "Delete failed! Cannot delete current user.");
+			} else {
+				ottUserService.deleteUser(user.getUserId());
+				map.put("success", true);
+				map.put("msg", "Delete successfully!");
+			}
+		} catch (Exception e) {
+			logger.error("", e);
+			map.put("success", false);
+			map.put("msg", "Delete failed! Please try again.");
+		}
+		return map;
+	}
+	
+	@RequestMapping("/user/listAllRole.html")
+	@ResponseBody
+	public List<OttRole> listAllRole() {
+		List<OttRole> list = ottRoleService.findAllRole();
 		return list;
 	}
 }

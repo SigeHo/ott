@@ -34,11 +34,7 @@ CREATE TABLE IF NOT EXISTS ott.ott_permission (
 CREATE TABLE IF NOT EXISTS ott.ott_user_role (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    role_id INT NOT NULL,
-   	created_by INT NOT NULL,
-   	create_date TIMESTAMP NOT NULL DEFAULT current_timestamp,
-   	updated_by INT,
-   	update_date TIMESTAMP NULL
+    role_id INT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS ott.ott_role_permission (

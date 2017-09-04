@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.pccw.ott.dao.OttRoleDao;
-import com.pccw.ott.model.OttPermission;
 import com.pccw.ott.model.OttRole;
 
 @Service("ottRoleService")
@@ -45,6 +44,16 @@ public class OttRoleServiceImpl implements OttRoleService {
 	@Override
 	public Long findCountByRoleName(String roleName) {
 		return ottRoleDao.findCountByRoleName(roleName);
+	}
+
+	@Override
+	public List<OttRole> findAllRole() {
+		return ottRoleDao.findAllRole();
+	}
+
+	@Override
+	public OttRole findRoleById(Long roleId) {
+		return ottRoleDao.findRoleById(roleId);
 	}
 
 }

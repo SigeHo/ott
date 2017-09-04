@@ -20,4 +20,6 @@ public interface OttPermissionService {
 
 	public OttPermission loadPermissionById(Long valueOf);
 
+	public Long findCountByPermissionName(String permissionName);
+
 }

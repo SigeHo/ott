@@ -18,4 +18,8 @@ public interface OttRoleDao {
 
 	public void deleteRole(Long roleId);
 
+	public List<OttRole> findAllRole();
+
+	public OttRole findRoleById(Long roleId);
+
 }

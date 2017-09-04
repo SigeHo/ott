@@ -106,8 +106,6 @@ ul li {
 	}
 
 	function loginInit() {
-		$("#loginForm").validatebox({validateOnCreate : false});
-		
 		$('#login').dialog({
 			title : 'Login',
 			modal : true,

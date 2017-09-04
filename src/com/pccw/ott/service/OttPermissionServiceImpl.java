@@ -51,4 +51,9 @@ public class OttPermissionServiceImpl implements OttPermissionService {
 		return ottPermissionDao.loadPermissionById(permissionId);
 	}
 
+	@Override
+	public Long findCountByPermissionName(String permissionName) {
+		return ottPermissionDao.findCountByPermissionName(permissionName);
+	}
+
 }

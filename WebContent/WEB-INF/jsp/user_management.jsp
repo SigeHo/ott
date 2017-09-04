@@ -24,8 +24,8 @@
 		var url;
 		var isUpdateOrAdd = true;
 		var isFirstTime = true;
-		
 		var rowIndexTag = -1;
+		var isInitRoleList = false;
 		    
 		<c:if test="${canUpdateUser eq 'Y'}">    
 		$(document).ready(function(){
@@ -106,9 +106,11 @@
 				isUpdateOrAdd = false;
 				$('#user_add_update_div').css("display", "block");
 				$('#fm').form('clear');
+				$("#fm").form('resetValidation');
 				url = '${ctx}/accountmanagement/user/addUser.html';
 				$('#addSpan').css("display", "inline");
 				$('#updateSpan').css("display", "none");
+				initRoleList();
 				return;
 			}
 			if(!isUpdateOrAdd) {// haven't saved data
@@ -121,6 +123,7 @@
 												    isUpdateOrAdd = false;
 													$('#user_add_update_div').css("display", "block");
 													$('#fm').form('clear');
+													$("#fm").form('resetValidation');
 													url = '${ctx}/accountmanagement/user/addUser.html';
 													$('#addSpan').css("display", "inline");
 													$('#updateSpan').css("display", "none");
@@ -133,23 +136,26 @@
 				isUpdateOrAdd = false;
 				$('#user_add_update_div').css("display", "block");
 				$('#fm').form('clear');
+				$("#fm").form('resetValidation');
 				url = '${ctx}/accountmanagement/user/addUser.html';
 				$('#addSpan').css("display", "inline");
 				$('#updateSpan').css("display", "none");
 			}
+			initRoleList();
 		}
 		
 		function doAddUser() {
+			var role = $("#roleDl").datalist("getSelected");
 			$('#fm').form('submit',{
 				url: url,
 				onSubmit: function(){
 					
-					var flag = (   checkLength($('#userName').val(), USER_NAME_MAX, "User name") 
+					var flag = (   checkLength($('#username').val(), USER_NAME_MAX, "User name") 
 					         	&& checkLength($('#userDesc').val(), USER_DESC_MAX, "Description") 
 					         	&& $(this).form('validate')
 							   );
-					if(flag && $('#domainName').combobox('getValue')==""){
-						$.messager.alert("","User domain name cant't be empty."); 
+					if(flag && role == null){
+						$.messager.alert("","Please choose one role.", "warning"); 
 						return false;
 					}
 					if(flag) {
@@ -196,7 +202,7 @@
 				url: url,
 				onSubmit: function(){
 					
-					var flag = (   checkLength($('#userName').val(), USER_NAME_MAX, "User name") 
+					var flag = (   checkLength($('#username').val(), USER_NAME_MAX, "User name") 
 					         	&& checkLength($('#userDesc').val(), USER_DESC_MAX, "Description") 
 					         	&& $(this).form('validate')
 							   );
@@ -218,7 +224,7 @@
 						isUpdateOrAdd = true;
 						$.messager.alert('',result.msg);						
 						$('#dg').datagrid('reload'); // reload the user data
-						//$('#dg').datagrid('getRows')[rowIndexTag].userName = $('#userName').val();
+						//$('#dg').datagrid('getRows')[rowIndexTag].username = $('#username').val();
 						//$('#dg').datagrid('getRows')[rowIndexTag].domainName = $('#domainName').combobox('getValue');
 						//$('#dg').datagrid('getRows')[rowIndexTag].userEmail = $('#userEmail').val();
 						//$('#dg').datagrid('getRows')[rowIndexTag].userDesc = $('#userDesc').val();
@@ -271,9 +277,9 @@
 			var usernameForSearch = $('#usernameForSearch').val();
 			usernameForSearch = usernameForSearch.Trim();
 			$('#usernameForSearch').val(usernameForSearch);
-			url = '${ctx}/accountmanagement/user/listUser.html?usernameForSearch='+usernameForSearch;
-			$('#dg').datagrid('options').url = url;
-			$('#dg').datagrid('reload');
+			$('#dg').datagrid('load', {
+				usernameForSearch : usernameForSearch
+			});
 		}
 		
 		<c:if test="${canEditUserRole eq 'Y'}">
@@ -288,7 +294,7 @@
 				
 				if(!is_dg_user_roles_init) {					
 					$('#dg-user-roles').datagrid({
-			    		title:'Current user:' +row.userName,
+			    		title:'Current user:' +row.username,
 					    iconCls:'',
 					    url:'${ctx}/accountmanagement/user/listUserRoles.html?userId='+row.userId,
 					    idField:'roleId',
@@ -314,7 +320,7 @@
 			    	});
 			    	is_dg_user_roles_init = true;
 				} else {	
-					$('#dg-user-roles').datagrid({title:'Current user:' +row.userName});
+					$('#dg-user-roles').datagrid({title:'Current user:' +row.username});
 					$('#dg-user-roles').datagrid('clearSelections');					
 					$('#dg-user-roles').datagrid('options').url = '${ctx}/accountmanagement/user/listUserRoles.html?userId='+row.userId;
 					$('#dg-user-roles').datagrid('reload');
@@ -357,6 +363,31 @@
 	    }
 	    </c:if>
 	    
+	    function initRoleList() {
+			var row = $("#dg").datagrid("getSelected");
+			if (!isInitRoleList) {
+				$("#roleDl").datalist({
+					url : '${ctx}/accountmanagement/user/listAllRole.html',
+					lines : true,
+					idField : 'roleId',
+					valueField : 'roleId',
+					singleSelect : true,
+					textField : 'roleName',
+					onLoadSuccess : function(data) {
+						if ( row && row.role) {
+							$("#roleDl").datalist("selectRecord", rowrole.roleId);
+						} 
+					}
+				});
+				isInitRoleList = true;
+			} else {
+				$("#roleDl").datalist("clearSelections");
+				if ( row && row.row) {
+					$("#roleDl").datalist("selectRecord", rowrole.roleId);
+				} 
+			}
+	    }
+	    
 	    function clearSearch(){
 			$("#usernameForSearch").val("");
 		}
@@ -366,16 +397,15 @@
 </head>
 
 <body>
-	<table id="dg" class="easyui-datagrid" style=""
+	<table id="dg" class="easyui-datagrid" 
 			url="${ctx}/accountmanagement/user/listUser.html"
-			method="post"
 			toolbar="#toolbar" pagination="true"
-			pageSize="15" pageList="[10,20,30,40]"
+			pageSize="10" pageList="[10,20,30,40]"
 			rownumbers="false" fitColumns="true" 
 			singleSelect="true">
 		<thead>
 			<tr>
-				<th field="userName" width="150">User Name</th>
+				<th field="username" width="150">User Name</th>
 				<th field="userEmail" width="150">User Email</th>
 				<th field="userDesc" width="150">User Description</th>
 			</tr>
@@ -395,9 +425,6 @@
 				<c:if test="${canDeleteUser eq 'Y'}">
 					<a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="deleteUser()">Delete User</a>
 				</c:if>
-				<c:if test="${canEditUserRole eq 'Y'}">
-				<a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editRole()">Edit user's roles</a>
-				</c:if>
 			</td>
 			<td align="right">
 				<span style="padding-left:10px;">User name: <input type="text" style="" id="usernameForSearch" name="usernameForSearch" /></span>
@@ -413,20 +440,26 @@
 	<div id="user_add_update_div" style="padding:15px 10px; display:none" >
 		<form id="fm" method="post">
 			<input name="userId" type="hidden" />
-			<table>
+			<table style="border-collapse: separate; border-spacing: 10px;">
 				<tr>
 					<td  style="vertical-align: top">User Name:</td>
-					<td><input id="userName" name="userName" maxlength="50" class="easyui-validatebox" required="true" style="width:200"></td>
+					<td><input id="username" name="username" maxlength="50" class="easyui-validatebox" style="width:200px" data-options="required:true, validateOnCreate:false"></td>
 				</tr>
 				<tr>
 					<td  style="vertical-align: top">User Email:</td>
-					<td><input id="userEmail" name="userEmail" maxlength="50" class="easyui-validatebox" required="true" validType="pccwEmail[1,100]" style="width:200"></td>
+					<td><input id="userEmail" name="userEmail" maxlength="50" class="easyui-validatebox" style="width:200px" data-options="required:true, validType:'pccwEmail[1,100]', validateOnCreate:false"></td>
 				</tr>
 				<tr>
 					<td style="vertical-align: top">Description:</td>
-					<td><textarea id="userDesc" name="userDesc" maxlength="100" class="easyui-validatebox" rows="3" required="false" style="width:200"></textarea></td>
+					<td><textarea id="userDesc" name="userDesc" maxlength="100" class="easyui-validatebox" rows="3" style="width:200px" data-options="required:false, validateOnCreate:false"></textarea></td>
 				</tr>
-
+				<tr>
+					<td style="vertical-align: top">Role:</td>
+					<td>
+						<ul id="roleDl"></ul>
+						<input id="userRole" name="userRole" hidden>
+					</td>
+				</tr>
 				<tr>
 					<td colspan="2" style="text-align:right">
 						<span id="updateSpan" ><a id="updateBtn" href="#" class="easyui-linkbutton" iconCls="icon-ok" onclick="doUpdateUser()">Update</a></span>

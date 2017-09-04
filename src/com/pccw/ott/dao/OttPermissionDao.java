@@ -18,4 +18,6 @@ public interface OttPermissionDao {
 	public List<OttPermission> findAllPermission();
 
 	public OttPermission loadPermissionById(Long permissionId);
+
+	public Long findCountByPermissionName(String permissionName);
 }

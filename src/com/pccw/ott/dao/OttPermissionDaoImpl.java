@@ -72,4 +72,13 @@ public class OttPermissionDaoImpl extends HibernateDaoSupport implements OttPerm
 		return getHibernateTemplate().load(OttPermission.class, permissionId);
 	}
 
+	@Override
+	public Long findCountByPermissionName(String permissionName) {
+		String hql = "select count(*) from OttPermission ";
+		if (StringUtils.isNotBlank(permissionName)) {
+			hql += "where permissionName like '%" + permissionName + "%'";
+		}
+		return (Long) this.getHibernateTemplate().find(hql).get(0);
+	}
+
 }

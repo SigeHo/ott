@@ -18,4 +18,8 @@ public interface OttRoleService {
 
 	public Long findCountByRoleName(String roleName);
 
+	public List<OttRole> findAllRole();
+
+	public OttRole findRoleById(Long valueOf);
+
 }
