@@ -34,7 +34,7 @@
 	    										if(isFirstTime) {
 	    											isFirstTime = false;
 	    											isUpdateOrAdd = false;
-	    											showUpdateUser(rowIndex, rowData);
+	    											initUpdateDiv(rowIndex, rowData);
 	    											return;
 	    										}
 	    										if(!isUpdateOrAdd && (rowIndexTag != rowIndex) ) {// haven't saved data and not the same record
@@ -44,21 +44,21 @@
 																				return ;
 																			} else {
 																			    isUpdateOrAdd = false;
-																				showUpdateUser(rowIndex, rowData);
+																				initUpdateDiv(rowIndex, rowData);
 																			}
 																		 }
 																      );
 	    											
 	    										} else {
 	    										    isUpdateOrAdd = false;
-	    											showUpdateUser(rowIndex, rowData);
+	    											initUpdateDiv(rowIndex, rowData);
 	    										}
 	    									 }
 	    					 });
 	    	   	
 	    });
 	    
-	    function showUpdateUser2() {
+	    function showUpdateUser() {
 	    	var rowData = $('#dg').datagrid('getSelected');
 			if (rowData){
 				var rowIndex = $('#dg').datagrid('getRowIndex', rowData);
@@ -66,7 +66,7 @@
 				if(isFirstTime) {
 					isFirstTime = false;
 					isUpdateOrAdd = false;
-					showUpdateUser(rowIndex, rowData);
+					initUpdateDiv(rowIndex, rowData);
 					return;
 				}
 				if(!isUpdateOrAdd && (rowIndexTag != rowIndex)) {// haven't saved data and not the same record
@@ -76,14 +76,14 @@
 									return ;
 								} else {
 								    isUpdateOrAdd = false;
-									showUpdateUser(rowIndex, rowData);
+									initUpdateDiv(rowIndex, rowData);
 								}
 							 }
 					      );
 					
 				} else {
 				    isUpdateOrAdd = false;
-					showUpdateUser(rowIndex, rowData);
+					initUpdateDiv(rowIndex, rowData);
 				}
 			} else {
 				$.messager.alert('',"Please select one user to edit.");
@@ -146,10 +146,12 @@
 		
 		function doAddUser() {
 			var role = $("#roleDl").datalist("getSelected");
+			if (role) {
+				$("#userRole").val(role.roleId);
+			}
 			$('#fm').form('submit',{
 				url: url,
 				onSubmit: function(){
-					
 					var flag = (   checkLength($('#username').val(), USER_NAME_MAX, "User name") 
 					         	&& checkLength($('#userDesc').val(), USER_DESC_MAX, "Description") 
 					         	&& $(this).form('validate')
@@ -182,7 +184,7 @@
 		</c:if>
 		
 		<c:if test="${canUpdateUser eq 'Y'}">
-		function showUpdateUser(rowIndex, rowData) {
+		function initUpdateDiv(rowIndex, rowData) {
 			var row = $('#dg').datagrid('getSelected');
 			if (row){
 				$('#updateBtn').linkbutton('enable'); 
@@ -196,8 +198,13 @@
 				$('#updateBtn').linkbutton('enable'); 
 				url = '${ctx}/accountmanagement/user/updateUser.html';
 			}
+			initRoleList();
 		}
-		function doUpdateUser(){
+		function doUpdateUser() {
+			var role = $("#roleDl").datalist("getSelected");
+			if (role) {
+				$("#userRole").val(role.roleId);
+			}
 			$('#fm').form('submit',{
 				url: url,
 				onSubmit: function(){
@@ -206,8 +213,8 @@
 					         	&& checkLength($('#userDesc').val(), USER_DESC_MAX, "Description") 
 					         	&& $(this).form('validate')
 							   );
-					if(flag && $('#domainName').combobox('getValue')==""){
-						$.messager.alert("","User domain name can't be empty."); 
+					if(flag && role == null){
+						$.messager.alert("","Please choose one role.", "warning"); 
 						return false;
 					}
 					if(flag) {
@@ -375,15 +382,15 @@
 					textField : 'roleName',
 					onLoadSuccess : function(data) {
 						if ( row && row.role) {
-							$("#roleDl").datalist("selectRecord", rowrole.roleId);
+							$("#roleDl").datalist("selectRecord", row.role.roleId);
 						} 
 					}
 				});
 				isInitRoleList = true;
 			} else {
 				$("#roleDl").datalist("clearSelections");
-				if ( row && row.row) {
-					$("#roleDl").datalist("selectRecord", rowrole.roleId);
+				if ( row && row.role) {
+					$("#roleDl").datalist("selectRecord", row.role.roleId);
 				} 
 			}
 	    }
@@ -420,7 +427,7 @@
 					<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="showAddUser()">Add User</a>
 				</c:if>
 				<c:if test="${canUpdateUser eq 'Y'}">
-					<a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="showUpdateUser2()">Edit User</a>
+					<a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="showUpdateUser()">Edit User</a>
 				</c:if>
 				<c:if test="${canDeleteUser eq 'Y'}">
 					<a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="deleteUser()">Delete User</a>
@@ -447,7 +454,7 @@
 				</tr>
 				<tr>
 					<td  style="vertical-align: top">User Email:</td>
-					<td><input id="userEmail" name="userEmail" maxlength="50" class="easyui-validatebox" style="width:200px" data-options="required:true, validType:'pccwEmail[1,100]', validateOnCreate:false"></td>
+					<td><input id="userEmail" name="userEmail" maxlength="50" class="easyui-validatebox" style="width:200px" data-options="required:true, validType:'email', validateOnCreate:false"></td>
 				</tr>
 				<tr>
 					<td style="vertical-align: top">Description:</td>

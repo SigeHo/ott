@@ -53,3 +53,12 @@ $.extend($.fn.datagrid.methods, {
         });
     }
 });
+
+$.extend($.fn.validatebox.defaults.rules, {
+	equalTo: {
+        validator: function(value, param){
+        	return $(param[0]).val() == value;
+        },
+        message: 'Dose not match.'
+    }
+});

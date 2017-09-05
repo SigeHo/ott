@@ -47,4 +47,14 @@ public class OttUserServiceImpl implements OttUserService {
 		ottUserDao.saveUser(user);		
 	}
 
+	@Override
+	public void updateOttUser(OttUser user) {
+		ottUserDao.updateUser(user);		
+	}
+
+	@Override
+	public void changePassword(Long userId, String newPassword) {
+		ottUserDao.updateUserPassword(userId, newPassword);
+	}
+
 }

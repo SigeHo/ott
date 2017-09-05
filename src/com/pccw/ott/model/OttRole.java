@@ -106,7 +106,7 @@ public class OttRole implements Serializable {
 		this.updateDate = updateDate;
 	}
 
-	@OneToMany(cascade = { CascadeType.PERSIST}, fetch = FetchType.EAGER)
+	@OneToMany(cascade = { CascadeType.MERGE}, fetch = FetchType.EAGER)
 	@JoinTable(name = "ott_role_permission", joinColumns = {
 			@JoinColumn(name = "role_id", referencedColumnName = "role_id") }, inverseJoinColumns = {
 					@JoinColumn(name = "permission_id", referencedColumnName = "permission_id") })

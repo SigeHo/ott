@@ -18,4 +18,8 @@ public interface OttUserService {
 
 	public void saveOttUser(OttUser user);
 
+	public void updateOttUser(OttUser user);
+
+	public void changePassword(Long userId, String newPassword);
+
 }

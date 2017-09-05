@@ -179,5 +179,7 @@ public class Constants {
 	public static String TEST_JBOSS_URL = "/test_jboss.html";
 	public static String TEST_DATABASE = "/test_database.html";
 	public static String TEST_DB = "/testDB.html";
+	
+	public static String DEFAULT_PASSWORD = "admin";
 
 }

@@ -37,7 +37,7 @@ public class OttUser implements Serializable {
 	private OttRole role;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "user_id")
 	public Long getUserId() {
 		return userId;
@@ -123,7 +123,7 @@ public class OttUser implements Serializable {
 		this.updateDate = updateDate;
 	}
 
-	@OneToOne(cascade = { CascadeType.PERSIST}, fetch = FetchType.EAGER)
+	@OneToOne(cascade = { CascadeType.MERGE}, fetch = FetchType.EAGER)
 	@JoinTable(name = "ott_user_role", joinColumns = {
 			@JoinColumn(name = "user_id", referencedColumnName = "user_id") }, inverseJoinColumns = {
 					@JoinColumn(name = "role_id", referencedColumnName = "role_id") })

@@ -164,6 +164,7 @@ ul li {
 					<c:if test="${hasUserPermission eq 'Y'|| hasRolePermission eq 'Y'|| hasPermission eq 'Y'}">
 			       	<span style="font-weight:bold;color:#06c">Account Management</span>
 					<ul>
+						<li><a href="javascript:void(0)" onclick="addTab('Pwd', '${ctx}/accountmanagement/user/goToChangePwdPage.html', ' ');return false;">Change Password</a><br/></li>
 						<c:if test="${hasUserPermission eq 'Y'}">
 			   			<li><a href="javascript:void(0)" onclick="addTab('User', '${ctx}/accountmanagement/user/goToListUserPage.html', ' ');return false;">User</a><br/></li>
 						</c:if>

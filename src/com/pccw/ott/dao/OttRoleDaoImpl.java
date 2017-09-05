@@ -64,6 +64,7 @@ public class OttRoleDaoImpl extends HibernateDaoSupport implements OttRoleDao {
 		OttRole originalRole = this.getHibernateTemplate().load(OttRole.class, role.getRoleId());
 		originalRole.setRoleName(role.getRoleName());
 		originalRole.setRoleDesc(role.getRoleDesc());
+		originalRole.setPermissionList(role.getPermissionList());
 		this.getHibernateTemplate().update(originalRole);
 	}
 

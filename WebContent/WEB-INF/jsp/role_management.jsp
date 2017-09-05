@@ -142,11 +142,13 @@
 		
 		function doAddRole() {
 			var rows = $("#permissionDl").datalist("getSelections");
-			var permissions = new Array();
-			for (var i=0; i<rows.length; i++) {
-				permissions.push(rows[i].permissionId);
+			if (rows.length > 0) {
+				var permissions = new Array();
+				for (var i=0; i<rows.length; i++) {
+					permissions.push(rows[i].permissionId);
+				}
+				$("#permissions").val(permissions);
 			}
-			$("#permissions").val(permissions);
 			$('#fm').form('submit',{
 				url: url,
 				onSubmit: function(){
@@ -154,6 +156,10 @@
 					           && checkLength($('#roleDesc').val(), ROLE_DESC_MAX, "Description") 
 					           && $(this).form('validate')
 							   );
+					if (flag && !rows.length) {
+						$.messager.alert("", "Please choose at lease one permission.", "warning");
+						return false;
+					}
 					if(flag) {
 						$('#addBtn').linkbutton('disable');    // disable the button  
 						showLoadingMsg();
@@ -193,7 +199,15 @@
 				url = '${ctx}/accountmanagement/role/updateRole.html';
 			}
 		}
-		function doUpdateRole(){
+		function doUpdateRole() {
+			var rows = $("#permissionDl").datalist("getSelections");
+			if (rows.length > 0) {
+				var permissions = new Array();
+				for (var i=0; i<rows.length; i++) {
+					permissions.push(rows[i].permissionId);
+				}
+				$("#permissions").val(permissions);
+			}
 			$('#fm').form('submit',{
 				url: url,
 				onSubmit: function(){
@@ -201,6 +215,10 @@
 					           && checkLength($('#roleDesc').val(), ROLE_DESC_MAX, "Description") 
 					           && $(this).form('validate')
 							   );
+					if (flag && !rows.length) {
+						$.messager.alert("", "Please choose at lease one permission.", "warning");
+						return false;
+					}
 					if(flag) {
 						$('#updateBtn').linkbutton('disable');    // disable the button  
 						showLoadingMsg();

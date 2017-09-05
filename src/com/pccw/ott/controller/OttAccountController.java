@@ -25,6 +25,7 @@ import com.pccw.ott.model.OttUser;
 import com.pccw.ott.service.OttPermissionService;
 import com.pccw.ott.service.OttRoleService;
 import com.pccw.ott.service.OttUserService;
+import com.pccw.ott.util.Constants;
 import com.pccw.ott.util.MD5Util;
 
 @Controller
@@ -281,7 +282,7 @@ public class OttAccountController {
 
 	@RequestMapping("/role/updateRole.html")
 	@ResponseBody
-	public Map<String, Object> updateRole(OttRole role, HttpServletRequest request) throws Exception {
+	public Map<String, Object> updateRole(OttRole role, HttpServletRequest request, @RequestParam String permissions) throws Exception {
 		Map<String, Object> map = new HashMap<String, Object>();
 
 		try {
@@ -297,9 +298,17 @@ public class OttAccountController {
 					role.setUpdatedBy(loginUser.getUserId());
 					OttRole ottRole = ottRoleService.findExactByRoleName(role.getRoleName());
 					if (null != ottRole) {// Already exists
-						if (ottRole.getRoleId().longValue() == role.getRoleId().longValue()) {// The
-																								// same
-																								// one
+						if (ottRole.getRoleId().longValue() == role.getRoleId().longValue()) {
+							if (StringUtils.isNotBlank(permissions)) {
+								String[] permissionIds = permissions.split(",");
+								OttPermission permission = null;
+								List<OttPermission> permisionList = new ArrayList<>();
+								for (int i = 0; i < permissionIds.length; i++) {
+									permission = ottPermissionService.loadPermissionById(Long.valueOf(permissionIds[i]));
+									permisionList.add(permission);
+								}
+								role.setPermissionList(permisionList);
+							}
 							ottRoleService.updateRole(role);
 							map.put("success", true);
 							map.put("msg", "Update successfully!");
@@ -371,7 +380,7 @@ public class OttAccountController {
 		List<OttUser> list = ottUserService.findUserByUserName(usernameForSearch, first, max);
 		Long totalCount = ottUserService.findCountByUserName(usernameForSearch);
 		returnMap.put("rows", list);
-		returnMap.put("page", totalCount);
+		returnMap.put("total", totalCount);
 		return returnMap;
 	}
 	
@@ -385,7 +394,7 @@ public class OttAccountController {
 				map.put("success", false);
 				map.put("msg", "Add user failed!");
 			} else {
-				if (StringUtils.isBlank(user.getUsername()) || StringUtils.isNotBlank(user.getUserEmail())) {
+				if (StringUtils.isBlank(user.getUsername()) || StringUtils.isBlank(user.getUserEmail()) || StringUtils.isBlank(userRole)) {
 					map.put("success", false);
 					map.put("msg", "Add failed! Please complete the form.");
 				} else {
@@ -394,6 +403,7 @@ public class OttAccountController {
 						map.put("success", false);
 						map.put("msg", "User name already exists! Please check and then try again.");
 					} else {// Not exists
+						user.setPassword(MD5Util.md5(Constants.DEFAULT_PASSWORD));
 						user.setCreatedBy(loginUser.getUserId());
 						user.setUpdatedBy(loginUser.getUserId());
 						if (StringUtils.isNotBlank(userRole)) {
@@ -418,10 +428,35 @@ public class OttAccountController {
 	
 	@RequestMapping("/user/updateUser.html")
 	@ResponseBody
-	public Map<String, Object> updateUser(OttUser user, HttpServletRequest request) throws Exception {
-		Map<String, Object> map = new HashMap<String, Object>();
+	public Map<String, Object> updateUser(OttUser user, HttpServletRequest request, @RequestParam String userRole) throws Exception {
+		Map<String, Object> returnMap = new HashMap<String, Object>();
 		OttUser loginUser = (OttUser) request.getSession().getAttribute("loginUser");
-		return map;
+		if (null == user ) {
+			returnMap.put("success", false);
+			returnMap.put("msg", "Update failed! Please try again.");
+		} else if (StringUtils.isBlank(user.getUsername()) || StringUtils.isBlank(user.getUserEmail()) || StringUtils.isBlank(userRole) ) {
+			returnMap.put("success", false);
+			returnMap.put("msg", "Update failed! Please complete the form.");
+		} else {
+			OttUser ottUser = ottUserService.findExactByUsername(user.getUsername());
+			if (null != ottUser && ottUser.getUserId() != user.getUserId()) {// Already exists
+				returnMap.put("success", false);
+				returnMap.put("msg", "User name already exists! Please check and then try again.");
+			} else {// Not exists
+				user.setUpdatedBy(loginUser.getUserId());
+				if (StringUtils.isNotBlank(userRole)) {
+					OttRole role = ottRoleService.findRoleById(Long.valueOf(userRole));
+					if (role != null) {
+						user.setRole(role);
+					}
+				}
+				ottUserService.updateOttUser(user);
+				returnMap.put("success", true);
+				returnMap.put("msg", "Update successfully!");
+			}
+		
+		}
+		return returnMap;
 	}
 
 	@RequestMapping("/user/deleteUser.html")
@@ -454,5 +489,26 @@ public class OttAccountController {
 	public List<OttRole> listAllRole() {
 		List<OttRole> list = ottRoleService.findAllRole();
 		return list;
+	}
+	
+	@RequestMapping("/user/goToChangePwdPage.html")
+	public ModelAndView goToChangePwdPage() {
+		ModelAndView mv = new ModelAndView("change_password");
+		return mv;
+	}
+	
+	@RequestMapping("/user/changePassword.html")
+	@ResponseBody
+	public Map<String, Object> changePassword(@RequestParam String oldPassword, @RequestParam String newPassword, HttpServletRequest request) {
+		Map<String, Object> returnMap = new HashMap<>();
+		OttUser loginUser = (OttUser) request.getSession().getAttribute("loginUser");
+		if (!loginUser.getPassword().equals(MD5Util.md5(oldPassword))) {
+			returnMap.put("success", false);
+			returnMap.put("msg", "The old password does not match.");
+		} else {
+			ottUserService.changePassword(loginUser.getUserId(), MD5Util.md5(newPassword));
+			returnMap.put("success", true);
+		}
+		return returnMap;
 	}
 }

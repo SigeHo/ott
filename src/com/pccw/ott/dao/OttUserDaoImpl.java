@@ -82,4 +82,23 @@ public class OttUserDaoImpl extends HibernateDaoSupport implements OttUserDao {
 		this.getHibernateTemplate().save(user);
 	}
 
+	@Override
+	public void updateUser(OttUser user) {
+		OttUser originalUser = this.getHibernateTemplate().load(OttUser.class, user.getUserId());
+		originalUser.setUsername(user.getUsername());
+		originalUser.setUserEmail(user.getUserEmail());
+		originalUser.setUserDesc(user.getUserDesc());
+		originalUser.setUpdatedBy(user.getUpdatedBy());
+		originalUser.setRole(user.getRole());
+		this.getHibernateTemplate().update(originalUser);
+	}
+
+	@Override
+	public void updateUserPassword(Long userId, String newPassword) {
+		OttUser originalUser = this.getHibernateTemplate().load(OttUser.class, userId);
+		originalUser.setPassword(newPassword);
+		originalUser.setUpdatedBy(userId);
+		this.getHibernateTemplate().update(originalUser);
+	}
+
 }

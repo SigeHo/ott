@@ -17,4 +17,8 @@ public interface OttUserDao {
 	public OttUser findExactByUsername(String username);
 
 	public void saveUser(OttUser user);
+
+	public void updateUser(OttUser user);
+
+	public void updateUserPassword(Long userId, String newPassword);
 }
