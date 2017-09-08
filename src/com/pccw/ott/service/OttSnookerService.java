@@ -24,4 +24,10 @@ public interface OttSnookerService {
 	public void batchUpdateSnookerRankList(List<OttSnookerRank> updatedList);
 
 	public void batchDeleteSnookerRankList(List<OttSnookerRank> deletedList);
+
+	public void batchSaveSnookerPointList(List<OttSnookerPoint> insertedList);
+
+	public void batchUpdateSnookerPointList(List<OttSnookerPoint> updatedList);
+
+	public void batchDeleteSnookerPointList(List<OttSnookerPoint> deletedList);
 }

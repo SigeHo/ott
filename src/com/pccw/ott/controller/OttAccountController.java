@@ -80,59 +80,84 @@ public class OttAccountController {
 		session.removeAttribute("loginUser");
 	}
 
-	// ---------------- Permission Management ----------------
-	@RequestMapping("/permission/goToListPermissionPage.html")
-	public ModelAndView goToListPermissionPage(HttpServletRequest request) throws Exception {
-		ModelAndView mv = new ModelAndView("permission_management");
-		try {
-			mv.addObject("canAddPermission", "Y");
-			mv.addObject("canUpdatePermission", "Y");
-			mv.addObject("canDeletePermission", "Y");
-		} catch (Exception e) {
-			logger.error("", e);
-			throw e;
-		}
-
+	// ------------------ Change Password ------------------
+	@RequestMapping("/user/goToChangePwdPage.html")
+	public ModelAndView goToChangePwdPage() {
+		ModelAndView mv = new ModelAndView("change_password");
 		return mv;
 	}
-
-	@RequestMapping("/permission/listPermission.html")
+	
+	@RequestMapping("/user/changePassword.html")
 	@ResponseBody
-	public Map<String, Object> listPermission(HttpServletRequest request, @RequestParam int page, @RequestParam int rows) throws Exception {
-		Map<String, Object> returnMap = new HashMap<String, Object>();
-		String permissionName = request.getParameter("permissionNameForSearch");
+	public Map<String, Object> changePassword(@RequestParam String oldPassword, @RequestParam String newPassword, HttpServletRequest request) {
+		Map<String, Object> returnMap = new HashMap<>();
+		OttUser loginUser = (OttUser) request.getSession().getAttribute("loginUser");
+		if (!loginUser.getPassword().equals(MD5Util.md5(oldPassword))) {
+			returnMap.put("success", false);
+			returnMap.put("msg", "The old password does not match.");
+		} else {
+			ottUserService.changePassword(loginUser.getUserId(), MD5Util.md5(newPassword));
+			loginUser.setPassword(MD5Util.md5(newPassword));
+			request.getSession().setAttribute("loginUser", loginUser);
+			returnMap.put("success", true);
+		}
+		return returnMap;
+	}
+	
+	// ----------------- User Management -----------------
+	@RequestMapping("/user/goToListUserPage.html")
+	public ModelAndView goToListUserPage() {
+		ModelAndView mv = new ModelAndView("user_management");
+		mv.addObject("canAddUser", "Y");
+		mv.addObject("canUpdateUser", "Y");
+		mv.addObject("canDeleteUser", "Y");
+		mv.addObject("canEditUserRole", "Y");
+		return mv;
+	}
+	
+	@RequestMapping("/user/listUser.html")
+	@ResponseBody
+	public Map<String, Object> listUser(HttpServletRequest request, @RequestParam int page, @RequestParam int rows) {
+		Map<String, Object> returnMap = new HashMap<>();
+		String usernameForSearch = request.getParameter("usernameForSearch");
 		int first = (page - 1) * rows;
 		int max = page * rows;
-		List<OttPermission> list = ottPermissionService.findPermissionList(permissionName, first, max);
-		Long totalCount = ottPermissionService.findCountByPermissionName(permissionName);
+		List<OttUser> list = ottUserService.findUserByUserName(usernameForSearch, first, max);
+		Long totalCount = ottUserService.findCountByUserName(usernameForSearch);
 		returnMap.put("rows", list);
 		returnMap.put("total", totalCount);
 		return returnMap;
 	}
-
-	@RequestMapping("/permission/addPermission.html")
+	
+	@RequestMapping("/user/addUser.html")
 	@ResponseBody
-	public Map<String, Object> addPermission(OttPermission permission, HttpServletRequest request) throws Exception {
+	public Map<String, Object> addUser(OttUser user, @RequestParam String userRole, HttpServletRequest request) throws Exception {
 		Map<String, Object> map = new HashMap<String, Object>();
 		try {
 			OttUser loginUser = (OttUser) request.getSession().getAttribute("loginUser");
-			if (null == permission) {
+			if (null == user) {
 				map.put("success", false);
-				map.put("msg", "Add permission failed!");
+				map.put("msg", "Add user failed!");
 			} else {
-				// save url permission
-				if (StringUtils.isBlank(permission.getPermissionName()) || StringUtils.isBlank(permission.getPermissionUrl())) {
+				if (StringUtils.isBlank(user.getUsername()) || StringUtils.isBlank(user.getUserEmail()) || StringUtils.isBlank(userRole)) {
 					map.put("success", false);
 					map.put("msg", "Add failed! Please complete the form.");
 				} else {
-					OttPermission ottPermission = ottPermissionService.findExactByPermissionName(permission.getPermissionName());
-					if (null != ottPermission) {// Already exists
+					OttUser ottUser = ottUserService.findExactByUsername(user.getUsername());
+					if (null != ottUser) {// Already exists
 						map.put("success", false);
-						map.put("msg", "Permission name already exists! Please check and then try again.");
+						map.put("msg", "User name already exists! Please check and then try again.");
 					} else {// Not exists
-						permission.setCreatedBy(loginUser.getUserId());
-						permission.setUpdatedBy(loginUser.getUserId());
-						ottPermissionService.saveOttPermission(permission);
+						user.setPassword(MD5Util.md5(Constants.DEFAULT_PASSWORD));
+						user.setCreatedBy(loginUser.getUserId());
+						user.setUpdatedBy(loginUser.getUserId());
+						if (StringUtils.isNotBlank(userRole)) {
+							OttRole role = ottRoleService.findRoleById(Long.valueOf(userRole));
+							if (role != null) {
+								user.setRole(role);
+							}
+						}
+						ottUserService.saveOttUser(user);
 						map.put("success", true);
 						map.put("msg", "Add successfully!");
 					}
@@ -145,60 +170,54 @@ public class OttAccountController {
 		}
 		return map;
 	}
-
-	@RequestMapping("/permission/updatePermission.html")
+	
+	@RequestMapping("/user/updateUser.html")
 	@ResponseBody
-	public Map<String, Object> updatePermission(OttPermission permission, HttpServletRequest request) throws Exception {
-		Map<String, Object> map = new HashMap<String, Object>();
-
-		try {
-			OttUser loginUser = (OttUser) request.getSession().getAttribute("loginUser");
-			if (null == permission) {
-				map.put("success", false);
-				map.put("msg", "Update failed!");
-			} else {
-				if (StringUtils.isBlank(permission.getPermissionName()) || StringUtils.isBlank(permission.getPermissionUrl())) {
-					map.put("success", false);
-					map.put("msg", "Update failed! Please complete the form.");
-				} else {
-					permission.setUpdatedBy(loginUser.getUserId());
-					OttPermission ottPermission = ottPermissionService.findExactByPermissionName(permission.getPermissionName());
-					if (null != ottPermission) {// Already exists
-						if (ottPermission.getPermissionId().longValue() == permission.getPermissionId().longValue()) {// The
-																														// same
-																														// one
-							ottPermissionService.updatePermission(permission);
-							map.put("success", true);
-							map.put("msg", "Update successfully!");
-						} else {
-							map.put("success", false);
-							map.put("msg", "Permission already exists! Please check and then try again.");
-						}
-					} else {// Not exists
-						ottPermissionService.updatePermission(permission);
-						map.put("success", true);
-						map.put("msg", "Update successfully!");
+	public Map<String, Object> updateUser(OttUser user, HttpServletRequest request, @RequestParam String userRole) throws Exception {
+		Map<String, Object> returnMap = new HashMap<String, Object>();
+		OttUser loginUser = (OttUser) request.getSession().getAttribute("loginUser");
+		if (null == user ) {
+			returnMap.put("success", false);
+			returnMap.put("msg", "Update failed! Please try again.");
+		} else if (StringUtils.isBlank(user.getUsername()) || StringUtils.isBlank(user.getUserEmail()) || StringUtils.isBlank(userRole) ) {
+			returnMap.put("success", false);
+			returnMap.put("msg", "Update failed! Please complete the form.");
+		} else {
+			OttUser ottUser = ottUserService.findExactByUsername(user.getUsername());
+			if (null != ottUser && ottUser.getUserId() != user.getUserId()) {// Already exists
+				returnMap.put("success", false);
+				returnMap.put("msg", "User name already exists! Please check and then try again.");
+			} else {// Not exists
+				user.setUpdatedBy(loginUser.getUserId());
+				if (StringUtils.isNotBlank(userRole)) {
+					OttRole role = ottRoleService.findRoleById(Long.valueOf(userRole));
+					if (role != null) {
+						user.setRole(role);
 					}
 				}
+				ottUserService.updateOttUser(user);
+				returnMap.put("success", true);
+				returnMap.put("msg", "Update successfully!");
 			}
-		} catch (Exception e) {
-			logger.error("", e);
-			map.put("success", false);
-			map.put("msg", "Update failed!");
+		
 		}
-		return map;
+		return returnMap;
 	}
 
-	@RequestMapping("/permission/deletePermission.html")
+	@RequestMapping("/user/deleteUser.html")
 	@ResponseBody
-	public Map<String, Object> deletePermission(OttPermission permission, HttpServletRequest request) throws Exception {
+	public Map<String, Object> deleteUser(OttUser user, HttpServletRequest request) throws Exception {
 		Map<String, Object> map = new HashMap<String, Object>();
+		OttUser loginUser = (OttUser) request.getSession().getAttribute("loginUser");
 		try {
-			if (null == permission) {
+			if (null == user) {
 				map.put("success", false);
 				map.put("msg", "Delete failed! Please try again.");
+			} else if (loginUser.getUserId() == user.getUserId()) {
+				map.put("success", false);
+				map.put("msg", "Delete failed! Cannot delete current user.");
 			} else {
-				ottPermissionService.deletePermission(permission.getPermissionId());
+				ottUserService.deleteUser(user.getUserId());
 				map.put("success", true);
 				map.put("msg", "Delete successfully!");
 			}
@@ -209,7 +228,14 @@ public class OttAccountController {
 		}
 		return map;
 	}
-
+	
+	@RequestMapping("/user/listAllRole.html")
+	@ResponseBody
+	public List<OttRole> listAllRole() {
+		List<OttRole> list = ottRoleService.findAllRole();
+		return list;
+	}	
+	
 	// ---------------- Role Management ----------------
 	@RequestMapping("/role/goToListRolePage.html")
 	public ModelAndView goToListRolePage() {
@@ -359,60 +385,59 @@ public class OttAccountController {
 		return list;
 	}
 	
-	// ----------------- User Management -----------------
-	@RequestMapping("/user/goToListUserPage.html")
-	public ModelAndView goToListUserPage() {
-		ModelAndView mv = new ModelAndView("user_management");
-		mv.addObject("canAddUser", "Y");
-		mv.addObject("canUpdateUser", "Y");
-		mv.addObject("canDeleteUser", "Y");
-		mv.addObject("canEditUserRole", "Y");
+	// ---------------- Permission Management ----------------
+	@RequestMapping("/permission/goToListPermissionPage.html")
+	public ModelAndView goToListPermissionPage(HttpServletRequest request) throws Exception {
+		ModelAndView mv = new ModelAndView("permission_management");
+		try {
+			mv.addObject("canAddPermission", "Y");
+			mv.addObject("canUpdatePermission", "Y");
+			mv.addObject("canDeletePermission", "Y");
+		} catch (Exception e) {
+			logger.error("", e);
+			throw e;
+		}
+
 		return mv;
 	}
-	
-	@RequestMapping("/user/listUser.html")
+
+	@RequestMapping("/permission/listPermission.html")
 	@ResponseBody
-	public Map<String, Object> listUser(HttpServletRequest request, @RequestParam int page, @RequestParam int rows) {
-		Map<String, Object> returnMap = new HashMap<>();
-		String usernameForSearch = request.getParameter("usernameForSearch");
+	public Map<String, Object> listPermission(HttpServletRequest request, @RequestParam int page, @RequestParam int rows) throws Exception {
+		Map<String, Object> returnMap = new HashMap<String, Object>();
+		String permissionName = request.getParameter("permissionNameForSearch");
 		int first = (page - 1) * rows;
 		int max = page * rows;
-		List<OttUser> list = ottUserService.findUserByUserName(usernameForSearch, first, max);
-		Long totalCount = ottUserService.findCountByUserName(usernameForSearch);
+		List<OttPermission> list = ottPermissionService.findPermissionList(permissionName, first, max);
+		Long totalCount = ottPermissionService.findCountByPermissionName(permissionName);
 		returnMap.put("rows", list);
 		returnMap.put("total", totalCount);
 		return returnMap;
 	}
-	
-	@RequestMapping("/user/addUser.html")
+
+	@RequestMapping("/permission/addPermission.html")
 	@ResponseBody
-	public Map<String, Object> addUser(OttUser user, @RequestParam String userRole, HttpServletRequest request) throws Exception {
+	public Map<String, Object> addPermission(OttPermission permission, HttpServletRequest request) throws Exception {
 		Map<String, Object> map = new HashMap<String, Object>();
 		try {
 			OttUser loginUser = (OttUser) request.getSession().getAttribute("loginUser");
-			if (null == user) {
+			if (null == permission) {
 				map.put("success", false);
-				map.put("msg", "Add user failed!");
+				map.put("msg", "Add permission failed!");
 			} else {
-				if (StringUtils.isBlank(user.getUsername()) || StringUtils.isBlank(user.getUserEmail()) || StringUtils.isBlank(userRole)) {
+				// save url permission
+				if (StringUtils.isBlank(permission.getPermissionName()) || StringUtils.isBlank(permission.getPermissionUrl())) {
 					map.put("success", false);
 					map.put("msg", "Add failed! Please complete the form.");
 				} else {
-					OttUser ottUser = ottUserService.findExactByUsername(user.getUsername());
-					if (null != ottUser) {// Already exists
+					OttPermission ottPermission = ottPermissionService.findExactByPermissionName(permission.getPermissionName());
+					if (null != ottPermission) {// Already exists
 						map.put("success", false);
-						map.put("msg", "User name already exists! Please check and then try again.");
+						map.put("msg", "Permission name already exists! Please check and then try again.");
 					} else {// Not exists
-						user.setPassword(MD5Util.md5(Constants.DEFAULT_PASSWORD));
-						user.setCreatedBy(loginUser.getUserId());
-						user.setUpdatedBy(loginUser.getUserId());
-						if (StringUtils.isNotBlank(userRole)) {
-							OttRole role = ottRoleService.findRoleById(Long.valueOf(userRole));
-							if (role != null) {
-								user.setRole(role);
-							}
-						}
-						ottUserService.saveOttUser(user);
+						permission.setCreatedBy(loginUser.getUserId());
+						permission.setUpdatedBy(loginUser.getUserId());
+						ottPermissionService.saveOttPermission(permission);
 						map.put("success", true);
 						map.put("msg", "Add successfully!");
 					}
@@ -425,54 +450,60 @@ public class OttAccountController {
 		}
 		return map;
 	}
-	
-	@RequestMapping("/user/updateUser.html")
+
+	@RequestMapping("/permission/updatePermission.html")
 	@ResponseBody
-	public Map<String, Object> updateUser(OttUser user, HttpServletRequest request, @RequestParam String userRole) throws Exception {
-		Map<String, Object> returnMap = new HashMap<String, Object>();
-		OttUser loginUser = (OttUser) request.getSession().getAttribute("loginUser");
-		if (null == user ) {
-			returnMap.put("success", false);
-			returnMap.put("msg", "Update failed! Please try again.");
-		} else if (StringUtils.isBlank(user.getUsername()) || StringUtils.isBlank(user.getUserEmail()) || StringUtils.isBlank(userRole) ) {
-			returnMap.put("success", false);
-			returnMap.put("msg", "Update failed! Please complete the form.");
-		} else {
-			OttUser ottUser = ottUserService.findExactByUsername(user.getUsername());
-			if (null != ottUser && ottUser.getUserId() != user.getUserId()) {// Already exists
-				returnMap.put("success", false);
-				returnMap.put("msg", "User name already exists! Please check and then try again.");
-			} else {// Not exists
-				user.setUpdatedBy(loginUser.getUserId());
-				if (StringUtils.isNotBlank(userRole)) {
-					OttRole role = ottRoleService.findRoleById(Long.valueOf(userRole));
-					if (role != null) {
-						user.setRole(role);
+	public Map<String, Object> updatePermission(OttPermission permission, HttpServletRequest request) throws Exception {
+		Map<String, Object> map = new HashMap<String, Object>();
+
+		try {
+			OttUser loginUser = (OttUser) request.getSession().getAttribute("loginUser");
+			if (null == permission) {
+				map.put("success", false);
+				map.put("msg", "Update failed!");
+			} else {
+				if (StringUtils.isBlank(permission.getPermissionName()) || StringUtils.isBlank(permission.getPermissionUrl())) {
+					map.put("success", false);
+					map.put("msg", "Update failed! Please complete the form.");
+				} else {
+					permission.setUpdatedBy(loginUser.getUserId());
+					OttPermission ottPermission = ottPermissionService.findExactByPermissionName(permission.getPermissionName());
+					if (null != ottPermission) {// Already exists
+						if (ottPermission.getPermissionId().longValue() == permission.getPermissionId().longValue()) {// The
+																														// same
+																														// one
+							ottPermissionService.updatePermission(permission);
+							map.put("success", true);
+							map.put("msg", "Update successfully!");
+						} else {
+							map.put("success", false);
+							map.put("msg", "Permission already exists! Please check and then try again.");
+						}
+					} else {// Not exists
+						ottPermissionService.updatePermission(permission);
+						map.put("success", true);
+						map.put("msg", "Update successfully!");
 					}
 				}
-				ottUserService.updateOttUser(user);
-				returnMap.put("success", true);
-				returnMap.put("msg", "Update successfully!");
 			}
-		
+		} catch (Exception e) {
+			logger.error("", e);
+			map.put("success", false);
+			map.put("msg", "Update failed!");
 		}
-		return returnMap;
+		return map;
 	}
 
-	@RequestMapping("/user/deleteUser.html")
+	@RequestMapping("/permission/deletePermission.html")
 	@ResponseBody
-	public Map<String, Object> deleteUser(OttUser user, HttpServletRequest request) throws Exception {
+	public Map<String, Object> deletePermission(OttPermission permission, HttpServletRequest request) throws Exception {
 		Map<String, Object> map = new HashMap<String, Object>();
-		OttUser loginUser = (OttUser) request.getSession().getAttribute("loginUser");
 		try {
-			if (null == user) {
+			if (null == permission) {
 				map.put("success", false);
 				map.put("msg", "Delete failed! Please try again.");
-			} else if (loginUser.getUserId() == user.getUserId()) {
-				map.put("success", false);
-				map.put("msg", "Delete failed! Cannot delete current user.");
 			} else {
-				ottUserService.deleteUser(user.getUserId());
+				ottPermissionService.deletePermission(permission.getPermissionId());
 				map.put("success", true);
 				map.put("msg", "Delete successfully!");
 			}
@@ -484,31 +515,4 @@ public class OttAccountController {
 		return map;
 	}
 	
-	@RequestMapping("/user/listAllRole.html")
-	@ResponseBody
-	public List<OttRole> listAllRole() {
-		List<OttRole> list = ottRoleService.findAllRole();
-		return list;
-	}
-	
-	@RequestMapping("/user/goToChangePwdPage.html")
-	public ModelAndView goToChangePwdPage() {
-		ModelAndView mv = new ModelAndView("change_password");
-		return mv;
-	}
-	
-	@RequestMapping("/user/changePassword.html")
-	@ResponseBody
-	public Map<String, Object> changePassword(@RequestParam String oldPassword, @RequestParam String newPassword, HttpServletRequest request) {
-		Map<String, Object> returnMap = new HashMap<>();
-		OttUser loginUser = (OttUser) request.getSession().getAttribute("loginUser");
-		if (!loginUser.getPassword().equals(MD5Util.md5(oldPassword))) {
-			returnMap.put("success", false);
-			returnMap.put("msg", "The old password does not match.");
-		} else {
-			ottUserService.changePassword(loginUser.getUserId(), MD5Util.md5(newPassword));
-			returnMap.put("success", true);
-		}
-		return returnMap;
-	}
 }

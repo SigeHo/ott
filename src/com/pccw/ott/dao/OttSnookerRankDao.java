@@ -7,7 +7,7 @@ import com.pccw.ott.model.OttSnookerRank;
 
 public interface OttSnookerRankDao {
 	
-	public void batchSave(List<OttSnookerRank> list);
+	public void batchSaveRankList(List<OttSnookerRank> list);
 
 	public List<OttSnookerRank> findByPlayerName(String playerName, int first, int max);
 
@@ -24,5 +24,11 @@ public interface OttSnookerRankDao {
 	public void batchUpdateSnookerRankList(List<OttSnookerRank> updatedList);
 
 	public void batchDeleteSnookerRankList(List<OttSnookerRank> deletedList);
+
+	public void batchSaveSnookerPointList(List<OttSnookerPoint> insertedList);
+
+	public void batchUpdateSnookerPointList(List<OttSnookerPoint> updatedList);
+
+	public void batchDeleteSnookerPointList(List<OttSnookerPoint> deletedList);
 
 }

@@ -58,9 +58,9 @@ public class OttSnookerController {
 		return returnMap;
 	}
 
-	@RequestMapping("/rank/saveChanges.html")
+	@RequestMapping("/rank/saveRankChanges.html")
 	@ResponseBody
-	public Map<String, Object> saveChanges(HttpServletRequest request) {
+	public Map<String, Object> saveRankChanges(HttpServletRequest request) {
 		Map<String, Object> returnMap = new HashMap<String, Object>();
 		String inserted = request.getParameter("inserted");
 		String updated = request.getParameter("updated");
@@ -106,7 +106,43 @@ public class OttSnookerController {
 		returnMap.put("rows", list);
 		return returnMap;
 	}
-
+	
+	@RequestMapping("/rank/savePointChanges.html")
+	@ResponseBody
+	public Map<String, Object> savePointChanges(HttpServletRequest request) {
+		Map<String, Object> returnMap = new HashMap<String, Object>();
+		String inserted = request.getParameter("inserted");
+		String updated = request.getParameter("updated");
+		String deleted = request.getParameter("deleted");
+		ObjectMapper mapper = new ObjectMapper();
+		JavaType javaType = mapper.getTypeFactory().constructParametricType(ArrayList.class, OttSnookerPoint.class);
+		try {
+			if (StringUtils.isNotBlank(inserted)) {
+				List<OttSnookerPoint> insertedList = mapper.readValue(inserted, javaType);
+				if (insertedList.size() > 0)
+					ottSnookerService.batchSaveSnookerPointList(insertedList);
+			}
+			if (StringUtils.isNotBlank(updated)) {
+				List<OttSnookerPoint> updatedList = mapper.readValue(updated, javaType);
+				if (updatedList.size() > 0)
+					ottSnookerService.batchUpdateSnookerPointList(updatedList);
+			}
+			if (StringUtils.isNotBlank(deleted)) {
+				List<OttSnookerPoint> deletedList = mapper.readValue(deleted, javaType);
+				if (deletedList.size() > 0)
+					ottSnookerService.batchDeleteSnookerPointList(deletedList);
+			}
+			returnMap.put("success", true);
+		} catch (JsonParseException | JsonMappingException e) {
+			logger.error(e.toString());
+			returnMap.put("success", false);
+		} catch (IOException e) {
+			logger.error(e.toString());
+			returnMap.put("success", false);
+		}
+		return returnMap;
+	}
+	
 	// ------------------ Snooker Fixture ------------------
 
 	@RequestMapping("/fixture/goToListFixturePage.html")

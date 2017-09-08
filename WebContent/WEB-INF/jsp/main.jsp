@@ -165,15 +165,15 @@ ul li {
 			       	<span style="font-weight:bold;color:#06c">Account Management</span>
 					<ul>
 						<li><a href="javascript:void(0)" onclick="addTab('Pwd', '${ctx}/accountmanagement/user/goToChangePwdPage.html', ' ');return false;">Change Password</a><br/></li>
-						<c:if test="${hasUserPermission eq 'Y'}">
-			   			<li><a href="javascript:void(0)" onclick="addTab('User', '${ctx}/accountmanagement/user/goToListUserPage.html', ' ');return false;">User</a><br/></li>
-						</c:if>
-						<c:if test="${hasRolePermission eq 'Y'}">
-			   			<li><a href="javascript:void(0)" onclick="addTab('Role', '${ctx}/accountmanagement/role/goToListRolePage.html', ' ');return false;">Role</a><br/></li>
-						</c:if>
-						<c:if test="${hasPermission eq 'Y'}">
-			   			<li><a href="javascript:void(0)" onclick="addTab('Permission', '${ctx}/accountmanagement/permission/goToListPermissionPage.html', ' ');return false;">Permission</a><br/></li>
-						</c:if>
+<%-- 						<c:if test="${hasUserPermission eq 'Y'}"> --%>
+<%-- 			   			<li><a href="javascript:void(0)" onclick="addTab('User', '${ctx}/accountmanagement/user/goToListUserPage.html', ' ');return false;">User</a><br/></li> --%>
+<%-- 						</c:if> --%>
+<%-- 						<c:if test="${hasRolePermission eq 'Y'}"> --%>
+<%-- 			   			<li><a href="javascript:void(0)" onclick="addTab('Role', '${ctx}/accountmanagement/role/goToListRolePage.html', ' ');return false;">Role</a><br/></li> --%>
+<%-- 						</c:if> --%>
+<%-- 						<c:if test="${hasPermission eq 'Y'}"> --%>
+<%-- 			   			<li><a href="javascript:void(0)" onclick="addTab('Permission', '${ctx}/accountmanagement/permission/goToListPermissionPage.html', ' ');return false;">Permission</a><br/></li> --%>
+<%-- 						</c:if> --%>
 				    </ul>
 				    </c:if>				    
 				</td>

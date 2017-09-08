@@ -17,10 +17,10 @@ public class OttSnookerServiceImpl implements OttSnookerService {
 
 	@Autowired
 	private OttSnookerRankDao ottSnookerRankDao;
-
+	
 	@Override
-	public void batchSaveSnookerRankList(final List<OttSnookerRank> list) {
-		ottSnookerRankDao.batchSave(list);
+	public void batchSaveSnookerRankList(List<OttSnookerRank> list) {
+		ottSnookerRankDao.batchSaveRankList(list);
 	}
 
 	@Override
@@ -66,6 +66,21 @@ public class OttSnookerServiceImpl implements OttSnookerService {
 	@Override
 	public void batchDeleteSnookerRankList(List<OttSnookerRank> deletedList) {
 		ottSnookerRankDao.batchDeleteSnookerRankList(deletedList);		
+	}
+
+	@Override
+	public void batchSaveSnookerPointList(List<OttSnookerPoint> insertedList) {
+		ottSnookerRankDao.batchSaveSnookerPointList(insertedList);		
+	}
+
+	@Override
+	public void batchUpdateSnookerPointList(List<OttSnookerPoint> updatedList) {
+		ottSnookerRankDao.batchUpdateSnookerPointList(updatedList);
+	}
+
+	@Override
+	public void batchDeleteSnookerPointList(List<OttSnookerPoint> deletedList) {
+		ottSnookerRankDao.batchDeleteSnookerPointList(deletedList);
 	}
 
 }

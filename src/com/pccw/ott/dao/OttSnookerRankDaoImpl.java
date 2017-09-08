@@ -17,7 +17,7 @@ import com.pccw.ott.model.OttSnookerRank;
 public class OttSnookerRankDaoImpl extends HibernateDaoSupport implements OttSnookerRankDao {
 
 	@Override
-	public void batchSave(List<OttSnookerRank> list) {
+	public void batchSaveRankList(List<OttSnookerRank> list) {
 		this.getHibernateTemplate().execute(new HibernateCallback<Object>() {
 			@Override
 			public Object doInHibernate(Session session) throws HibernateException {
@@ -144,6 +144,58 @@ public class OttSnookerRankDaoImpl extends HibernateDaoSupport implements OttSno
 				query.executeUpdate();
 				query = session.createQuery("delete from OttSnookerRank");
 				query.executeUpdate();
+				return null;
+			}
+		});
+	}
+
+	@Override
+	public void batchSaveSnookerPointList(List<OttSnookerPoint> insertedList) {
+		this.getHibernateTemplate().execute(new HibernateCallback<Object>() {
+			@Override
+			public Object doInHibernate(Session session) throws HibernateException {
+				for (OttSnookerPoint ottSnookerPoint : insertedList) {
+					session.save(ottSnookerPoint);
+				}
+				session.flush();
+				session.clear();
+				return null;
+			}
+		});
+	}
+
+	@Override
+	public void batchUpdateSnookerPointList(List<OttSnookerPoint> updatedList) {
+		this.getHibernateTemplate().execute(new HibernateCallback<Object>() {
+			@Override
+			public Object doInHibernate(Session session) throws HibernateException {
+				for (OttSnookerPoint ottSnookerPoint : updatedList) {
+					OttSnookerPoint point = session.load(OttSnookerPoint.class, ottSnookerPoint.getPointId());
+					point.setLeagueId(ottSnookerPoint.getLeagueId());
+					point.setLeagueNameCn(ottSnookerPoint.getLeagueNameCn());
+					point.setLeagueNameEn(ottSnookerPoint.getLeagueNameEn());
+					point.setLeagueNameTr(ottSnookerPoint.getLeagueNameTr());
+					point.setSn(ottSnookerPoint.getSn());
+					session.update(point);
+				}
+				session.flush();
+				session.clear();
+				return null;
+			}
+		});
+	}
+
+	@Override
+	public void batchDeleteSnookerPointList(List<OttSnookerPoint> deletedList) {
+		this.getHibernateTemplate().execute(new HibernateCallback<Object>() {
+			@Override
+			public Object doInHibernate(Session session) throws HibernateException {
+				for (OttSnookerPoint ottSnookerPoint : deletedList) {
+					OttSnookerPoint point = session.load(OttSnookerPoint.class, ottSnookerPoint.getPointId());
+					session.delete(point);
+				}
+				session.flush();
+				session.clear();
 				return null;
 			}
 		});

@@ -2,45 +2,52 @@ package com.pccw.ott.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.Transient;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.annotations.CreationTimestamp;
 
-//@Entity
-//@Table(name = "ott_snooker_fixture")
+@Entity
+@Table(name = "ott_snooker_fixture")
 public class OttSnookerFixture implements Serializable {
 	private static final long serialVersionUID = -7000740508755967868L;
+	private Long fixtureId;
 	private String matchId;
+	private String seasonId;
 	private Date matchTime;
-	private String leagueId;
-	private String leagueNameEn;
+	private Long leagueId;
 	private String leagueNameCn;
+	private String leagueNameEn;
 	private String leagueNameTr;
 	private String leagueType;
-	private String mMatchLevel;
-	private String matchLevel;
-	private String matchGroup;
+	private String matchLevel1;
+	private String matchLevel2;
+	private String group;
 	private String playAId;
-	private String playANameEn;
-	private String playANameCn;
-	private String playANameTr;
 	private String playBId;
-	private String playBName;
-	private String playBNameEn;
+	private String playANameCn;
+	private String playANameEn;
+	private String playANameTr;
 	private String playBNameCn;
+	private String playBNameEn;
 	private String playBNameTr;
 	private Long playAWinNum;
 	private Long playBWinNum;
-	private Long maxFrame;
-	private Long currentFrameNum;
-	private Long currentScoreA;
-	private Long currentScoreB;
-	private String currentBestPlayer;
-	private Long currentCscoreA;
-	private Long currentCscoreB;
-	private Long currentMatchSort;
+	private Long maxField;
+	private Long currentField;
 	private String winnerId;
 	private String winReason;
 	private String quiterId;
@@ -51,6 +58,20 @@ public class OttSnookerFixture implements Serializable {
 	private String currentPlayerId;
 	private Long currentScore;
 	private Long sort;
+	private Date lastPublishedDate;
+	private List<OttSnookerFrame> frameList;
+	
+
+	@Id
+	@Column(name ="fixture_id")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	public Long getFixtureId() {
+		return fixtureId;
+	}
+
+	public void setFixtureId(Long fixtureId) {
+		this.fixtureId = fixtureId;
+	}
 
 	@Column(name = "match_id")
 	public String getMatchId() {
@@ -59,6 +80,15 @@ public class OttSnookerFixture implements Serializable {
 
 	public void setMatchId(String matchId) {
 		this.matchId = matchId;
+	}
+
+	@Column(name = "season_id")
+	public String getSeasonId() {
+		return seasonId;
+	}
+
+	public void setSeasonId(String seasonId) {
+		this.seasonId = seasonId;
 	}
 
 	@Column(name = "match_time")
@@ -71,21 +101,12 @@ public class OttSnookerFixture implements Serializable {
 	}
 
 	@Column(name = "league_id")
-	public String getLeagueId() {
+	public Long getLeagueId() {
 		return leagueId;
 	}
 
-	public void setLeagueId(String leagueId) {
+	public void setLeagueId(Long leagueId) {
 		this.leagueId = leagueId;
-	}
-
-	@Column(name = "league_name_en")
-	public String getLeagueNameEn() {
-		return leagueNameEn;
-	}
-
-	public void setLeagueNameEn(String leagueNameEn) {
-		this.leagueNameEn = leagueNameEn;
 	}
 
 	@Column(name = "league_name_cn")
@@ -95,6 +116,15 @@ public class OttSnookerFixture implements Serializable {
 
 	public void setLeagueNameCn(String leagueNameCn) {
 		this.leagueNameCn = leagueNameCn;
+	}
+
+	@Column(name = "league_name_en")
+	public String getLeagueNameEn() {
+		return leagueNameEn;
+	}
+
+	public void setLeagueNameEn(String leagueNameEn) {
+		this.leagueNameEn = leagueNameEn;
 	}
 
 	@Column(name = "league_name_tr")
@@ -115,34 +145,34 @@ public class OttSnookerFixture implements Serializable {
 		this.leagueType = leagueType;
 	}
 
-	@Column(name = "m_match_level")
-	public String getmMatchLevel() {
-		return mMatchLevel;
+	@Column(name = "match_level_1")
+	public String getMatchLevel1() {
+		return matchLevel1;
 	}
 
-	public void setmMatchLevel(String mMatchLevel) {
-		this.mMatchLevel = mMatchLevel;
+	public void setMatchLevel1(String matchLevel1) {
+		this.matchLevel1 = matchLevel1;
 	}
 
-	@Column(name = "match_level")
-	public String getMatchLevel() {
-		return matchLevel;
+	@Column(name = "match_level_2")
+	public String getMatchLevel2() {
+		return matchLevel2;
 	}
 
-	public void setMatchLevel(String matchLevel) {
-		this.matchLevel = matchLevel;
+	public void setMatchLevel2(String matchLevel2) {
+		this.matchLevel2 = matchLevel2;
 	}
 
-	@Column(name = "matchGroup")
-	public String getMatchGroup() {
-		return matchGroup;
+	@Column(name = "group")
+	public String getGroup() {
+		return group;
 	}
 
-	public void setMatchGroup(String matchGroup) {
-		this.matchGroup = matchGroup;
+	public void setGroup(String group) {
+		this.group = group;
 	}
 
-	@Column(name = "play_a_id")
+	@Column(name = "player_a_id")
 	public String getPlayAId() {
 		return playAId;
 	}
@@ -151,34 +181,7 @@ public class OttSnookerFixture implements Serializable {
 		this.playAId = playAId;
 	}
 
-	@Column(name = "play_a_name_en")
-	public String getPlayANameEn() {
-		return playANameEn;
-	}
-
-	public void setPlayANameEn(String playANameEn) {
-		this.playANameEn = playANameEn;
-	}
-
-	@Column(name = "play_a_name_cn")
-	public String getPlayANameCn() {
-		return playANameCn;
-	}
-
-	public void setPlayANameCn(String playANameCn) {
-		this.playANameCn = playANameCn;
-	}
-
-	@Column(name = "play_a_name_tr")
-	public String getPlayANameTr() {
-		return playANameTr;
-	}
-
-	public void setPlayANameHk(String playANameTr) {
-		this.playANameTr = playANameTr;
-	}
-
-	@Column(name = "play_b_id")
+	@Column(name = "player_b_id")
 	public String getPlayBId() {
 		return playBId;
 	}
@@ -187,25 +190,34 @@ public class OttSnookerFixture implements Serializable {
 		this.playBId = playBId;
 	}
 
-	@Transient
-	public String getPlayBName() {
-		return playBName;
+	@Column(name = "player_a_name_cn")
+	public String getPlayANameCn() {
+		return playANameCn;
 	}
 
-	public void setPlayBName(String playBName) {
-		this.playBName = playBName;
+	public void setPlayANameCn(String playANameCn) {
+		this.playANameCn = playANameCn;
 	}
 
-	@Column(name = "play_b_name_en")
-	public String getPlayBNameEn() {
-		return playBNameEn;
+	@Column(name = "player_a_name_en")
+	public String getPlayANameEn() {
+		return playANameEn;
 	}
 
-	public void setPlayBNameEn(String playBNameEn) {
-		this.playBNameEn = playBNameEn;
+	public void setPlayANameEn(String playANameEn) {
+		this.playANameEn = playANameEn;
 	}
 
-	@Column(name = "play_b_name_cn")
+	@Column(name = "player_a_name_tr")
+	public String getPlayANameTr() {
+		return playANameTr;
+	}
+
+	public void setPlayANameTr(String playANameTr) {
+		this.playANameTr = playANameTr;
+	}
+
+	@Column(name = "player_b_name_cn")
 	public String getPlayBNameCn() {
 		return playBNameCn;
 	}
@@ -214,17 +226,26 @@ public class OttSnookerFixture implements Serializable {
 		this.playBNameCn = playBNameCn;
 	}
 
-	@Column(name = "play_b_name_tr")
+	@Column(name = "player_b_name_en")
+	public String getPlayBNameEn() {
+		return playBNameEn;
+	}
+
+	public void setPlayBNameEn(String playBNameEn) {
+		this.playBNameEn = playBNameEn;
+	}
+
+	@Column(name = "player_b_name_tr")
 	public String getPlayBNameTr() {
 		return playBNameTr;
 	}
 
-	public void setPlayBNameHk(String playBNameTr) {
+	public void setPlayBNameTr(String playBNameTr) {
 		this.playBNameTr = playBNameTr;
 	}
 
-	@Column(name = "play_a_win_num")
-	public Long getPlayAWinNum() { 
+	@Column(name = "player_a_win_num")
+	public Long getPlayAWinNum() {
 		return playAWinNum;
 	}
 
@@ -232,7 +253,7 @@ public class OttSnookerFixture implements Serializable {
 		this.playAWinNum = playAWinNum;
 	}
 
-	@Column(name = "play_B_win_num")
+	@Column(name = "player_b_win_num")
 	public Long getPlayBWinNum() {
 		return playBWinNum;
 	}
@@ -241,76 +262,22 @@ public class OttSnookerFixture implements Serializable {
 		this.playBWinNum = playBWinNum;
 	}
 
-	@Column(name = "max_frame")
-	public Long getMaxFrame() {
-		return maxFrame;
+	@Column(name = "max_field")
+	public Long getMaxField() {
+		return maxField;
 	}
 
-	public void setMaxFrame(Long maxFrame) {
-		this.maxFrame = maxFrame;
+	public void setMaxField(Long maxField) {
+		this.maxField = maxField;
 	}
 
-	@Column(name = "current_frame_num")
-	public Long getCurrentFrameNum() {
-		return currentFrameNum;
+	@Column(name = "current_field")
+	public Long getCurrentField() {
+		return currentField;
 	}
 
-	public void setCurrentFrameNum(Long currentFrameNum) {
-		this.currentFrameNum = currentFrameNum;
-	}
-
-	@Column(name = "current_score_a")
-	public Long getCurrentScoreA() {
-		return currentScoreA;
-	}
-
-	public void setCurrentScoreA(Long currentScoreA) {
-		this.currentScoreA = currentScoreA;
-	}
-
-	@Column(name = "current_score_b")
-	public Long getCurrentScoreB() {
-		return currentScoreB;
-	}
-
-	public void setCurrentScoreB(Long currentScoreB) {
-		this.currentScoreB = currentScoreB;
-	}
-
-	@Column(name = "current_best_player")
-	public String getCurrentBestPlayer() {
-		return currentBestPlayer;
-	}
-
-	public void setCurrentBestPlayer(String currentBestPlayer) {
-		this.currentBestPlayer = currentBestPlayer;
-	}
-
-	@Column(name = "current_cscore_a")
-	public Long getCurrentCscoreA() {
-		return currentCscoreA;
-	}
-
-	public void setCurrentCscoreA(Long currentCscoreA) {
-		this.currentCscoreA = currentCscoreA;
-	}
-
-	@Column(name = "current_cscore_b")
-	public Long getCurrentCscoreB() {
-		return currentCscoreB;
-	}
-
-	public void setCurrentCscoreB(Long currentCscoreB) {
-		this.currentCscoreB = currentCscoreB;
-	}
-
-	@Column(name = "current_match_sort")
-	public Long getCurrentMatchSort() {
-		return currentMatchSort;
-	}
-
-	public void setCurrentMatchSort(Long currentMatchSort) {
-		this.currentMatchSort = currentMatchSort;
+	public void setCurrentField(Long currentField) {
+		this.currentField = currentField;
 	}
 
 	@Column(name = "winner_id")
@@ -322,8 +289,7 @@ public class OttSnookerFixture implements Serializable {
 		this.winnerId = winnerId;
 	}
 
-	@JsonProperty("wr")
-	@Column(name = "winn_reason")
+	@Column(name = "win_reason")
 	public String getWinReason() {
 		return winReason;
 	}
@@ -332,7 +298,6 @@ public class OttSnookerFixture implements Serializable {
 		this.winReason = winReason;
 	}
 
-	@JsonProperty("qid")
 	@Column(name = "quiter_id")
 	public String getQuiterId() {
 		return quiterId;
@@ -342,8 +307,7 @@ public class OttSnookerFixture implements Serializable {
 		this.quiterId = quiterId;
 	}
 
-	@JsonProperty("qr")
-	@Column(name = "quit_id")
+	@Column(name = "quit_reason")
 	public String getQuitReason() {
 		return quitReason;
 	}
@@ -352,7 +316,6 @@ public class OttSnookerFixture implements Serializable {
 		this.quitReason = quitReason;
 	}
 
-	@JsonProperty("bestId")
 	@Column(name = "best_player_id")
 	public String getBestPlayerId() {
 		return bestPlayerId;
@@ -362,7 +325,6 @@ public class OttSnookerFixture implements Serializable {
 		this.bestPlayerId = bestPlayerId;
 	}
 
-	@JsonProperty("bestscore")
 	@Column(name = "best_score")
 	public Long getBestScore() {
 		return bestScore;
@@ -372,7 +334,6 @@ public class OttSnookerFixture implements Serializable {
 		this.bestScore = bestScore;
 	}
 
-	@JsonProperty("st")
 	@Column(name = "status")
 	public String getStatus() {
 		return status;
@@ -382,7 +343,6 @@ public class OttSnookerFixture implements Serializable {
 		this.status = status;
 	}
 
-	@JsonProperty("curId")
 	@Column(name = "current_player_id")
 	public String getCurrentPlayerId() {
 		return currentPlayerId;
@@ -392,7 +352,6 @@ public class OttSnookerFixture implements Serializable {
 		this.currentPlayerId = currentPlayerId;
 	}
 
-	@JsonProperty("curscore")
 	@Column(name = "current_score")
 	public Long getCurrentScore() {
 		return currentScore;
@@ -409,6 +368,29 @@ public class OttSnookerFixture implements Serializable {
 
 	public void setSort(Long sort) {
 		this.sort = sort;
+	}
+	
+	@Column(name = "las_published_date")
+	@Temporal(TemporalType.TIMESTAMP)
+	@CreationTimestamp
+	public Date getLastPublishedDate() {
+		return lastPublishedDate;
+	}
+
+	public void setLastPublishedDate(Date lastPublishedDate) {
+		this.lastPublishedDate = lastPublishedDate;
+	}
+
+	@OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
+	@JoinTable(name = "ott_snooker_fixture_frame", joinColumns = {
+			@JoinColumn(name = "fixture_id", referencedColumnName = "fixture_id") }, inverseJoinColumns = {
+					@JoinColumn(name = "frame_id", referencedColumnName = "frame_id") })
+	public List<OttSnookerFrame> getFrameList() {
+		return frameList;
+	}
+
+	public void setFrameList(List<OttSnookerFrame> frameList) {
+		this.frameList = frameList;
 	}
 
 }
