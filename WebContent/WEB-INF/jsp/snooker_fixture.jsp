@@ -1,141 +1,364 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<!DOCTYPE html>
+<%@ include file="/common/taglibs.jsp"%>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
+<style type="text/css">
+div.centent {
+	float: left;
+	text-align: center;
+	margin: 10px;
+}
+
+div.centent span {
+	display: block;
+	margin: 2px 2px;
+	padding: 4px 10px;
+	background: #898989;
+	cursor: pointer;
+	font-size: 12px;
+	color: white;
+}
+
+tr.changed-row {
+	background-color: yellow;
+}
+</style>
+
+<script type="text/javascript">
+	var scoreEditIndex = undefined;
+	var frameEditIndex = undefined;
+	
+	function endEditing(type) {
+		var dg = $(this);
+		var editIndex = undefined;
+		if (dg == $("#score_dg")) {
+			editIndex = scoreEditIndex;
+		} else if (dg == $("#frame_dg")) {
+			editIndex = frameEditIndex;
+		}
+		if (editIndex == undefined) { return true; }
+		if (dg.datagrid('validateRow', editIndex)) {
+			dg.datagrid('endEdit', editIndex);
+			if (dg == $("#score_dg")) {
+				scoreEditIndex = undefined;
+			} else {
+				frameEditIndex = undefined;
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	function onDblClickCell(index,field,value) {
+		var dg = $(this);
+		var editIndex = undefined;
+		if (dg == $("#score_dg")) {
+			editIndex = scoreEditIndex;
+		} else if (dg == $("#frame_dg")) {
+			editIndex = frameEditIndex;
+		}
+		$("#saveBtn").linkbutton("enable");
+		if (editIndex != index) {
+			if (endEditing()) {
+				dg.datagrid('selectRow', index).datagrid('beginEdit', index);
+				var ed = dg.datagrid('getEditor', {
+					index : index,
+					field : field
+				});
+				if (ed) {
+					($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
+				}
+				if (dg == $("#score_dg")) {
+					scoreEditIndex = scoreEditIndex;
+				} else if (dg == $("#frame_dg")) {
+					frameEditIndex = frameEditIndex;
+				}
+			} else {
+				setTimeout(function() {
+					dg.datagrid('selectRow', editIndex);
+				}, 0);
+			}
+		} 
+	}
+	
+	function onEndEdit(index, row, changes){
+		toggleSaveBtn();
+		var scoreTable = $($(".datagrid-btable")[0]);
+		var changedRow = scoreTable.find("tr")[index];
+		$(changedRow).addClass("changed-row");
+	}
+	
+	function onLoadSuccess(data) {
+		var dg = $(this);
+		if (dg == $("#score_dg")) {
+			$("#saveBtn").linkbutton("disable");
+		} else if (dg == $("#frame_dg")) {
+			$("#savePointBtn").linkbutton("disable");
+		}
+	}
+	
+	function dateFormatter(value, row, index) {
+		if (value != "") {
+			var date = new Date(value);
+			return date.format("MM/dd/yyyy hh:mm:ss");
+		} else {
+			return "";
+		}
+	}
+	
+	function onClickRow(index, row) {
+		var id = $(this).attr("id");
+		if (id == 'score_dg') {
+			var frameData = row.ottSnookerFrameList;
+			if (frameData) {
+				$("#frame_dg").datagrid('loadData', frameData);	
+			} else {
+				$("#frame_dg").datagrid('loadData', {rows : []});
+			}
+			scoreEditIndex = index;
+		} else {
+			frameEditIndex = index;
+		}
+	}
+
+	function doSearch() {
+		var leagueNameForSearch = $('#leagueNameForSearch').val();
+		leagueNameForSearch = leagueNameForSearch.Trim();
+		$('#leagueNameForSearch').val(leagueNameForSearch);
+		$('#score_dg').datagrid('load', {
+			leagueNameForSearch : leagueNameForSearch
+		});
+	}
+
+	function clearSearch() {
+		$("#leagueNameForSearch").val("");
+	}
+
+	function saveScore() {
+		$("#score_dg").datagrid("endEdit", scoreEditIndex);
+		if ($("#score_dg").datagrid("getChanges").length) {
+			var inserted = $("#score_dg").datagrid('getChanges', 'inserted');
+			var updated = $("#score_dg").datagrid('getChanges', 'updated');
+			var deleted = $("#score_dg").datagrid('getChanges', 'deleted');
+			var effectRow = new Object();
+			if(inserted.length) {
+				effectRow['inserted'] = JSON.stringify(inserted);
+			}
+			if(updated.length) {
+				effectRow['updated'] = JSON.stringify(updated);
+			}
+			if(deleted.length) {
+				effectRow['deleted'] = JSON.stringify(deleted);
+			}
+			$.post("${ctx}/snooker/fixture/saveFixtureChanges.html", effectRow,
+				function(response) {
+					if (response.success) {
+						$("#saveBtn").linkbutton('disable');
+						$.messager.alert("", "Save changes successfully .", "info", function() {
+							$("#score_dg").datagrid("reload");
+						});
+					} else if (response.msg) {
+						$.messager.alert("", response.msg, "error");
+					} else {
+						$.messager.alert("", "Failed to save the changes.", "error");
+					}
+				}, 'JSON').error(function() {
+				$.messager.alert("", "Failed to save the changes.", "error");
+			});
+		} else {
+			$.messager.alert("", "Nothing is changed.", "warning");
+		}
+	}
+
+	function reset(type) {
+		var dg = null;
+		if (type == "score") {
+			dg = $("#score_dg")
+		} else {
+			dg = $("#frame_dg")
+		}
+		
+		dg.datagrid("rejectChanges");
+	}
+
+	function addRow(type) {
+		var dg = null;
+		if (type == "score") {
+			dg = $("#score_dg")
+		} else {
+			dg = $("#frame_dg")
+		}
+		var editIndex = undefined;
+		if (endEditing()) {
+			dg.datagrid('appendRow', {
+				lastPublishedDate : ""
+			});
+			editIndex = dg.datagrid('getRows').length - 1;
+			dg.datagrid('selectRow', editIndex).datagrid('beginEdit', editIndex);
+			if (type == "score") {
+				scoreEditIndex = editIndex;
+			} else if (dg == $("#frame_dg")) {
+				frameEditIndex = editIndex;
+			}
+			toggleSaveBtn(type);
+		}
+	}
+	
+	function deleteRow(type) {
+		var dg = null;
+		if (type == "score") {
+			dg = $("#score_dg")
+		} else {
+			dg = $("#frame_dg")
+		}
+		var editIndex = undefined;
+		if (type == "score") {
+			editIndex = scoreEditIndex;
+		} else {
+			editIndex = frameEditIndex;
+		}
+		if (editIndex == undefined) {
+			return
+		}
+		dg.datagrid('cancelEdit', editIndex).datagrid('deleteRow', editIndex);
+		if (type == "score") {
+			scoreEditIndex = undefined;
+		} else {
+			frameEditIndex = undefined;
+		}
+		toggleSaveBtn(type);
+	}
+	
+	function toggleSaveBtn(type) {
+		var dg = null;
+		if (type == "score") {
+			dg = $("#score_dg")
+		} else {
+			dg = $("#frame_dg")
+		}
+		if (dg.datagrid("getChanges").length) {
+			$("#saveBtn").linkbutton("enable");
+		} else {
+			$("#saveBtn").linkbutton("disable");
+		}
+	}
+</script>
 </head>
 <body>
-	<h2>Row Editing in DataGrid</h2>
-	<p>Click the row to start editing.</p>
-	<div style="margin:20px 0;"></div>
-	
-	<table id="dg" class="easyui-datagrid" title="Row Editing in DataGrid" style="width:700px;height:auto"
-			data-options="
-				iconCls: 'icon-edit',
-				singleSelect: true,
-				toolbar: '#tb',
-				data: rowData,
-				onClickCell: onClickCell,
-				onEndEdit: onEndEdit
-			">
+	<table id="score_dg" class="easyui-datagrid" data-options="
+		title: 'Snooker Fixture(double click to edit)',
+		singleSelect: true,
+		toolbar: '#fixture_toolbar',
+		pagination: true,
+		pageSize: 10,
+		url: '${ctx}/snooker/fixture/listFixture.html',
+		singleSelect: true,
+		onClickRow: onClickRow,
+		onDblClickCell: onDblClickCell,
+		onAfterEdit: onEndEdit,
+		onLoadSuccess: onLoadSuccess
+	">
 		<thead>
 			<tr>
-				<th data-options="field:'itemid',width:80">Item ID</th>
-				<th data-options="field:'productid',width:100,
-						formatter:function(value,row){
-							return row.productname;
-						},
-						editor:{
-							type:'combobox',
-							options:{
-								valueField:'productid',
-								textField:'productname',
-								data: products,
-								required:true
-							}
-						}">Product</th>
-				<th data-options="field:'listprice',width:80,align:'right',editor:{type:'numberbox',options:{precision:1}}">List Price</th>
-				<th data-options="field:'unitcost',width:80,align:'right',editor:'numberbox'">Unit Cost</th>
-				<th data-options="field:'attr1',width:250,editor:'textbox'">Attribute</th>
-				<th data-options="field:'status',width:60,align:'center',editor:{type:'checkbox',options:{on:'P',off:''}}">Status</th>
+				<th field="scoreId"  hidden="true" width="150px">Score ID</th>
+				<th field="matchId" editor="numberbox" width="150px">Match ID</th>
+				<th field="seasonId" editor="numberbox" width="150px">Season ID</th>
+				<th field="matchTime" hidden="true" width="150px">Match Time</th>
+				<th field="matchTimeStr" editor="datetimebox" width="150px">Match Time</th>
+				<th field="leagueId" editor="numberbox" width="150px">League ID</th>
+				<th field="leagueNameCn" editor="text" width="150px">League Name CN</th>
+				<th field="leagueNameEn" editor="text" width="150px">League Name EN</th>
+				<th field="leagueNameTr" editor="text" width="150px">League Name TR</th>
+				<th field="leagueType" editor="text" width="150px">League Type</th>
+				<th field="matchLevel1" editor="text" width="150px">Match Level 1</th>
+				<th field="matchLevel2" editor="text" width="150px">Match Level 2</th>
+				<th field="playerAId" editor="numberbox" width="150px">Player A ID</th>
+				<th field="playerBId" editor="numberbox" width="150px">Player B ID</th>
+				<th field="playerANameCn" editor="text" width="150px">Player A Name CN</th>
+				<th field="playerANameEn" editor="text" width="150px">Player A Name EN</th>
+				<th field="playerANameTr" editor="text" width="150px">Player A Name TR</th>
+				<th field="playerANameCn" editor="text" width="150px">Player B Name CN</th>
+				<th field="playerANameEn" editor="text" width="150px">Player B Name EN</th>
+				<th field="playerANameTr" editor="text" width="150px">Player B Name TR</th>
+				<th field="playerAWinNum" editor="numberbox" width="150px">Player A Win Num</th>
+				<th field="playerBWinNum" editor="numberbox" width="150px">Player B Win Num</th>
+				<th field="maxField" editor="numberbox" width="150px">Max Field</th>
+				<th field="currentField" editor="numberbox" width="150px">Current Field</th>
+				<th field="winnerId" editor="numberbox" width="150px">Winner ID</th>
+				<th field="winReason" editor="text" width="150px">Win Reason</th>
+				<th field="quiterId" editor="numberbox" width="150px">Quiter ID</th>
+				<th field="quitReason" editor="text" width="150px">Quit Reason</th>
+				<th field="bestPlayer" editor="numberbox" width="150px">Best Player</th>
+				<th field="bestScore" editor="numberbox" width="150px">Best Score</th>
+				<th field="status" editor="text" width="150px">Status</th>
+				<th field="currentPlayer" editor="numberbox" width="150px">Current Player</th>
+				<th field="currentScore" editor="numberbox" width="150px">Current Score</th>
+				<th field="sort" editor="numberbox" width="150px">Sort</th>
+				<th field="lastPublishedDate" formatter="dateFormatter" width="150px">Last Published Date</th>
 			</tr>
 		</thead>
 	</table>
-
-	<div id="tb" style="height:auto">
-		<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true" onclick="append()">Append</a>
-		<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" onclick="removeit()">Remove</a>
-		<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" onclick="accept()">Accept</a>
-		<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" onclick="reject()">Reject</a>
-		<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-search',plain:true" onclick="getChanges()">GetChanges</a>
+	<br />
+	<table id="frame_dg" class="easyui-datagrid" data-options="
+		title: 'Snooker Frame(double click to edit)',
+		toolbar: '#frame_toolbar',
+		striped: true,
+		singleSelect: true,
+		idField: 'frameId',
+		fitColumns: true,
+		onDblClickCell: onDblClickCell,
+		onAfterEdit: onEndEdit,
+		onLoadSuccess: onLoadSuccess,
+		onClickRow:onClickRow
+	">
+		<thead>
+			<tr>
+				<th field="frameId" hidden="true" >Frame ID</th>
+				<th field="matchSort" data-options="editor:'numberbox'" >Match Sort</th>
+				<th field="sort" data-options="editor:'numberbox'" >Sort</th>
+				<th field="scoreA" data-options="editor:'numberbox'" >Score A</th>
+				<th field="scoreB" data-options="editor:'numberbox'" >Score B</th>
+				<th field="bestPlayer" data-options="editor:'numberbox'" >Best Player</th>
+				<th field="cscoreA" data-options="editor:'numberbox'" >Cscore A</th>
+				<th field="cscoreB" data-options="editor:'numberbox'" >Cscore B</th>
+				<th field="lastPublishedDate" formatter="dateFormatter">Last Published Date</th>
+			</tr>
+		</thead>
+	</table>	
+	
+	<div id="fixture_toolbar" style="padding:5px;height:auto;margin-bottom:5px">
+		<table width="100%">
+			<tr>
+				<td>
+						<a id="saveBtn" href="#" class="easyui-linkbutton" iconCls="icon-save" plain="true" onclick="saveScore()" disabled="true">Save</a>
+						<a href="#" class="easyui-linkbutton" iconCls="icon-undo" plain="true" onclick="reset('score')">Reset</a>
+						<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="addRow('score')">Add</a>
+						<a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="deleteRow('score')">Delete</a>
+				</td>
+				<td align="right">
+					<span style="padding-left:20px">League Name: <input type="text" id="leagueNameForSearch" name="leagueNameForSearch" maxlength="50"/></span>
+					<a href="#" class="easyui-linkbutton" iconCls="icon-search" plain="true" onclick="doSearch()">Search</a>
+					<a href="#" class="easyui-linkbutton" iconCls="icon-reload" plain="true" onclick="clearSearch()" style="margin-left: 5px;">Reset</a>
+				</td>
+			</tr>
+		</table>
 	</div>
 	
-	<script type="text/javascript">
-	
-		var rowData = {"total":28,"rows":[
-		                               	{"productid":"FI-SW-01","productname":"Koi","unitcost":10.00,"status":"P","listprice":36.50,"attr1":"Large","itemid":"EST-1"},
-		                            	{"productid":"K9-DL-01","productname":"Dalmation","unitcost":12.00,"status":"P","listprice":18.50,"attr1":"Spotted Adult Female","itemid":"EST-10"},
-		                            	{"productid":"RP-SN-01","productname":"Rattlesnake","unitcost":12.00,"status":"P","listprice":38.50,"attr1":"Venomless","itemid":"EST-11"},
-		                            	{"productid":"RP-SN-01","productname":"Rattlesnake","unitcost":12.00,"status":"P","listprice":26.50,"attr1":"Rattleless","itemid":"EST-12"},
-		                            	{"productid":"RP-LI-02","productname":"Iguana","unitcost":12.00,"status":"P","listprice":35.50,"attr1":"Green Adult","itemid":"EST-13"},
-		                            	{"productid":"FL-DSH-01","productname":"Manx","unitcost":12.00,"status":"P","listprice":158.50,"attr1":"Tailless","itemid":"EST-14"},
-		                            	{"productid":"FL-DSH-01","productname":"Manx","unitcost":12.00,"status":"P","listprice":83.50,"attr1":"With tail","itemid":"EST-15"},
-		                            	{"productid":"FL-DLH-02","productname":"Persian","unitcost":12.00,"status":"P","listprice":23.50,"attr1":"Adult Female","itemid":"EST-16"},
-		                            	{"productid":"FL-DLH-02","productname":"Persian","unitcost":12.00,"status":"P","listprice":89.50,"attr1":"Adult Male","itemid":"EST-17"},
-		                            	{"productid":"AV-CB-01","productname":"Amazon Parrot","unitcost":92.00,"status":"P","listprice":63.50,"attr1":"Adult Male","itemid":"EST-18"}
-		                            ]};
-		
-		var products = [
-									{"productid":"FI-SW-01","productname":"Koi"},
-									{"productid":"K9-DL-01","productname":"Dalmation"},
-									{"productid":"RP-SN-01","productname":"Rattlesnake"},
-									{"productid":"RP-LI-02","productname":"Iguana"},
-									{"productid":"FL-DSH-01","productname":"Manx"},
-									{"productid":"FL-DLH-02","productname":"Persian"},
-									{"productid":"AV-CB-01","productname":"Amazon Parrot"}
-									];
+	<div id="frame_toolbar" style="padding:5px;height:auto;margin-bottom:5px">
+		<table width="100%">
+			<tr>
+				<td>
+						<a id="savePointBtn" href="#" class="easyui-linkbutton" iconCls="icon-save" plain="true" onclick="saveFrame()" disabled="true">Save</a>
+						<a href="#" class="easyui-linkbutton" iconCls="icon-undo" plain="true" onclick="reset('frame')">Reset</a>
+						<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="addRow('frame')">Add</a>
+						<a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="deleteRow('frame')">Delete</a>
+				</td>
+			</tr>
+		</table>
+	</div>
 
-		var editIndex = undefined;
-		function endEditing(){
-			if (editIndex == undefined){return true}
-			if ($('#dg').datagrid('validateRow', editIndex)){
-				$('#dg').datagrid('endEdit', editIndex);
-				editIndex = undefined;
-				return true;
-			} else {
-				return false;
-			}
-		}
-		function onClickCell(index, field){
-			if (editIndex != index){
-				if (endEditing()){
-					$('#dg').datagrid('selectRow', index)
-							.datagrid('beginEdit', index);
-					var ed = $('#dg').datagrid('getEditor', {index:index,field:field});
-					if (ed){
-						($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
-					}
-					editIndex = index;
-				} else {
-					setTimeout(function(){
-						$('#dg').datagrid('selectRow', editIndex);
-					},0);
-				}
-			}
-		}
-		function onEndEdit(index, row){
-			var ed = $(this).datagrid('getEditor', {
-				index: index,
-				field: 'productid'
-			});
-			row.productname = $(ed.target).combobox('getText');
-		}
-		function append(){
-			if (endEditing()){
-				$('#dg').datagrid('appendRow',{status:'P'});
-				editIndex = $('#dg').datagrid('getRows').length-1;
-				$('#dg').datagrid('selectRow', editIndex)
-						.datagrid('beginEdit', editIndex);
-			}
-		}
-		function removeit(){
-			if (editIndex == undefined){return}
-			$('#dg').datagrid('cancelEdit', editIndex)
-					.datagrid('deleteRow', editIndex);
-			editIndex = undefined;
-		}
-		function accept(){
-			if (endEditing()){
-				$('#dg').datagrid('acceptChanges');
-			}
-		}
-		function reject(){
-			$('#dg').datagrid('rejectChanges');
-			editIndex = undefined;
-		}
-		function getChanges(){
-			var rows = $('#dg').datagrid('getChanges');
-			alert(rows.length+' rows are changed!');
-		}
-	</script>
 </body>
 </html>

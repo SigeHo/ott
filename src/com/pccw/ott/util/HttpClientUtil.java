@@ -272,7 +272,7 @@ public class HttpClientUtil {
 		return responseContent;
 	}
 
-	public static String readFile(String filePath) {
+	public String readFile(String filePath) {
 		StringBuffer sb = new StringBuffer();
 		File file = new File(filePath);// 打开文件
 		BufferedReader reader = null;
@@ -300,7 +300,7 @@ public class HttpClientUtil {
 	public static void main(String[] args) {
 		// String response =
 		// getInstance().sendHttpPost("http://vpn.gooooal.com:8023/api/sports.json?v=1&uId=now&pwd=pccw&sport=snk&target=snk_rank");
-		String response = readFile("e:/desktop/json.txt");
+		String response = getInstance().readFile("e:/desktop/json.txt");
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);
 		mapper.configure(Feature.AUTO_CLOSE_SOURCE, true);

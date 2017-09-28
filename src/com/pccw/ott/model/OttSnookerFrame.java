@@ -21,12 +21,12 @@ public class OttSnookerFrame implements Serializable {
 	private static final long serialVersionUID = -7644031061099497124L;
 
 	private Long frameId;
-	private String match_sort;
-	private Long scoreA;
-	private Long scoreB;
-	private Long bestPlayerId;
-	private Long cscoreA;
-	private Long cscoreB;
+	private Integer matchSort;
+	private Integer scoreA;
+	private Integer scoreB;
+	private Integer bestPlayer;
+	private Integer cscoreA;
+	private Integer cscoreB;
 	private Date lastPublishedDate;
 
 	@Id
@@ -41,56 +41,56 @@ public class OttSnookerFrame implements Serializable {
 	}
 
 	@Column(name = "match_sort")
-	public String getMatch_sort() {
-		return match_sort;
+	public Integer getMatchSort() {
+		return matchSort;
 	}
 
-	public void setMatch_sort(String match_sort) {
-		this.match_sort = match_sort;
+	public void setMatchSort(Integer matchSort) {
+		this.matchSort = matchSort;
 	}
 
 	@Column(name = "score_a")
-	public Long getScoreA() {
+	public Integer getScoreA() {
 		return scoreA;
 	}
 
-	public void setScoreA(Long scoreA) {
+	public void setScoreA(Integer scoreA) {
 		this.scoreA = scoreA;
 	}
 
 	@Column(name = "score_b")
-	public Long getScoreB() {
+	public Integer getScoreB() {
 		return scoreB;
 	}
 
-	public void setScoreB(Long scoreB) {
+	public void setScoreB(Integer scoreB) {
 		this.scoreB = scoreB;
 	}
 
-	@Column(name = "best_player_id")
-	public Long getBestPlayerId() {
-		return bestPlayerId;
+	@Column(name = "best_player")
+	public Integer getBestPlayer() {
+		return bestPlayer;
 	}
 
-	public void setBestPlayerId(Long bestPlayerId) {
-		this.bestPlayerId = bestPlayerId;
+	public void setBestPlayer(Integer bestPlayer) {
+		this.bestPlayer = bestPlayer;
 	}
 
 	@Column(name = "cscore_a")
-	public Long getCscoreA() {
+	public Integer getCscoreA() {
 		return cscoreA;
 	}
 
-	public void setCscoreA(Long cscoreA) {
+	public void setCscoreA(Integer cscoreA) {
 		this.cscoreA = cscoreA;
 	}
 
 	@Column(name = "cscore_b")
-	public Long getCscoreB() {
+	public Integer getCscoreB() {
 		return cscoreB;
 	}
 
-	public void setCscoreB(Long cscoreB) {
+	public void setCscoreB(Integer cscoreB) {
 		this.cscoreB = cscoreB;
 	}
 

@@ -14,6 +14,7 @@ import com.pccw.ott.model.OttSnookerPoint;
 import com.pccw.ott.model.OttSnookerRank;
 
 @Repository("ottSnookerRankDao")
+@SuppressWarnings({"unchecked", "rawtypes", "deprecation"})
 public class OttSnookerRankDaoImpl extends HibernateDaoSupport implements OttSnookerRankDao {
 
 	@Override
@@ -33,28 +34,43 @@ public class OttSnookerRankDaoImpl extends HibernateDaoSupport implements OttSno
 	
 	@Override
 	public void batchUpdateSnookerRankList(List<OttSnookerRank> updatedList) {
-		this.getHibernateTemplate().execute(new HibernateCallback<Object>() {
+		
+		this.getHibernateTemplate().execute(new HibernateCallback() {
 			@Override
 			public Object doInHibernate(Session session) throws HibernateException {
 				for (OttSnookerRank ottSnookerRank : updatedList) {
-					OttSnookerRank rank = session.load(OttSnookerRank.class, ottSnookerRank.getRankId());
-					rank.setRankTitle(ottSnookerRank.getRankTitle());
-					rank.setRankYear(ottSnookerRank.getRankYear());
-					rank.setPlayerId(ottSnookerRank.getPlayerId());
-					rank.setNameCn(ottSnookerRank.getNameCn());
-					rank.setNameEn(ottSnookerRank.getNameEn());
-					rank.setNameTr(ottSnookerRank.getNameTr());
-					rank.setNationality(ottSnookerRank.getNationality());
-					rank.setRank(ottSnookerRank.getRank());
-					rank.setPoint1(ottSnookerRank.getPoint1());
-					rank.setPoint2(ottSnookerRank.getPoint2());
-					rank.setPoint3(ottSnookerRank.getPoint3());
-					rank.setPtcPoint(ottSnookerRank.getPtcPoint());
-					rank.setTotalPoint(ottSnookerRank.getTotalPoint());
-					session.update(rank);
+					String hql = "update OttSnookerRank set "
+							+ "rankTitle = :rankTitle, "
+							+ "rankYear = :rankYear, "
+							+ "playerId = :playerId, "
+							+ "nameCn = :nameCn, "
+							+ "nameEn = :nameEn, "
+							+ "nameTr = :nameTr, "
+							+ "nationality = :nationality, "
+							+ "rank = :rank, "
+							+ "point1 = :point1, "
+							+ "point2 = :point2, "
+							+ "point3 = :point3, "
+							+ "ptcPoint = :ptcPoint, "
+							+ "totalPoint = :totalPoint "
+							+ "where rankId = :rankId";
+					Query query = session.createQuery(hql);
+					query.setParameter("rankTitle", ottSnookerRank.getRankTitle());
+					query.setParameter("rankYear", ottSnookerRank.getRankYear());
+					query.setParameter("playerId", ottSnookerRank.getPlayerId());
+					query.setParameter("nameCn", ottSnookerRank.getNameCn());
+					query.setParameter("nameEn", ottSnookerRank.getNameEn());
+					query.setParameter("nameTr", ottSnookerRank.getNameTr());
+					query.setParameter("nationality", ottSnookerRank.getNationality());
+					query.setParameter("rank", ottSnookerRank.getRank());
+					query.setParameter("point1", ottSnookerRank.getPoint1());
+					query.setParameter("point2", ottSnookerRank.getPoint2());
+					query.setParameter("point3", ottSnookerRank.getPoint3());
+					query.setParameter("ptcPoint", ottSnookerRank.getPtcPoint());
+					query.setParameter("totalPoint", ottSnookerRank.getTotalPoint());
+					query.setParameter("rankId", ottSnookerRank.getRankId());
+					query.executeUpdate();
 				}
-				session.flush();
-				session.clear();
 				return null;
 			}
 		});
@@ -62,18 +78,22 @@ public class OttSnookerRankDaoImpl extends HibernateDaoSupport implements OttSno
 
 	@Override
 	public void batchDeleteSnookerRankList(List<OttSnookerRank> deletedList) {
-		this.getHibernateTemplate().execute(new HibernateCallback<Object>() {
-			@Override
-			public Object doInHibernate(Session session) throws HibernateException {
-				for (OttSnookerRank ottSnookerRank : deletedList) {
-					OttSnookerRank rank = session.load(OttSnookerRank.class, ottSnookerRank.getRankId());
-					session.delete(rank);
-				}
-				session.flush();
-				session.clear();
-				return null;
+		for (OttSnookerRank ottSnookerRank : deletedList) {
+			if (null != ottSnookerRank.getSnookerPointList() && ottSnookerRank.getSnookerPointList().size() > 0) {
+				OttSnookerRank rank = this.getHibernateTemplate().load(OttSnookerRank.class, ottSnookerRank.getRankId());
+				this.getHibernateTemplate().delete(rank);
+			} else {
+				this.getHibernateTemplate().execute(new HibernateCallback() {
+					@Override
+					public Object doInHibernate(Session session) throws HibernateException {
+						Query query = session.createQuery("delete from OttSnookerRank where rankId = :rankId");
+						query.setParameter("rankId", ottSnookerRank.getRankId());
+						query.executeUpdate();
+						return null;
+					}
+				});
 			}
-		});
+		}
 	}
 
 	@Override
@@ -122,11 +142,9 @@ public class OttSnookerRankDaoImpl extends HibernateDaoSupport implements OttSno
 		return (Long) this.getHibernateTemplate().find(hql).get(0);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<OttSnookerPoint> findPointByPlayerId(String playerId) {
-		return (List<OttSnookerPoint>) this.getHibernateTemplate()
-				.find("from OttSnookerPoint p where p.pointId in (select rp.pointId from OttSnookerRankPoint rp where rp.playerId = ?)", playerId);
+		return (List<OttSnookerPoint>) this.getHibernateTemplate().find("from OttSnookerPoint p where p.pointId in (select rp.pointId from OttSnookerRankPoint rp where rp.playerId = ?)", playerId);
 	}
 
 	@Override
@@ -140,22 +158,25 @@ public class OttSnookerRankDaoImpl extends HibernateDaoSupport implements OttSno
 		this.getHibernateTemplate().execute(new HibernateCallback<Object>() {
 			@Override
 			public Object doInHibernate(Session session) throws HibernateException {
-				Query query = session.createQuery("delete from OttSnookerPoint");
-				query.executeUpdate();
-				query = session.createQuery("delete from OttSnookerRank");
-				query.executeUpdate();
+				session.createNativeQuery("truncate ott_snooker_rank_point").executeUpdate();
+				session.createNativeQuery("truncate ott_snooker_point").executeUpdate();
+				session.createNativeQuery("truncate ott_snooker_rank").executeUpdate();
 				return null;
 			}
 		});
 	}
 
 	@Override
-	public void batchSaveSnookerPointList(List<OttSnookerPoint> insertedList) {
+	public void batchSaveSnookerPointList(OttSnookerRank rank, List<OttSnookerPoint> insertedList) {
 		this.getHibernateTemplate().execute(new HibernateCallback<Object>() {
 			@Override
 			public Object doInHibernate(Session session) throws HibernateException {
 				for (OttSnookerPoint ottSnookerPoint : insertedList) {
-					session.save(ottSnookerPoint);
+					Long pointId = (Long) session.save(ottSnookerPoint);
+					Query query = session.createNativeQuery("insert into ott_snooker_rank_point (player_id, point_id) values(:playerId, :pointId)");
+					query.setParameter("playerId", rank.getPlayerId());
+					query.setParameter("pointId", pointId);
+					query.executeUpdate();
 				}
 				session.flush();
 				session.clear();
@@ -191,6 +212,7 @@ public class OttSnookerRankDaoImpl extends HibernateDaoSupport implements OttSno
 			@Override
 			public Object doInHibernate(Session session) throws HibernateException {
 				for (OttSnookerPoint ottSnookerPoint : deletedList) {
+					session.createNativeQuery("delete from ott_snooker_rank_point where point_id = " + ottSnookerPoint.getPointId()).executeUpdate();
 					OttSnookerPoint point = session.load(OttSnookerPoint.class, ottSnookerPoint.getPointId());
 					session.delete(point);
 				}

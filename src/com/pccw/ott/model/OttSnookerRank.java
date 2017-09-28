@@ -28,17 +28,17 @@ public class OttSnookerRank implements Serializable {
 	private Long rankId;
 	private String rankTitle;
 	private String rankYear;
-	private Long playerId;
+	private Integer playerId;
 	private String nameCn;
 	private String nameEn;
 	private String nameTr;
 	private String nationality;
-	private Long rank;
-	private Long point1;
-	private Long point2;
-	private Long point3;
-	private Long ptcPoint;
-	private Long totalPoint;
+	private Integer rank;
+	private Integer point1;
+	private Integer point2;
+	private Integer point3;
+	private Integer ptcPoint;
+	private Integer totalPoint;
 	private Date lastUpdatedTime;
 	private List<OttSnookerPoint> snookerPointList;
 
@@ -72,11 +72,11 @@ public class OttSnookerRank implements Serializable {
 	}
 
 	@Column(name = "player_id")
-	public Long getPlayerId() {
+	public Integer getPlayerId() {
 		return playerId;
 	}
 
-	public void setPlayerId(Long playerId) {
+	public void setPlayerId(Integer playerId) {
 		this.playerId = playerId;
 	}
 
@@ -117,56 +117,56 @@ public class OttSnookerRank implements Serializable {
 	}
 
 	@Column(name = "rank")
-	public Long getRank() {
+	public Integer getRank() {
 		return rank;
 	}
 
-	public void setRank(Long rank) {
+	public void setRank(Integer rank) {
 		this.rank = rank;
 	}
 
 	@Column(name = "point1")
-	public Long getPoint1() {
+	public Integer getPoint1() {
 		return point1;
 	}
 
-	public void setPoint1(Long point1) {
+	public void setPoint1(Integer point1) {
 		this.point1 = point1;
 	}
 
 	@Column(name = "point2")
-	public Long getPoint2() {
+	public Integer getPoint2() {
 		return point2;
 	}
 
-	public void setPoint2(Long point2) {
+	public void setPoint2(Integer point2) {
 		this.point2 = point2;
 	}
 
 	@Column(name = "point3")
-	public Long getPoint3() {
+	public Integer getPoint3() {
 		return point3;
 	}
 
-	public void setPoint3(Long point3) {
+	public void setPoint3(Integer point3) {
 		this.point3 = point3;
 	}
 
 	@Column(name = "ptc_point")
-	public Long getPtcPoint() {
+	public Integer getPtcPoint() {
 		return ptcPoint;
 	}
 
-	public void setPtcPoint(Long ptcPoint) {
+	public void setPtcPoint(Integer ptcPoint) {
 		this.ptcPoint = ptcPoint;
 	}
 
 	@Column(name = "total_point")
-	public Long getTotalPoint() {
+	public Integer getTotalPoint() {
 		return totalPoint;
 	}
 
-	public void setTotalPoint(Long totalPoint) {
+	public void setTotalPoint(Integer totalPoint) {
 		this.totalPoint = totalPoint;
 	}
 

@@ -55,59 +55,60 @@ CREATE TABLE IF NOT EXISTS ott.ott_audit_trail (
    	update_date TIMESTAMP NULL
 );
 
-CREATE TABLE ott.ott_snooker_fixture (
-    match_id VARCHAR(10),
+CREATE TABLE IF NOT EXISTS ott.ott_snooker_score (
+	score_id INT AUTO_INCREMENT PRIMARY KEY,
+    match_id INT,
+    season_id INT,
     match_time TIMESTAMP,
-    league_id VARCHAR(10),
+    league_id INT,
     league_name_en VARCHAR(50),
     league_name_cn VARCHAR(50),
-    league_name_hk VARCHAR(50),
+    league_name_tr VARCHAR(50),
     league_type VARCHAR(50),
-    m_match_level VARCHAR(50),
-    match_level VARCHAR(50),
+   	match_level1 VARCHAR(50),
+    match_level2 VARCHAR(50),
     match_group VARCHAR(50),
-    play_a_id VARCHAR(10),
-    play_a_name_en VARCHAR(50),
-    play_a_name_cn VARCHAR(50),
-    play_a_name_hk VARCHAR(50),
-    play_b_id VARCHAR(10),
-    play_b_name_en VARCHAR(50),
-    play_b_name_cn VARCHAR(50),
-    play_b_name_hk VARCHAR(50),
-    play_a_win_num INT,
-    play_b_win_num INT,
-    max_frame INT,
-    current_frame_num INT,
-    current_ score_a INT,
-    current_score_b INT,
-    current_best_player VARCHAR(10),
-    current_cscore_a INT,
-    current_cscore_b INT,
-    current_match_sort INT,
-    winner_id VARCHAR(10),
-    win_reason VARCHAR(50),
-    quiter_id VARCHAR(10),
-    quit_reason VARCHAR(50),
-    best_player VARCHAR(10),
+    player_a_id INT,
+    player_b_id INT,
+    player_a_name_cn VARCHAR(50),
+    player_a_name_en VARCHAR(50),
+    player_a_name_tr VARCHAR(50),
+    player_b_name_cn VARCHAR(50),
+    player_b_name_en VARCHAR(50),
+    player_b_name_tr VARCHAR(50),
+    player_a_win_num INT,
+    player_b_win_num INT,
+    max_field INT,
+    current_field INT,
+    winner_id INT,
+    win_reason VARCHAR(100),
+    quiter_id INT,
+    quit_reason VARCHAR(100),
+    best_player INT,
     best_score INT,
     status VARCHAR(50),
-    current_player VARCHAR(10),
+    current_player INT,
     current_score INT,
     sort INT,
+    last_published_date TIMESTAMP
 );
 
-CREATE TABLE ott.ott_snooker_rank (
-	player_id VARCHAR(10),
-	name_cn VARCHAR(50),
-	name_en VARCHAR(50),
-	name_tr VARCHAR(50),
-	nationality VARCHAR(50),
-	rank INT(10),
-	point1 INT(10),
-	point2 INT(10),
-	point3 INT(10),
-	ptc_point INT(10),
-	total_point INT(10)
+CREATE TABLE IF NOT EXISTS ott.ott_snooker_frame (
+	frame_id INT AUTO_INCREMENT PRIMARY KEY, 
+	match_sort INT,
+	sort INT,
+	score_a INT,
+	score_b INT,
+	best_player INT,
+	cscore_a INT,
+	cscore_b INT,
+	last_published_date TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS ott.ott_snooker_score_frame (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	score_id INT,
+	frame_id INT
 );
 
 CREATE TABLE IF NOT EXISTS ott.ott_snooker_rank (
@@ -142,6 +143,58 @@ CREATE TABLE IF NOT EXISTS ott.ott_snooker_rank_point (
 	id INT AUTO_INCREMENT PRIMARY KEY,
 	player_id INT NOT NULL,
 	point_id INT NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS ott.ott_snooker_league (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	league_id INT,
+	league_name_cn VARCHAR(50),
+	league_name_en VARCHAR(50),
+	league_name_tr VARCHAR(50),
+	start_time TIMESTAMP,
+	end_time TIMESTAMP,
+	color VARCHAR(10),
+	remark VARCHAR(200),
+	money INT,
+	last_published_date TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS ott.ott_snooker_level (
+	level_id INT AUTO_INCREMENT PRIMARY KEY,
+	level_rounds VARCHAR(50),
+	match_levels VARCHAR(50),
+	match_group INT,
+	remark VARCHAR(200),
+	last_published_date TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS ott.ott_snooker_league_level (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	league_id INT,
+	level_id INT
+);
+
+CREATE TABLE IF NOT EXISTS ott.ott_snooker_person (
+	player_id INT PRIMARY KEY,
+	player_name_cn VARCHAR(50),
+	player_name_en VARCHAR(50),
+	player_name_tr VARCHAR(50),
+	sex VARCHAR(10),
+	nationality VARCHAR(50),
+	birthday TIMESTAMP,
+	height INT,
+	weight INT,
+	score INT,
+	max_score_num INT,
+	current_rank INT,
+	highest_rank INT,
+	transfer_time INT,
+	total_money INT,
+	win_num INT,
+	point INT,
+	experience VARCHAR(200),
+	remark VARCHAR(200),
+	last_published_date TIMESTAMP
 );
 
 insert into ott.ott_user(username, password, user_email, created_by) values('admin','21232f297a57a5a743894a0e4a801fc3','admin@pccw.com', 0);

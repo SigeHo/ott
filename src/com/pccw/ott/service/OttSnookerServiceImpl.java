@@ -7,16 +7,57 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.pccw.ott.dao.OttSnookerLeagueDao;
 import com.pccw.ott.dao.OttSnookerRankDao;
+import com.pccw.ott.dao.OttSnookerScoreDao;
+import com.pccw.ott.model.OttSnookerLeague;
 import com.pccw.ott.model.OttSnookerPoint;
 import com.pccw.ott.model.OttSnookerRank;
+import com.pccw.ott.model.OttSnookerScore;
 
 @Service("ottSnookerService")
 @Transactional
 public class OttSnookerServiceImpl implements OttSnookerService {
 
 	@Autowired
+	private OttSnookerScoreDao ottSnookerScoreDao;
+	
+	@Autowired
 	private OttSnookerRankDao ottSnookerRankDao;
+	
+	@Autowired
+	private OttSnookerLeagueDao ottSnookerLeagueDao;
+	
+	@Override
+	public void flushSnookerScoreData(List<OttSnookerScore> list) {
+		clearSnookerScoreData();
+		batchSaveSnookerScoreList(list);
+	}
+	
+	@Override
+	public List<OttSnookerScore> findSnookerScoreList(String leagueName, int first, int max, String sort, String order) {
+		return ottSnookerScoreDao.findByParam(leagueName, first, max, sort, order);
+	}
+
+	@Override
+	public Long findSnookerScoreListSize(String leagueName) {
+		return ottSnookerScoreDao.findCountByParam(leagueName);
+	}
+	
+	@Override
+	public void batchSaveSnookerScoreList(List<OttSnookerScore> list) {
+		ottSnookerScoreDao.batchSaveSnookerScoreList(list);
+	}
+	
+	@Override
+	public void batchUpdateSnookerScoreList(List<OttSnookerScore> updatedList) {
+		ottSnookerScoreDao.batchUpdateSnookerScoreList(updatedList);
+	}
+
+	@Override
+	public void batchDeleteSnookerScoreList(List<OttSnookerScore> deletedList) {
+		ottSnookerScoreDao.batchDeleteSnookerScoreList(deletedList);
+	}
 	
 	@Override
 	public void batchSaveSnookerRankList(List<OttSnookerRank> list) {
@@ -50,12 +91,8 @@ public class OttSnookerServiceImpl implements OttSnookerService {
 
 	@Override
 	public void flushSnookerRankData(List<OttSnookerRank> list) {
-		cleanUpOldData();
+		clearSnookerRankData();
 		batchSaveSnookerRankList(list);
-	}
-
-	private void cleanUpOldData() {
-		ottSnookerRankDao.deleteAllSnookerRank();
 	}
 
 	@Override
@@ -69,8 +106,8 @@ public class OttSnookerServiceImpl implements OttSnookerService {
 	}
 
 	@Override
-	public void batchSaveSnookerPointList(List<OttSnookerPoint> insertedList) {
-		ottSnookerRankDao.batchSaveSnookerPointList(insertedList);		
+	public void batchSaveSnookerPointList(OttSnookerRank rank, List<OttSnookerPoint> insertedList) {
+		ottSnookerRankDao.batchSaveSnookerPointList(rank, insertedList);		
 	}
 
 	@Override
@@ -83,4 +120,29 @@ public class OttSnookerServiceImpl implements OttSnookerService {
 		ottSnookerRankDao.batchDeleteSnookerPointList(deletedList);
 	}
 
+	@Override
+	public void flushSnookerLeagueData(OttSnookerLeague league) {
+		this.deleteSnookerLeaugeByLeagueId(league.getLeagueId());
+		this.saveSnookerLeauge(league);
+	}
+	
+	private void clearSnookerScoreData() {
+		ottSnookerScoreDao.deleteAll();
+	}
+	
+	private void clearSnookerRankData() {
+		ottSnookerRankDao.deleteAllSnookerRank();
+	}
+	
+	private void deleteSnookerLeaugeByLeagueId(Integer leagueId) {
+		ottSnookerLeagueDao.deleteByLeagueId(leagueId);
+	}
+
+	private void saveSnookerLeauge(OttSnookerLeague ottSnookerLeague) {
+		ottSnookerLeagueDao.save(ottSnookerLeague);
+	}
+
+
+
+	
 }

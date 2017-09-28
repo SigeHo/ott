@@ -25,7 +25,10 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pccw.ott.model.OttSnookerPoint;
 import com.pccw.ott.model.OttSnookerRank;
+import com.pccw.ott.model.OttSnookerScore;
 import com.pccw.ott.service.OttSnookerService;
+import com.pccw.ott.util.HttpClientUtil;
+import com.pccw.ott.util.JsonUtil;
 
 @Controller
 @RequestMapping("/snooker")
@@ -35,7 +38,73 @@ public class OttSnookerController {
 
 	@Autowired
 	private OttSnookerService ottSnookerService;
+	
+	
+	// ------------------ Snooker Fixture ------------------
 
+	@RequestMapping("/fixture/goToListFixturePage.html")
+	public ModelAndView goToListFixturePage() {
+		ModelAndView mv = new ModelAndView("snooker_fixture");
+		return mv;
+	}
+	
+	@RequestMapping("/fixture/listFixture.html")
+	@ResponseBody
+	public Map<String, Object> listFixture(HttpServletRequest request, @RequestParam int page, @RequestParam int rows) {
+		Map<String, Object> returnMap = new HashMap<String, Object>();
+		String leagueName = request.getParameter("leagueNameForSearch");
+		String sort = request.getParameter("sort");
+		String order = request.getParameter("order");
+		int first = (page - 1) * rows;
+		int max = rows;
+		List<OttSnookerScore> list = ottSnookerService.findSnookerScoreList(leagueName, first, max, sort, order);
+		Long total = ottSnookerService.findSnookerScoreListSize(leagueName);
+		returnMap.put("rows", list);
+		returnMap.put("total", total);
+		return returnMap;
+	}
+	
+	@RequestMapping("/fixture/saveFixtureChanges.html")
+	@ResponseBody
+	public Map<String, Object> saveFixtureChanges(HttpServletRequest request) {
+		Map<String, Object> returnMap = new HashMap<String, Object>();
+		String inserted = request.getParameter("inserted");
+		String updated = request.getParameter("updated");
+		String deleted = request.getParameter("deleted");
+		ObjectMapper mapper = new ObjectMapper();
+		JavaType javaType = mapper.getTypeFactory().constructParametricType(ArrayList.class, OttSnookerScore.class);
+		try {
+			if (StringUtils.isNotBlank(inserted)) {
+				List<OttSnookerScore> insertedList = mapper.readValue(inserted, javaType);
+				if (insertedList.size() > 0)
+					ottSnookerService.batchSaveSnookerScoreList(insertedList);
+			}
+			if (StringUtils.isNotBlank(updated)) {
+				List<OttSnookerScore> updatedList = mapper.readValue(updated, javaType);
+				if (updatedList.size() > 0)
+					ottSnookerService.batchUpdateSnookerScoreList(updatedList);
+			}
+			if (StringUtils.isNotBlank(deleted)) {
+				List<OttSnookerScore> deletedList = mapper.readValue(deleted, javaType);
+				if (deletedList.size() > 0)
+					ottSnookerService.batchDeleteSnookerScoreList(deletedList);
+			}
+			returnMap.put("success", true);
+		} catch (DataIntegrityViolationException e) {
+			logger.error(e.toString());
+			returnMap.put("success", false);
+			returnMap.put("msg", "Failed to save changes. Duplicate match id is not allowed.");
+		} catch (JsonParseException | JsonMappingException e) {
+			logger.error(e.toString());
+			returnMap.put("success", false);
+		} catch (IOException e) {
+			logger.error(e.toString());
+			returnMap.put("success", false);
+		}
+		return returnMap;
+	}
+	
+	// ------------------ Snooker Rank ------------------
 	@RequestMapping("/rank/goToListRankPage.html")
 	public ModelAndView goToListRankPage(HttpServletRequest request) {
 		ModelAndView mv = new ModelAndView("snooker_rank");
@@ -114,13 +183,15 @@ public class OttSnookerController {
 		String inserted = request.getParameter("inserted");
 		String updated = request.getParameter("updated");
 		String deleted = request.getParameter("deleted");
+		String rankString = request.getParameter("rank");
 		ObjectMapper mapper = new ObjectMapper();
 		JavaType javaType = mapper.getTypeFactory().constructParametricType(ArrayList.class, OttSnookerPoint.class);
 		try {
+			OttSnookerRank rank = mapper.readValue(rankString, OttSnookerRank.class);
 			if (StringUtils.isNotBlank(inserted)) {
 				List<OttSnookerPoint> insertedList = mapper.readValue(inserted, javaType);
 				if (insertedList.size() > 0)
-					ottSnookerService.batchSaveSnookerPointList(insertedList);
+					ottSnookerService.batchSaveSnookerPointList(rank, insertedList);
 			}
 			if (StringUtils.isNotBlank(updated)) {
 				List<OttSnookerPoint> updatedList = mapper.readValue(updated, javaType);
@@ -143,12 +214,11 @@ public class OttSnookerController {
 		return returnMap;
 	}
 	
-	// ------------------ Snooker Fixture ------------------
-
-	@RequestMapping("/fixture/goToListFixturePage.html")
-	public ModelAndView goToListFixturePage() {
-		ModelAndView mv = new ModelAndView("snooker_fixture");
-		return mv;
+	@RequestMapping("/testSql")
+	public void testSave() {
+		String jsonData = HttpClientUtil.getInstance().readFile("e:/desktop/rank.json");
+		List<OttSnookerRank> list  = JsonUtil.parseJson2SnookerRank(jsonData);
+		ottSnookerService.flushSnookerRankData(list);
 	}
-
+	
 }

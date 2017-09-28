@@ -13,18 +13,17 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Table(name = "ott_snooker_point")
 public class OttSnookerPoint implements Serializable {
 	private static final long serialVersionUID = 5118656529264702910L;
 	private Long pointId;
-	private Long leagueId;
+	private Integer leagueId;
 	private String leagueNameCn;
 	private String leagueNameEn;
 	private String leagueNameTr;
-	private Long sn;
+	private Integer sn;
 	private Date lastUpdatedTime;
 
 	@Id
@@ -39,11 +38,11 @@ public class OttSnookerPoint implements Serializable {
 	}
 
 	@Column(name = "league_id")
-	public Long getLeagueId() {
+	public Integer getLeagueId() {
 		return leagueId;
 	}
 
-	public void setLeagueId(Long leagueId) {
+	public void setLeagueId(Integer leagueId) {
 		this.leagueId = leagueId;
 	}
 
@@ -75,11 +74,11 @@ public class OttSnookerPoint implements Serializable {
 	}
 
 	@Column(name = "sn")
-	public Long getSn() {
+	public Integer getSn() {
 		return sn;
 	}
 
-	public void setSn(Long sn) {
+	public void setSn(Integer sn) {
 		this.sn = sn;
 	}
 
