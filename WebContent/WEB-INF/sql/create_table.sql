@@ -126,7 +126,7 @@ CREATE TABLE IF NOT EXISTS ott.ott_snooker_rank (
 	total_point INT(10),
 	rank_title VARCHAR(50),
 	rank_year VARCHAR(50),
-	last_updated_time TIMESTAMP
+	last_published_date TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS ott.ott_snooker_point (
@@ -136,7 +136,7 @@ CREATE TABLE IF NOT EXISTS ott.ott_snooker_point (
 	league_name_en VARCHAR(50),
 	league_name_tr VARCHAR(50),
 	sn INT(10),
-	last_updated_time TIMESTAMP
+	last_published_date TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS ott.ott_snooker_rank_point (

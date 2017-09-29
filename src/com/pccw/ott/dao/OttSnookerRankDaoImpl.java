@@ -14,7 +14,7 @@ import com.pccw.ott.model.OttSnookerPoint;
 import com.pccw.ott.model.OttSnookerRank;
 
 @Repository("ottSnookerRankDao")
-@SuppressWarnings({"unchecked", "rawtypes", "deprecation"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class OttSnookerRankDaoImpl extends HibernateDaoSupport implements OttSnookerRankDao {
 
 	@Override
@@ -79,7 +79,7 @@ public class OttSnookerRankDaoImpl extends HibernateDaoSupport implements OttSno
 	@Override
 	public void batchDeleteSnookerRankList(List<OttSnookerRank> deletedList) {
 		for (OttSnookerRank ottSnookerRank : deletedList) {
-			if (null != ottSnookerRank.getSnookerPointList() && ottSnookerRank.getSnookerPointList().size() > 0) {
+			if (null != ottSnookerRank.getOttSnookerPointList() && ottSnookerRank.getOttSnookerPointList().size() > 0) {
 				OttSnookerRank rank = this.getHibernateTemplate().load(OttSnookerRank.class, ottSnookerRank.getRankId());
 				this.getHibernateTemplate().delete(rank);
 			} else {

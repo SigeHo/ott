@@ -68,7 +68,7 @@ public class JsonUtil {
 					snookerPoint.setSn(snookerPointNode.path("sn").asInt());
 					pointList.add(snookerPoint);
 				}
-				snookerRank.setSnookerPointList(pointList);
+				snookerRank.setOttSnookerPointList(pointList);
 				list.add(snookerRank);
 			}
 		} catch (IOException e) {

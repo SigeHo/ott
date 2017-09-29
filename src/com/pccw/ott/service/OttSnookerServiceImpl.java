@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.pccw.ott.dao.OttSnookerLeagueDao;
 import com.pccw.ott.dao.OttSnookerRankDao;
 import com.pccw.ott.dao.OttSnookerScoreDao;
+import com.pccw.ott.model.OttSnookerFrame;
 import com.pccw.ott.model.OttSnookerLeague;
 import com.pccw.ott.model.OttSnookerPoint;
 import com.pccw.ott.model.OttSnookerRank;
@@ -57,6 +58,21 @@ public class OttSnookerServiceImpl implements OttSnookerService {
 	@Override
 	public void batchDeleteSnookerScoreList(List<OttSnookerScore> deletedList) {
 		ottSnookerScoreDao.batchDeleteSnookerScoreList(deletedList);
+	}
+	
+	@Override
+	public void batchSaveSnookerFrameList(OttSnookerScore score, List<OttSnookerFrame> insertedList) {
+		ottSnookerScoreDao.batchSaveSnookerFrameList(score, insertedList);
+	}
+
+	@Override
+	public void batchUpdateSnookerFrameList(List<OttSnookerFrame> updatedList) {
+		ottSnookerScoreDao.batchUpdateSnookerFrameList(updatedList);
+	}
+
+	@Override
+	public void batchDeleteSnookerFrameList(List<OttSnookerFrame> deletedList) {
+		ottSnookerScoreDao.batchDeleteSnookerFrameList(deletedList);
 	}
 	
 	@Override
@@ -142,7 +158,4 @@ public class OttSnookerServiceImpl implements OttSnookerService {
 		ottSnookerLeagueDao.save(ottSnookerLeague);
 	}
 
-
-
-	
 }

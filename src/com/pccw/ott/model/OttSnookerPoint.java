@@ -24,7 +24,7 @@ public class OttSnookerPoint implements Serializable {
 	private String leagueNameEn;
 	private String leagueNameTr;
 	private Integer sn;
-	private Date lastUpdatedTime;
+	private Date lastPublishedDate;
 
 	@Id
 	@Column(name = "point_id")
@@ -85,12 +85,12 @@ public class OttSnookerPoint implements Serializable {
 	@Column(name = "last_updated_time")
 	@Temporal(TemporalType.TIMESTAMP)
 	@CreationTimestamp
-	public Date getLastUpdatedTime() {
-		return lastUpdatedTime;
+	public Date getLastPublishedDate() {
+		return lastPublishedDate;
 	}
 
-	public void setLastUpdatedTime(Date lastUpdatedTime) {
-		this.lastUpdatedTime = lastUpdatedTime;
+	public void setLastPublishedDate(Date lastUpdatedTime) {
+		this.lastPublishedDate = lastUpdatedTime;
 	}
 
 }

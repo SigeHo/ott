@@ -16,7 +16,7 @@ div.centent span {
 	margin: 2px 2px;
 	padding: 4px 10px;
 	background: #898989;
-	cursor: pointer;
+	cursor: frameer;
 	font-size: 12px;
 	color: white;
 }
@@ -31,17 +31,19 @@ tr.changed-row {
 	var frameEditIndex = undefined;
 	
 	function endEditing(type) {
-		var dg = $(this);
+		var dg = null;
 		var editIndex = undefined;
-		if (dg == $("#score_dg")) {
+		if (type == "score") {
+			dg = $("#score_dg")
 			editIndex = scoreEditIndex;
-		} else if (dg == $("#frame_dg")) {
+		} else {
+			dg = $("#frame_dg")
 			editIndex = frameEditIndex;
 		}
 		if (editIndex == undefined) { return true; }
 		if (dg.datagrid('validateRow', editIndex)) {
 			dg.datagrid('endEdit', editIndex);
-			if (dg == $("#score_dg")) {
+			if (type == "score") {
 				scoreEditIndex = undefined;
 			} else {
 				frameEditIndex = undefined;
@@ -53,50 +55,52 @@ tr.changed-row {
 	}
 
 	function onDblClickCell(index,field,value) {
-		var dg = $(this);
+		var id  = $(this).attr("id");
 		var editIndex = undefined;
-		if (dg == $("#score_dg")) {
+		var dg = null;
+		var type = undefined;
+		if (id == "score_dg") {
+			dg = $("#score_dg");
+			type = "score";
 			editIndex = scoreEditIndex;
-		} else if (dg == $("#frame_dg")) {
+			$("#saveScoreBtn").linkbutton("enable");
+		} else {
+			dg = $("#frame_dg");
 			editIndex = frameEditIndex;
+			type = "frame";
+			$("#saveFrameBtn").linkbutton("enable");
 		}
-		$("#saveBtn").linkbutton("enable");
-		if (editIndex != index) {
-			if (endEditing()) {
-				dg.datagrid('selectRow', index).datagrid('beginEdit', index);
-				var ed = dg.datagrid('getEditor', {
-					index : index,
-					field : field
-				});
-				if (ed) {
-					($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
-				}
-				if (dg == $("#score_dg")) {
-					scoreEditIndex = scoreEditIndex;
-				} else if (dg == $("#frame_dg")) {
-					frameEditIndex = frameEditIndex;
-				}
-			} else {
-				setTimeout(function() {
-					dg.datagrid('selectRow', editIndex);
-				}, 0);
+		if (endEditing(type)) {
+			dg.datagrid('selectRow', index).datagrid('beginEdit', index);
+			var ed = dg.datagrid('getEditor', {
+				index : index,
+				field : field
+			});
+			if (ed) {
+				($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
 			}
-		} 
+			if (id == "score_dg") {
+				scoreEditIndex = index;
+			} else {
+				frameEditIndex = index;
+			}
+		} else {
+			setTimeout(function() {
+				dg.datagrid('selectRow', editIndex);
+			}, 0);
+		}
 	}
-	
-	function onEndEdit(index, row, changes){
-		toggleSaveBtn();
-		var scoreTable = $($(".datagrid-btable")[0]);
-		var changedRow = scoreTable.find("tr")[index];
-		$(changedRow).addClass("changed-row");
-	}
-	
+
 	function onLoadSuccess(data) {
-		var dg = $(this);
-		if (dg == $("#score_dg")) {
-			$("#saveBtn").linkbutton("disable");
-		} else if (dg == $("#frame_dg")) {
-			$("#savePointBtn").linkbutton("disable");
+		var id = $(this).attr("id");
+		if (id == "score_dg") {
+			$("#saveScoreBtn").linkbutton("disable");
+			var score = $("#score_dg").datagrid("getSelected");
+			if (!score || undefined == score) {
+				$("#frame_dg").datagrid("loadData", {rows : []});
+			}
+		} else {
+			$("#saveFrameBtn").linkbutton("disable");
 		}
 	}
 	
@@ -138,11 +142,49 @@ tr.changed-row {
 	}
 
 	function saveScore() {
-		$("#score_dg").datagrid("endEdit", scoreEditIndex);
-		if ($("#score_dg").datagrid("getChanges").length) {
-			var inserted = $("#score_dg").datagrid('getChanges', 'inserted');
-			var updated = $("#score_dg").datagrid('getChanges', 'updated');
-			var deleted = $("#score_dg").datagrid('getChanges', 'deleted');
+		if (endEditing('score')) {
+			$("#score_dg").datagrid("endEdit", scoreEditIndex);
+			if ($("#score_dg").datagrid("getChanges").length) {
+				var inserted = $("#score_dg").datagrid('getChanges', 'inserted');
+				var updated = $("#score_dg").datagrid('getChanges', 'updated');
+				var deleted = $("#score_dg").datagrid('getChanges', 'deleted');
+				var effectRow = new Object();
+				if(inserted.length) {
+					effectRow['inserted'] = JSON.stringify(inserted);
+				}
+				if(updated.length) {
+					effectRow['updated'] = JSON.stringify(updated);
+				}
+				if(deleted.length) {
+					effectRow['deleted'] = JSON.stringify(deleted);
+				}
+				$.post("${ctx}/snooker/fixture/saveScoreChanges.html", effectRow,
+					function(response) {
+						if (response.success) {
+							$.messager.alert("", "Save changes successfully .", "info", function() {
+								$("#score_dg").datagrid("reload");
+								$("#saveScoreBtn").linkbutton("disable");
+							});
+						} else if (response.msg) {
+							$.messager.alert("", response.msg, "error");
+						} else {
+							$.messager.alert("", "Failed to save the changes.", "error");
+						}
+					}, 'JSON').error(function() {
+					$.messager.alert("", "Failed to save the changes.", "error");
+				});
+			} else {
+				$.messager.alert("", "Nothing is changed.", "warning");
+			}
+		}
+	}
+	
+	function saveFrame() {
+		$("#frame_dg").datagrid("endEdit", frameEditIndex);
+		if ($("#frame_dg").datagrid("getChanges").length) {
+			var inserted = $("#frame_dg").datagrid('getChanges', 'inserted');
+			var updated = $("#frame_dg").datagrid('getChanges', 'updated');
+			var deleted = $("#frame_dg").datagrid('getChanges', 'deleted');
 			var effectRow = new Object();
 			if(inserted.length) {
 				effectRow['inserted'] = JSON.stringify(inserted);
@@ -153,12 +195,14 @@ tr.changed-row {
 			if(deleted.length) {
 				effectRow['deleted'] = JSON.stringify(deleted);
 			}
-			$.post("${ctx}/snooker/fixture/saveFixtureChanges.html", effectRow,
+			var score = $("#score_dg").datagrid("getSelected");
+			effectRow['score'] = JSON.stringify(score);
+			$.post("${ctx}/snooker/score/saveFrameChanges.html", effectRow,
 				function(response) {
 					if (response.success) {
-						$("#saveBtn").linkbutton('disable');
 						$.messager.alert("", "Save changes successfully .", "info", function() {
-							$("#score_dg").datagrid("reload");
+							$("#frame_dg").datagrid("reload");
+							$("#saveFrameBtn").linkbutton("disable");
 						});
 					} else if (response.msg) {
 						$.messager.alert("", response.msg, "error");
@@ -171,28 +215,34 @@ tr.changed-row {
 		} else {
 			$.messager.alert("", "Nothing is changed.", "warning");
 		}
-	}
+	}	
 
 	function reset(type) {
 		var dg = null;
 		if (type == "score") {
-			dg = $("#score_dg")
+			$("#score_dg").datagrid("rejectChanges");
+			$("#saveScoreBtn").linkbutton("disable");
+			$("#frame_dg").datagrid("loadData", {rows : []});
 		} else {
-			dg = $("#frame_dg")
+			$("#frame_dg").datagrid("rejectChanges");
+			$("#saveFrameBtn").linkbutton("disable");
 		}
-		
-		dg.datagrid("rejectChanges");
 	}
 
 	function addRow(type) {
 		var dg = null;
 		if (type == "score") {
-			dg = $("#score_dg")
+			dg = $("#score_dg");
 		} else {
-			dg = $("#frame_dg")
+			dg = $("#frame_dg");
+			var score = $("#score_dg").datagrid("getSelected");
+			if (null == score || undefined == score || undefined == score.scoreId || "" == score.scoreId) {
+				$.messager.alert("", "Please select one score above.", "info");
+				return;
+			}
 		}
 		var editIndex = undefined;
-		if (endEditing()) {
+		if (endEditing(type)) {
 			dg.datagrid('appendRow', {
 				lastPublishedDate : ""
 			});
@@ -200,7 +250,8 @@ tr.changed-row {
 			dg.datagrid('selectRow', editIndex).datagrid('beginEdit', editIndex);
 			if (type == "score") {
 				scoreEditIndex = editIndex;
-			} else if (dg == $("#frame_dg")) {
+				$("#frame_dg").datagrid("loadData", {rows : []});
+			} else {
 				frameEditIndex = editIndex;
 			}
 			toggleSaveBtn(type);
@@ -210,9 +261,9 @@ tr.changed-row {
 	function deleteRow(type) {
 		var dg = null;
 		if (type == "score") {
-			dg = $("#score_dg")
+			dg = $("#score_dg");
 		} else {
-			dg = $("#frame_dg")
+			dg = $("#frame_dg");
 		}
 		var editIndex = undefined;
 		if (type == "score") {
@@ -226,6 +277,7 @@ tr.changed-row {
 		dg.datagrid('cancelEdit', editIndex).datagrid('deleteRow', editIndex);
 		if (type == "score") {
 			scoreEditIndex = undefined;
+			$("#frame_dg").datagrid("loadData", {rows : []});
 		} else {
 			frameEditIndex = undefined;
 		}
@@ -235,14 +287,19 @@ tr.changed-row {
 	function toggleSaveBtn(type) {
 		var dg = null;
 		if (type == "score") {
-			dg = $("#score_dg")
+			dg = $("#score_dg");
+			if (dg.datagrid("getChanges").length) {
+				$("#saveRankBtn").linkbutton("enable");
+			} else {
+				$("#saveRankBtn").linkbutton("disable");
+			}
 		} else {
-			dg = $("#frame_dg")
-		}
-		if (dg.datagrid("getChanges").length) {
-			$("#saveBtn").linkbutton("enable");
-		} else {
-			$("#saveBtn").linkbutton("disable");
+			dg = $("#frame_dg");
+			if (dg.datagrid("getChanges").length) {
+				$("#savePointBtn").linkbutton("enable");
+			} else {
+				$("#savePointBtn").linkbutton("disable");
+			}
 		}
 	}
 </script>
@@ -258,7 +315,6 @@ tr.changed-row {
 		singleSelect: true,
 		onClickRow: onClickRow,
 		onDblClickCell: onDblClickCell,
-		onAfterEdit: onEndEdit,
 		onLoadSuccess: onLoadSuccess
 	">
 		<thead>
@@ -310,7 +366,6 @@ tr.changed-row {
 		idField: 'frameId',
 		fitColumns: true,
 		onDblClickCell: onDblClickCell,
-		onAfterEdit: onEndEdit,
 		onLoadSuccess: onLoadSuccess,
 		onClickRow:onClickRow
 	">
@@ -351,7 +406,7 @@ tr.changed-row {
 		<table width="100%">
 			<tr>
 				<td>
-						<a id="savePointBtn" href="#" class="easyui-linkbutton" iconCls="icon-save" plain="true" onclick="saveFrame()" disabled="true">Save</a>
+						<a id="saveFrameBtn" href="#" class="easyui-linkbutton" iconCls="icon-save" plain="true" onclick="saveFrame()" disabled="true">Save</a>
 						<a href="#" class="easyui-linkbutton" iconCls="icon-undo" plain="true" onclick="reset('frame')">Reset</a>
 						<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="addRow('frame')">Add</a>
 						<a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="deleteRow('frame')">Delete</a>

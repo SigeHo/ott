@@ -39,8 +39,8 @@ public class OttSnookerRank implements Serializable {
 	private Integer point3;
 	private Integer ptcPoint;
 	private Integer totalPoint;
-	private Date lastUpdatedTime;
-	private List<OttSnookerPoint> snookerPointList;
+	private Date lastPublishedDate;
+	private List<OttSnookerPoint> ottSnookerPointList;
 
 	@Id
 	@Column(name = "rank_id")
@@ -173,24 +173,24 @@ public class OttSnookerRank implements Serializable {
 	@Column(name = "last_updated_time")
 	@Temporal(TemporalType.TIMESTAMP)
 	@CreationTimestamp
-	public Date getLastUpdatedTime() {
-		return lastUpdatedTime;
+	public Date getLastPublishedDate() {
+		return lastPublishedDate;
 	}
 
-	public void setLastUpdatedTime(Date lastUpdatedTime) {
-		this.lastUpdatedTime = lastUpdatedTime;
+	public void setLastPublishedDate(Date lastUpdatedTime) {
+		this.lastPublishedDate = lastUpdatedTime;
 	}
 
 	@OneToMany(cascade = { CascadeType.ALL}, fetch = FetchType.EAGER)
 	@JoinTable(name = "ott_snooker_rank_point", joinColumns = {
 			@JoinColumn(name = "player_id", referencedColumnName = "player_id") }, inverseJoinColumns = {
 					@JoinColumn(name = "point_id", referencedColumnName = "point_id") })
-	public List<OttSnookerPoint> getSnookerPointList() {
-		return snookerPointList;
+	public List<OttSnookerPoint> getOttSnookerPointList() {
+		return ottSnookerPointList;
 	}
 
-	public void setSnookerPointList(List<OttSnookerPoint> snookerPointList) {
-		this.snookerPointList = snookerPointList;
+	public void setOttSnookerPointList(List<OttSnookerPoint> snookerPointList) {
+		this.ottSnookerPointList = snookerPointList;
 	}
 
 }
