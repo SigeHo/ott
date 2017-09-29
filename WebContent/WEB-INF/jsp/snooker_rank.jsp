@@ -123,9 +123,9 @@ tr.changed-row {
 			} else {
 				$("#point_dg").datagrid('loadData', {rows : []});
 			}
-			rankEditIndex = index;
+			//rankEditIndex = index;
 		} else {
-			pointEditIndex = index;
+			//pointEditIndex = index;
 		}
 	}
 
@@ -144,7 +144,6 @@ tr.changed-row {
 
 	function saveRank() {
 		if (endEditing('rank')) {
-			$("#rank_dg").datagrid("endEdit", rankEditIndex);
 			if ($("#rank_dg").datagrid("getChanges").length) {
 				var inserted = $("#rank_dg").datagrid('getChanges', 'inserted');
 				var updated = $("#rank_dg").datagrid('getChanges', 'updated');
@@ -181,7 +180,6 @@ tr.changed-row {
 	}
 	
 	function savePoint() {
-		$("#point_dg").datagrid("endEdit", pointEditIndex);
 		if ($("#point_dg").datagrid("getChanges").length) {
 			var inserted = $("#point_dg").datagrid('getChanges', 'inserted');
 			var updated = $("#point_dg").datagrid('getChanges', 'updated');
@@ -245,7 +243,7 @@ tr.changed-row {
 		var editIndex = undefined;
 		if (endEditing(type)) {
 			dg.datagrid('appendRow', {
-				lastUpdatedTime : ""
+				lastPublishedDate : ""
 			});
 			editIndex = dg.datagrid('getRows').length - 1;
 			dg.datagrid('selectRow', editIndex).datagrid('beginEdit', editIndex);
@@ -333,7 +331,7 @@ tr.changed-row {
 				<th colspan="3">Point</th>
 				<th field="ptcPoint" rowspan="2" editor="numberbox" width="100px">PTC Point</th>
 				<th field="totalPoint" rowspan="2" editor="numberbox" width="100px">Total Point</th>
-				<th field="lastUpdatedTime" rowspan="2" formatter="dateFormatter" width="150px">Last Updated Time</th>
+				<th field="lastPublishedDate" rowspan="2" formatter="dateFormatter" width="150px">Last Updated Time</th>
 			</tr>
 			<tr>
 				<th field="point1" editor="numberbox" width="100px">Season 1</th>
@@ -362,7 +360,7 @@ tr.changed-row {
 				<th field="leagueNameEn" data-options="editor:'text'" >League Name EN</th>
 				<th field="leagueNameTr" data-options="editor:'text'" >League Name TR</th>
 				<th field="sn" data-options="editor:'numberbox'" >SN</th>
-				<th field="lastUpdatedTime" formatter="dateFormatter">Last Updated Time</th>
+				<th field="lastPublishedDate" formatter="dateFormatter">Last Updated Time</th>
 			</tr>
 		</thead>
 	</table>	

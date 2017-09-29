@@ -39,7 +39,7 @@ public class OttSnookerRank implements Serializable {
 	private Integer point3;
 	private Integer ptcPoint;
 	private Integer totalPoint;
-	private Date lastUpdatedTime;
+	private Date lastPublishedDate;
 	private List<OttSnookerPoint> snookerPointList;
 
 	@Id
@@ -170,15 +170,15 @@ public class OttSnookerRank implements Serializable {
 		this.totalPoint = totalPoint;
 	}
 
-	@Column(name = "last_updated_time")
+	@Column(name = "last_published_date")
 	@Temporal(TemporalType.TIMESTAMP)
 	@CreationTimestamp
-	public Date getLastUpdatedTime() {
-		return lastUpdatedTime;
+	public Date getLastPublishedDate() {
+		return lastPublishedDate;
 	}
 
-	public void setLastUpdatedTime(Date lastUpdatedTime) {
-		this.lastUpdatedTime = lastUpdatedTime;
+	public void setLastPublishedDate(Date lastPublishedDate) {
+		this.lastPublishedDate = lastPublishedDate;
 	}
 
 	@OneToMany(cascade = { CascadeType.ALL}, fetch = FetchType.EAGER)

@@ -14,7 +14,7 @@ import com.pccw.ott.model.OttSnookerPoint;
 import com.pccw.ott.model.OttSnookerRank;
 
 @Repository("ottSnookerRankDao")
-@SuppressWarnings({"unchecked", "rawtypes", "deprecation"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class OttSnookerRankDaoImpl extends HibernateDaoSupport implements OttSnookerRankDao {
 
 	@Override

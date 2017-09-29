@@ -136,6 +136,7 @@ public class JsonUtil {
 					JsonNode frameNode = framesIt.next();
 					frame = new OttSnookerFrame();
 					frame.setMatchSort(frameNode.path("match_sort").asInt());
+					frame.setSort(frameNode.path("sort").asInt());
 					frame.setScoreA(frameNode.path("score_A").asInt());
 					frame.setScoreB(frameNode.path("score_B").asInt());
 					frame.setBestPlayer(frameNode.path("best_play").asInt());

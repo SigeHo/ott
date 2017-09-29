@@ -2,6 +2,7 @@ package com.pccw.ott.service;
 
 import java.util.List;
 
+import com.pccw.ott.model.OttSnookerFrame;
 import com.pccw.ott.model.OttSnookerLeague;
 import com.pccw.ott.model.OttSnookerPoint;
 import com.pccw.ott.model.OttSnookerRank;
@@ -21,7 +22,12 @@ public interface OttSnookerService {
 	public void batchUpdateSnookerScoreList(List<OttSnookerScore> updatedList);
 
 	public void batchDeleteSnookerScoreList(List<OttSnookerScore> deletedList);
+	
+	public void batchSaveSnookerFrameList(OttSnookerScore score, List<OttSnookerFrame> insertedList);
 
+	public void batchUpdateSnookerFrameList(List<OttSnookerFrame> updatedList);
+
+	public void batchDeleteSnookerFrameList(List<OttSnookerFrame> deletedList);
 
 	/* Snook Rank */
 	public void batchSaveSnookerRankList(List<OttSnookerRank> list);

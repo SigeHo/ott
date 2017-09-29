@@ -22,6 +22,7 @@ public class OttSnookerFrame implements Serializable {
 
 	private Long frameId;
 	private Integer matchSort;
+	private Integer sort;
 	private Integer scoreA;
 	private Integer scoreB;
 	private Integer bestPlayer;
@@ -47,6 +48,15 @@ public class OttSnookerFrame implements Serializable {
 
 	public void setMatchSort(Integer matchSort) {
 		this.matchSort = matchSort;
+	}
+	
+	@Column(name = "sort")
+	public Integer getSort() {
+		return sort;
+	}
+
+	public void setSort(Integer sort) {
+		this.sort = sort;
 	}
 
 	@Column(name = "score_a")
