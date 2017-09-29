@@ -23,7 +23,6 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pccw.ott.model.OttSnookerFrame;
 import com.pccw.ott.model.OttSnookerPoint;
 import com.pccw.ott.model.OttSnookerRank;
 import com.pccw.ott.model.OttSnookerScore;
@@ -105,44 +104,6 @@ public class OttSnookerController {
 		return returnMap;
 	}
 	
-	@RequestMapping("/fixture/saveFrameChanges.html")
-	@ResponseBody
-	public Map<String, Object> saveFrameChanges(HttpServletRequest request) {
-		Map<String, Object> returnMap = new HashMap<String, Object>();
-		String inserted = request.getParameter("inserted");
-		String updated = request.getParameter("updated");
-		String deleted = request.getParameter("deleted");
-		String rankString = request.getParameter("rank");
-		ObjectMapper mapper = new ObjectMapper();
-		JavaType javaType = mapper.getTypeFactory().constructParametricType(ArrayList.class, OttSnookerFrame.class);
-		try {
-			OttSnookerScore score = mapper.readValue(rankString, OttSnookerScore.class);
-			if (StringUtils.isNotBlank(inserted)) {
-				List<OttSnookerFrame> insertedList = mapper.readValue(inserted, javaType);
-				if (insertedList.size() > 0)
-					ottSnookerService.batchSaveSnookerFrameList(score, insertedList);
-			}
-			if (StringUtils.isNotBlank(updated)) {
-				List<OttSnookerFrame> updatedList = mapper.readValue(updated, javaType);
-				if (updatedList.size() > 0)
-					ottSnookerService.batchUpdateSnookerFrameList(updatedList);
-			}
-			if (StringUtils.isNotBlank(deleted)) {
-				List<OttSnookerFrame> deletedList = mapper.readValue(deleted, javaType);
-				if (deletedList.size() > 0)
-					ottSnookerService.batchDeleteSnookerFrameList(deletedList);
-			}
-			returnMap.put("success", true);
-		} catch (JsonParseException | JsonMappingException e) {
-			logger.error(e.toString());
-			returnMap.put("success", false);
-		} catch (IOException e) {
-			logger.error(e.toString());
-			returnMap.put("success", false);
-		}
-		return returnMap;
-	}
-	
 	// ------------------ Snooker Rank ------------------
 	@RequestMapping("/rank/goToListRankPage.html")
 	public ModelAndView goToListRankPage(HttpServletRequest request) {
@@ -206,14 +167,14 @@ public class OttSnookerController {
 		return returnMap;
 	}
 
-/*	@RequestMapping("/rank/listPoint.html")
+	@RequestMapping("/rank/listPoint.html")
 	@ResponseBody
 	public Map<String, Object> listPoint(HttpServletRequest request, @RequestParam String playerId) {
 		Map<String, Object> returnMap = new HashMap<String, Object>();
 		List<OttSnookerPoint> list = ottSnookerService.findSnookerPointList(playerId);
 		returnMap.put("rows", list);
 		return returnMap;
-	}*/
+	}
 	
 	@RequestMapping("/rank/savePointChanges.html")
 	@ResponseBody
