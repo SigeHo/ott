@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.pccw.ott.model.OttSnookerFrame;
 import com.pccw.ott.model.OttSnookerLeague;
+import com.pccw.ott.model.OttSnookerLevel;
 import com.pccw.ott.model.OttSnookerPoint;
 import com.pccw.ott.model.OttSnookerRank;
 import com.pccw.ott.model.OttSnookerScore;
@@ -56,5 +57,21 @@ public interface OttSnookerService {
 
 	/* Snooker League */
 	public void flushSnookerLeagueData(OttSnookerLeague league);
+
+	public List<OttSnookerLeague> findSnookerLeagueList(String leagueName, int first, int max, String sort, String order);
+
+	public Long findSnookerLeagueListSize(String leagueName);
+
+	public void batchSaveSnookerLeagueList(List<OttSnookerLeague> insertedList);
+
+	public void batchUpdateSnookerLeagueList(List<OttSnookerLeague> updatedList);
+
+	public void batchDeleteSnookerLeagueList(List<OttSnookerLeague> deletedList);
+
+	public void batchSaveSnookerLevelList(OttSnookerLeague league, List<OttSnookerLevel> insertedList);
+
+	public void batchUpdateSnookerLevelList(List<OttSnookerLevel> updatedList);
+
+	public void batchDeleteSnookerLevelList(List<OttSnookerLevel> deletedList);
 
 }

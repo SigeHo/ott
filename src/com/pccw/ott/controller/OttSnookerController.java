@@ -24,6 +24,8 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pccw.ott.model.OttSnookerFrame;
+import com.pccw.ott.model.OttSnookerLeague;
+import com.pccw.ott.model.OttSnookerLevel;
 import com.pccw.ott.model.OttSnookerPoint;
 import com.pccw.ott.model.OttSnookerRank;
 import com.pccw.ott.model.OttSnookerScore;
@@ -252,6 +254,107 @@ public class OttSnookerController {
 		}
 		return returnMap;
 	}
+	
+	//------------------ Snooker League ------------------
+	@RequestMapping("/league/goToListLeaguePage.html")
+	public ModelAndView goToListLeaguePage() {
+		ModelAndView mv = new ModelAndView("snooker_league");
+		return mv;
+	}
+	
+	@RequestMapping("/league/listLeague.html")
+	@ResponseBody
+	public Map<String, Object> listLeague(HttpServletRequest request, @RequestParam int page, @RequestParam int rows) {
+		Map<String, Object> returnMap = new HashMap<String, Object>();
+		String leagueName = request.getParameter("leagueNameForSearch");
+		String sort = request.getParameter("sort");
+		String order = request.getParameter("order");
+		int first = (page - 1) * rows;
+		int max = rows;
+		List<OttSnookerLeague> list = ottSnookerService.findSnookerLeagueList(leagueName, first, max, sort, order);
+		Long total = ottSnookerService.findSnookerLeagueListSize(leagueName);
+		returnMap.put("rows", list);
+		returnMap.put("total", total);
+		return returnMap;
+	}
+	
+	@RequestMapping("/league/saveLeagueChanges.html")
+	@ResponseBody
+	public Map<String, Object> saveLeagueChanges(HttpServletRequest request) {
+		Map<String, Object> returnMap = new HashMap<String, Object>();
+		String inserted = request.getParameter("inserted");
+		String updated = request.getParameter("updated");
+		String deleted = request.getParameter("deleted");
+		ObjectMapper mapper = new ObjectMapper();
+		JavaType javaType = mapper.getTypeFactory().constructParametricType(ArrayList.class, OttSnookerLeague.class);
+		try {
+			if (StringUtils.isNotBlank(inserted)) {
+				List<OttSnookerLeague> insertedList = mapper.readValue(inserted, javaType);
+				if (insertedList.size() > 0)
+					ottSnookerService.batchSaveSnookerLeagueList(insertedList);
+			}
+			if (StringUtils.isNotBlank(updated)) {
+				List<OttSnookerLeague> updatedList = mapper.readValue(updated, javaType);
+				if (updatedList.size() > 0)
+					ottSnookerService.batchUpdateSnookerLeagueList(updatedList);
+			}
+			if (StringUtils.isNotBlank(deleted)) {
+				List<OttSnookerLeague> deletedList = mapper.readValue(deleted, javaType);
+				if (deletedList.size() > 0)
+					ottSnookerService.batchDeleteSnookerLeagueList(deletedList);
+			}
+			returnMap.put("success", true);
+		} catch (DataIntegrityViolationException e) {
+			logger.error(e.toString());
+			returnMap.put("success", false);
+			returnMap.put("msg", "Failed to save changes. Duplicate league id is not allowed.");
+		} catch (JsonParseException | JsonMappingException e) {
+			logger.error(e.toString());
+			returnMap.put("success", false);
+		} catch (IOException e) {
+			logger.error(e.toString());
+			returnMap.put("success", false);
+		}
+		return returnMap;
+	}
+	
+	@RequestMapping("/league/saveLevelChanges.html")
+	@ResponseBody
+	public Map<String, Object> saveLevelChanges(HttpServletRequest request) {
+		Map<String, Object> returnMap = new HashMap<String, Object>();
+		String inserted = request.getParameter("inserted");
+		String updated = request.getParameter("updated");
+		String deleted = request.getParameter("deleted");
+		String leagueString = request.getParameter("league");
+		ObjectMapper mapper = new ObjectMapper();
+		JavaType javaType = mapper.getTypeFactory().constructParametricType(ArrayList.class, OttSnookerLevel.class);
+		try {
+			OttSnookerLeague league = mapper.readValue(leagueString, OttSnookerLeague.class);
+			if (StringUtils.isNotBlank(inserted)) {
+				List<OttSnookerLevel> insertedList = mapper.readValue(inserted, javaType);
+				if (insertedList.size() > 0)
+					ottSnookerService.batchSaveSnookerLevelList(league, insertedList);
+			}
+			if (StringUtils.isNotBlank(updated)) {
+				List<OttSnookerLevel> updatedList = mapper.readValue(updated, javaType);
+				if (updatedList.size() > 0)
+					ottSnookerService.batchUpdateSnookerLevelList(updatedList);
+			}
+			if (StringUtils.isNotBlank(deleted)) {
+				List<OttSnookerLevel> deletedList = mapper.readValue(deleted, javaType);
+				if (deletedList.size() > 0)
+					ottSnookerService.batchDeleteSnookerLevelList(deletedList);
+			}
+			returnMap.put("success", true);
+		} catch (JsonParseException | JsonMappingException e) {
+			logger.error(e.toString());
+			returnMap.put("success", false);
+		} catch (IOException e) {
+			logger.error(e.toString());
+			returnMap.put("success", false);
+		}
+		return returnMap;
+	}	
 	
 	@RequestMapping("/testSql")
 	public void testSave() {

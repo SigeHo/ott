@@ -1,6 +1,7 @@
 package com.pccw.ott.model;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -17,6 +18,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -32,7 +34,9 @@ public class OttSnookerLeague implements Serializable {
 	private String leagueNameEn;
 	private String leagueNameTr;
 	private Date startTime;
+	private String startTimeStr;
 	private Date endTime;
+	private String endTimeStr;
 	private String color;
 	private String remark;
 	private Integer money;
@@ -85,10 +89,14 @@ public class OttSnookerLeague implements Serializable {
 	public void setLeagueNameTr(String leagueNameTr) {
 		this.leagueNameTr = leagueNameTr;
 	}
-
+	
 	@Column(name = "start_time")
 	@Temporal(TemporalType.TIMESTAMP)
 	public Date getStartTime() {
+		if (null != startTime) {
+			SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+			this.setStartTimeStr(sdf.format(startTime));
+		}
 		return startTime;
 	}
 
@@ -99,6 +107,10 @@ public class OttSnookerLeague implements Serializable {
 	@Column(name = "end_time")
 	@Temporal(TemporalType.TIMESTAMP)
 	public Date getEndTime() {
+		if (null != endTime) {
+			SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+			this.setStartTimeStr(sdf.format(endTime));
+		}
 		return endTime;
 	}
 
@@ -143,7 +155,7 @@ public class OttSnookerLeague implements Serializable {
 	public void setLastPublishedDate(Date lastPublishedDate) {
 		this.lastPublishedDate = lastPublishedDate;
 	}
-
+	
 	@OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
 	@JoinTable(name = "ott_snooker_league_level", joinColumns = {
 			@JoinColumn(name = "league_id", referencedColumnName = "league_id") }, inverseJoinColumns = {
@@ -154,6 +166,24 @@ public class OttSnookerLeague implements Serializable {
 
 	public void setOttSnookerLevelList(List<OttSnookerLevel> ottSnookerLevelList) {
 		this.ottSnookerLevelList = ottSnookerLevelList;
+	}
+	
+	@Transient
+	public String getStartTimeStr() {
+		return startTimeStr;
+	}
+
+	public void setStartTimeStr(String startTimeStr) {
+		this.startTimeStr = startTimeStr;
+	}
+
+	@Transient
+	public String getEndTimeStr() {
+		return endTimeStr;
+	}
+
+	public void setEndTimeStr(String endTimeStr) {
+		this.endTimeStr = endTimeStr;
 	}
 
 }

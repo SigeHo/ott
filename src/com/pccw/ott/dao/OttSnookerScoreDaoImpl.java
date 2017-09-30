@@ -2,7 +2,6 @@ package com.pccw.ott.dao;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -14,7 +13,6 @@ import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
 import org.springframework.stereotype.Repository;
 
 import com.pccw.ott.model.OttSnookerFrame;
-import com.pccw.ott.model.OttSnookerPoint;
 import com.pccw.ott.model.OttSnookerScore;
 
 @Repository("ottSnookerScoreDao")
@@ -241,7 +239,7 @@ public class OttSnookerScoreDaoImpl extends HibernateDaoSupport implements OttSn
 			@Override
 			public Object doInHibernate(Session session) throws HibernateException {
 				for (OttSnookerFrame ottSnookerFrame : deletedList) {
-					session.createNativeQuery("delete from ott_snooker_rank_point where point_id = " + ottSnookerFrame.getFrameId()).executeUpdate();
+					session.createNativeQuery("delete from ott_snooker_score_frame where frame_id = " + ottSnookerFrame.getFrameId()).executeUpdate();
 					OttSnookerFrame frame = session.load(OttSnookerFrame.class, ottSnookerFrame.getFrameId());
 					session.delete(frame);
 				}

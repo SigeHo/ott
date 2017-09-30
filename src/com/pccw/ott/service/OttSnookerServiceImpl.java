@@ -12,6 +12,7 @@ import com.pccw.ott.dao.OttSnookerRankDao;
 import com.pccw.ott.dao.OttSnookerScoreDao;
 import com.pccw.ott.model.OttSnookerFrame;
 import com.pccw.ott.model.OttSnookerLeague;
+import com.pccw.ott.model.OttSnookerLevel;
 import com.pccw.ott.model.OttSnookerPoint;
 import com.pccw.ott.model.OttSnookerRank;
 import com.pccw.ott.model.OttSnookerScore;
@@ -156,6 +157,46 @@ public class OttSnookerServiceImpl implements OttSnookerService {
 
 	private void saveSnookerLeauge(OttSnookerLeague ottSnookerLeague) {
 		ottSnookerLeagueDao.save(ottSnookerLeague);
+	}
+
+	@Override
+	public List<OttSnookerLeague> findSnookerLeagueList(String leagueName, int first, int max, String sort, String order) {
+		return ottSnookerLeagueDao.findByParam(leagueName, first, max, sort, order);
+	}
+
+	@Override
+	public Long findSnookerLeagueListSize(String leagueName) {
+		return ottSnookerLeagueDao.findCountByParam(leagueName);
+	}
+
+	@Override
+	public void batchSaveSnookerLeagueList(List<OttSnookerLeague> insertedList) {
+		ottSnookerLeagueDao.batchSaveSnookerLeagueList(insertedList);		
+	}
+
+	@Override
+	public void batchUpdateSnookerLeagueList(List<OttSnookerLeague> updatedList) {
+		ottSnookerLeagueDao.batchUpdateSnookerLeagueList(updatedList);
+	}
+
+	@Override
+	public void batchDeleteSnookerLeagueList(List<OttSnookerLeague> deletedList) {
+		ottSnookerLeagueDao.batchDeleteSnookerLeagueList(deletedList);
+	}
+
+	@Override
+	public void batchSaveSnookerLevelList(OttSnookerLeague league, List<OttSnookerLevel> insertedList) {
+		ottSnookerLeagueDao.batchSaveSnookerLevelList(league, insertedList);		
+	}
+
+	@Override
+	public void batchUpdateSnookerLevelList(List<OttSnookerLevel> updatedList) {
+		ottSnookerLeagueDao.batchUpdateSnookerLevelList(updatedList);		
+	}
+
+	@Override
+	public void batchDeleteSnookerLevelList(List<OttSnookerLevel> deletedList) {
+		ottSnookerLeagueDao.batchDeleteSnookerLevelList(deletedList);		
 	}
 
 
