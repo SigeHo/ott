@@ -53,8 +53,8 @@ tr.changed-row {
 			return false;
 		}
 	}
-
-	function onDblClickCell(index,field,value) {
+	
+	function onClickRow(index, row) {
 		var id  = $(this).attr("id");
 		var editIndex = undefined;
 		var dg = null;
@@ -63,38 +63,61 @@ tr.changed-row {
 			dg = $("#score_dg");
 			type = "score";
 			editIndex = scoreEditIndex;
-			$("#saveScoreBtn").linkbutton("enable");
 		} else {
 			dg = $("#frame_dg");
 			editIndex = frameEditIndex;
 			type = "frame";
-			$("#saveFrameBtn").linkbutton("enable");
 		}
-		if (endEditing(type)) {
-			dg.datagrid('selectRow', index).datagrid('beginEdit', index);
-			var ed = dg.datagrid('getEditor', {
-				index : index,
-				field : field
-			});
-			if (ed) {
-				($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
+		if (editIndex != index) {
+			if (endEditing(type)) {
+				editIndex = index;
+				if (type == "score") {
+					var frameData = row.ottSnookerFrameList;
+					if (frameData) {
+						$("#frame_dg").datagrid('loadData', frameData);	
+					} else {
+						$("#frame_dg").datagrid('loadData', {rows : []});
+					}
+					scoreEditIndex = index;
+				} else {
+					frameEditIndex = index;
+				}
+			} else{
+				setTimeout(function() {
+					dg.datagrid('selectRow', editIndex);
+				},0);
 			}
-			if (id == "score_dg") {
-				scoreEditIndex = index;
-			} else {
-				frameEditIndex = index;
-			}
+		}
+	}
+
+	function onDblClickCell(index,field,value) {
+		/* var id  = $(this).attr("id");
+		var editIndex = undefined;
+		var dg = null;
+		var type = undefined;
+		if (id == "score_dg") {
+			dg = $("#score_dg");
+			type = "score";
+			editIndex = scoreEditIndex;
 		} else {
-			setTimeout(function() {
-				dg.datagrid('selectRow', editIndex);
-			}, 0);
+			dg = $("#frame_dg");
+			editIndex = frameEditIndex;
+			type = "frame";
+		} */
+		var dg = $(this);
+		dg.datagrid('selectRow', index).datagrid('beginEdit', index);
+		var ed = dg.datagrid('getEditor', {
+			index : index,
+			field : field
+		});
+		if (ed) {
+			($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
 		}
 	}
 
 	function onLoadSuccess(data) {
 		var id = $(this).attr("id");
 		if (id == "score_dg") {
-			$("#saveScoreBtn").linkbutton("disable");
 			var score = $("#score_dg").datagrid("getSelected");
 			if (!score || undefined == score) {
 				$("#frame_dg").datagrid("loadData", {rows : []});
@@ -113,21 +136,6 @@ tr.changed-row {
 		}
 	}
 	
-	function onClickRow(index, row) {
-		var id = $(this).attr("id");
-		if (id == 'score_dg') {
-			var frameData = row.ottSnookerFrameList;
-			if (frameData) {
-				$("#frame_dg").datagrid('loadData', frameData);	
-			} else {
-				$("#frame_dg").datagrid('loadData', {rows : []});
-			}
-			//scoreEditIndex = index;
-		} else {
-			//frameEditIndex = index;
-		}
-	}
-
 	function doSearch() {
 		var leagueNameForSearch = $('#leagueNameForSearch').val();
 		leagueNameForSearch = leagueNameForSearch.Trim();
@@ -252,7 +260,6 @@ tr.changed-row {
 			} else {
 				frameEditIndex = editIndex;
 			}
-			toggleSaveBtn(type);
 		}
 	}
 	
@@ -279,27 +286,8 @@ tr.changed-row {
 		} else {
 			frameEditIndex = undefined;
 		}
-		toggleSaveBtn(type);
 	}
 	
-	function toggleSaveBtn(type) {
-		var dg = null;
-		if (type == "score") {
-			dg = $("#score_dg");
-			if (dg.datagrid("getChanges").length) {
-				$("#saveScoreBtn").linkbutton("enable");
-			} else {
-				$("#saveScoreBtn").linkbutton("disable");
-			}
-		} else {
-			dg = $("#frame_dg");
-			if (dg.datagrid("getChanges").length) {
-				$("#saveFrameBtn").linkbutton("enable");
-			} else {
-				$("#saveFrameBtn").linkbutton("disable");
-			}
-		}
-	}
 </script>
 </head>
 <body>
@@ -363,9 +351,9 @@ tr.changed-row {
 		singleSelect: true,
 		idField: 'frameId',
 		fitColumns: true,
+		onClickRow: onClickRow,
 		onDblClickCell: onDblClickCell,
 		onLoadSuccess: onLoadSuccess,
-		onClickRow:onClickRow
 	">
 		<thead>
 			<tr>
@@ -386,7 +374,7 @@ tr.changed-row {
 		<table width="100%">
 			<tr>
 				<td>
-						<a id="saveScoreBtn" href="#" class="easyui-linkbutton" iconCls="icon-save" plain="true" onclick="saveScore()" disabled="true">Save</a>
+						<a id="saveScoreBtn" href="#" class="easyui-linkbutton" iconCls="icon-save" plain="true" onclick="saveScore()">Save</a>
 						<a href="#" class="easyui-linkbutton" iconCls="icon-undo" plain="true" onclick="reset('score')">Reset</a>
 						<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="addRow('score')">Add</a>
 						<a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="deleteRow('score')">Delete</a>
@@ -404,7 +392,7 @@ tr.changed-row {
 		<table width="100%">
 			<tr>
 				<td>
-						<a id="saveFrameBtn" href="#" class="easyui-linkbutton" iconCls="icon-save" plain="true" onclick="saveFrame()" disabled="true">Save</a>
+						<a id="saveFrameBtn" href="#" class="easyui-linkbutton" iconCls="icon-save" plain="true" onclick="saveFrame()">Save</a>
 						<a href="#" class="easyui-linkbutton" iconCls="icon-undo" plain="true" onclick="reset('frame')">Reset</a>
 						<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="addRow('frame')">Add</a>
 						<a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="deleteRow('frame')">Delete</a>

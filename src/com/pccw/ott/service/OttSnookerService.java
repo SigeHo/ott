@@ -1,10 +1,12 @@
 package com.pccw.ott.service;
 
+import java.text.ParseException;
 import java.util.List;
 
 import com.pccw.ott.model.OttSnookerFrame;
 import com.pccw.ott.model.OttSnookerLeague;
 import com.pccw.ott.model.OttSnookerLevel;
+import com.pccw.ott.model.OttSnookerPerson;
 import com.pccw.ott.model.OttSnookerPoint;
 import com.pccw.ott.model.OttSnookerRank;
 import com.pccw.ott.model.OttSnookerScore;
@@ -73,5 +75,19 @@ public interface OttSnookerService {
 	public void batchUpdateSnookerLevelList(List<OttSnookerLevel> updatedList);
 
 	public void batchDeleteSnookerLevelList(List<OttSnookerLevel> deletedList);
+	
+	/* Snooker Player */
+	
+	public void flushSnookerPersonData(OttSnookerPerson person);
+
+	public List<OttSnookerPerson> findSnookerPersonList(String playerName, int first, int max, String sort, String order);
+
+	public Long findSnookerPersonListSize(String playerName);
+
+	public void batchSaveSnookerPersonList(List<OttSnookerPerson> insertedList) throws ParseException;
+
+	public void batchUpdateSnookerPersonList(List<OttSnookerPerson> updatedList) throws ParseException;
+
+	public void batchDeleteSnookerPersonList(List<OttSnookerPerson> deletedList);
 
 }

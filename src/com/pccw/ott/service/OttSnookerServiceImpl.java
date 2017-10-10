@@ -1,5 +1,6 @@
 package com.pccw.ott.service;
 
+import java.text.ParseException;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -8,11 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.pccw.ott.dao.OttSnookerLeagueDao;
+import com.pccw.ott.dao.OttSnookerPersonDao;
 import com.pccw.ott.dao.OttSnookerRankDao;
 import com.pccw.ott.dao.OttSnookerScoreDao;
 import com.pccw.ott.model.OttSnookerFrame;
 import com.pccw.ott.model.OttSnookerLeague;
 import com.pccw.ott.model.OttSnookerLevel;
+import com.pccw.ott.model.OttSnookerPerson;
 import com.pccw.ott.model.OttSnookerPoint;
 import com.pccw.ott.model.OttSnookerRank;
 import com.pccw.ott.model.OttSnookerScore;
@@ -29,6 +32,9 @@ public class OttSnookerServiceImpl implements OttSnookerService {
 	
 	@Autowired
 	private OttSnookerLeagueDao ottSnookerLeagueDao;
+	
+	@Autowired
+	private OttSnookerPersonDao ottSnookerPersonDao;
 	
 	@Override
 	public void flushSnookerScoreData(List<OttSnookerScore> list) {
@@ -198,8 +204,36 @@ public class OttSnookerServiceImpl implements OttSnookerService {
 	public void batchDeleteSnookerLevelList(List<OttSnookerLevel> deletedList) {
 		ottSnookerLeagueDao.batchDeleteSnookerLevelList(deletedList);		
 	}
-
-
-
 	
+	@Override
+	public void flushSnookerPersonData(OttSnookerPerson person) {
+		ottSnookerPersonDao.deleteById(person.getPlayerId());
+		ottSnookerPersonDao.save(person);
+	}
+
+	@Override
+	public List<OttSnookerPerson> findSnookerPersonList(String playerName, int first, int max, String sort, String order) {
+		return ottSnookerPersonDao.findByPlayerName(playerName, first, max, sort, order);
+	}
+
+	@Override
+	public Long findSnookerPersonListSize(String playerName) {
+		return ottSnookerPersonDao.countByPlayerName(playerName);
+	}
+
+	@Override
+	public void batchSaveSnookerPersonList(List<OttSnookerPerson> insertedList) throws ParseException {
+		ottSnookerPersonDao.batchSaveSnookerPersonList(insertedList);
+	}
+
+	@Override
+	public void batchUpdateSnookerPersonList(List<OttSnookerPerson> updatedList) throws ParseException {
+		ottSnookerPersonDao.batchUpdateSnookerPersonList(updatedList);
+	}
+
+	@Override
+	public void batchDeleteSnookerPersonList(List<OttSnookerPerson> deletedList) {
+		ottSnookerPersonDao.batchDeleteSnookerPersonList(deletedList);
+	}
+
 }

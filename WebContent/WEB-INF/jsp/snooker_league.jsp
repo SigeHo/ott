@@ -77,7 +77,8 @@ tr.changed-row {
 				field : field
 			});
 			if (ed) {
-				($(ed.target).data('text') ? $(ed.target).text('text') : $(ed.target)).focus();
+				($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
+				$(ed.target).focus();
 			}
 			if (id == "league_dg") {
 				leagueEditIndex = index;
@@ -318,15 +319,15 @@ tr.changed-row {
 		<thead>
 			<tr>
 				<th field="leagueId"  editor="numberbox" width="150px">League ID</th>
-				<th field="leagueNameCn" editor="text" width="150px">League Name CN</th>
-				<th field="leagueNameEn" editor="text" width="150px">League Name EN</th>
-				<th field="leagueNameTr" editor="text" width="150px">League Name TR</th>
+				<th field="leagueNameCn" editor="textbox" width="150px">League Name CN</th>
+				<th field="leagueNameEn" editor="textbox" width="150px">League Name EN</th>
+				<th field="leagueNameTr" editor="textbox" width="150px">League Name TR</th>
 				<th field="startTime" hidden="true"></th>
 				<th field="startTimeStr" editor="datetimebox" width="150px">Start Time</th>
 				<th field="endTime" hidden="true"></th>
 				<th field="endTimeStr" editor="datetimebox" width="150px">End Time</th>
-				<th field="color" editor="text" width="150px">Color</th>
-				<th field="remark" editor="text" width="150px">Remark</th>
+				<th field="color" editor="textbox" width="150px">Color</th>
+				<th field="remark" editor="{type:'textarea', options:{rows:5}}" width="150px">Remark</th>
 				<th field="money" editor="numberbox" width="150px">Money</th>
 				<th field="lastPublishedDate" formatter="dateFormatter" width="150px">Last Published Date</th>
 			</tr>
@@ -347,10 +348,10 @@ tr.changed-row {
 		<thead>
 			<tr>
 				<th field="levelId" hidden="true" >Level ID</th>
-				<th field="levelRounds" data-options="editor:'text'" >Level Rounds</th>
-				<th field="matchLevels" data-options="editor:'text'" >Match Levels</th>
+				<th field="levelRounds" data-options="editor:'textbox'" >Level Rounds</th>
+				<th field="matchLevels" data-options="editor:'textbox'" >Match Levels</th>
 				<th field="matchGroup" data-options="editor:'numberbox'" >Match Group</th>
-				<th field="remark" data-options="editor:'text'" >Remark</th>
+				<th field="remark" data-options="editor:'{type:\'textarea\', options:{rows:5}}'" >Remark</th>
 				<th field="lastPublishedDate" formatter="dateFormatter">Last Published Date</th>
 			</tr>
 		</thead>

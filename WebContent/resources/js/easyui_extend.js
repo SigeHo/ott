@@ -1,7 +1,6 @@
 /**
- * 
+ * Methods
  */
-
 $.extend($.fn.datagrid.methods, {
 	editCell: function(jq,param){
 		return jq.each(function(){
@@ -54,11 +53,40 @@ $.extend($.fn.datagrid.methods, {
     }
 });
 
+/**
+ * Rules
+ */
 $.extend($.fn.validatebox.defaults.rules, {
 	equalTo: {
         validator: function(value, param){
         	return $(param[0]).val() == value;
         },
         message: 'Dose not match.'
+    }
+});
+
+/**
+ * Editors
+ */
+$.extend($.fn.datagrid.defaults.editors,{  
+    textarea: {  
+        init: function(container, options){  
+            var input = $("<textarea class='datagrid-editable-input' style='resize:none;' rows="+options.rows + "></textarea>").validatebox(options).appendTo(container);  
+                return input;  
+          },  
+        getValue: function(target){  
+            return $(target).val();  
+        },  
+        setValue: function(target, value){  
+            $(target).val(value);  
+        },  
+        resize: function(target, width){  
+            var input = $(target);  
+            if($.boxModel == true){  
+               input.width(width - (input.outerWidth() - input.width()));  
+            }else{  
+               input.width(width);  
+            }  
+        }  
     }
 });

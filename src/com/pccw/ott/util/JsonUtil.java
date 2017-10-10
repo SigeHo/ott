@@ -206,7 +206,7 @@ public class JsonUtil {
 			while (personIt.hasNext()) {
 				JsonNode perNode = personIt.next();
 				OttSnookerPerson person = new OttSnookerPerson();
-				person.setPlayerId(perNode.path("pid").asLong());
+				person.setPlayerId(perNode.path("pid").asInt());
 				String[] nameArr = perNode.path("name").asText().split("\\|");
 				person.setNameCn(nameArr[0]);
 				person.setNameTr(nameArr[1]);
@@ -229,7 +229,7 @@ public class JsonUtil {
 		try {
 			JsonNode rootNode = mapper.readTree(jsonData);
 			JsonNode perNode = rootNode.path("person").path("per");
-			ottSnookerPerson.setPlayerId(perNode.path("pid").asLong());
+			ottSnookerPerson.setPlayerId(perNode.path("pid").asInt());
 			String[] nameArr = perNode.path("name").asText().split("\\|");
 			ottSnookerPerson.setNameCn(nameArr[0]);
 			ottSnookerPerson.setNameTr(nameArr[1]);

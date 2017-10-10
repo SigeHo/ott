@@ -1,6 +1,7 @@
 package com.pccw.ott.controller;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pccw.ott.model.OttSnookerFrame;
 import com.pccw.ott.model.OttSnookerLeague;
 import com.pccw.ott.model.OttSnookerLevel;
+import com.pccw.ott.model.OttSnookerPerson;
 import com.pccw.ott.model.OttSnookerPoint;
 import com.pccw.ott.model.OttSnookerRank;
 import com.pccw.ott.model.OttSnookerScore;
@@ -356,11 +358,78 @@ public class OttSnookerController {
 		return returnMap;
 	}	
 	
+	// ------------------ Snooker Player ------------------
+	@RequestMapping("/player/goToListPlayerPage.html")
+	public ModelAndView goToListPlayerPage() {
+		ModelAndView mv = new ModelAndView("snooker_player");
+		return mv;
+	}
+	
+	@RequestMapping("/player/listPlayer.html")
+	@ResponseBody
+	public Map<String, Object> listPlayer(HttpServletRequest request, @RequestParam int page, @RequestParam int rows) {
+		Map<String, Object> returnMap = new HashMap<String, Object>();
+		String playerName = request.getParameter("playerNameForSearch");
+		String sort = request.getParameter("sort");
+		String order = request.getParameter("order");
+		int first = (page - 1) * rows;
+		int max = rows;
+		List<OttSnookerPerson> list = ottSnookerService.findSnookerPersonList(playerName, first, max, sort, order);
+		Long total = ottSnookerService.findSnookerPersonListSize(playerName);
+		returnMap.put("rows", list);
+		returnMap.put("total", total);
+		return returnMap;
+	}
+	
+	@RequestMapping("/player/savePersonChanges.html")
+	@ResponseBody
+	public Map<String, Object> savePersonChanges(HttpServletRequest request) {
+		Map<String, Object> returnMap = new HashMap<String, Object>();
+		String inserted = request.getParameter("inserted");
+		String updated = request.getParameter("updated");
+		String deleted = request.getParameter("deleted");
+		ObjectMapper mapper = new ObjectMapper();
+		JavaType javaType = mapper.getTypeFactory().constructParametricType(ArrayList.class, OttSnookerPerson.class);
+		try {
+			if (StringUtils.isNotBlank(inserted)) {
+				List<OttSnookerPerson> insertedList = mapper.readValue(inserted, javaType);
+				if (insertedList.size() > 0)
+					ottSnookerService.batchSaveSnookerPersonList(insertedList);
+			}
+			if (StringUtils.isNotBlank(updated)) {
+				List<OttSnookerPerson> updatedList = mapper.readValue(updated, javaType);
+				if (updatedList.size() > 0)
+					ottSnookerService.batchUpdateSnookerPersonList(updatedList);
+			}
+			if (StringUtils.isNotBlank(deleted)) {
+				List<OttSnookerPerson> deletedList = mapper.readValue(deleted, javaType);
+				if (deletedList.size() > 0)
+					ottSnookerService.batchDeleteSnookerPersonList(deletedList);
+			}
+			returnMap.put("success", true);
+		} catch (DataIntegrityViolationException e) {
+			logger.error(e.toString());
+			returnMap.put("success", false);
+			returnMap.put("msg", "Failed to save changes. Duplicate player id is not allowed.");
+		} catch (JsonParseException | JsonMappingException e) {
+			logger.error(e.toString());
+			returnMap.put("success", false);
+		} catch (IOException e) {
+			logger.error(e.toString());
+			returnMap.put("success", false);
+		} catch (ParseException e) {
+			e.printStackTrace();
+			logger.error(e.toString());
+			returnMap.put("success", false);
+		}
+		return returnMap;
+	}
+	
 	@RequestMapping("/testSql")
 	public void testSave() {
-		String jsonData = HttpClientUtil.getInstance().readFile("e:/desktop/live.json");
-		List<OttSnookerScore> list  = JsonUtil.parseJson2SnookerScore(jsonData);
-		ottSnookerService.flushSnookerScoreData(list);
+		String jsonData = HttpClientUtil.getInstance().readFile("e:/desktop/person_detail.json");
+		OttSnookerPerson p  = JsonUtil.parseJson2SnookerPerson(jsonData);
+		ottSnookerService.flushSnookerPersonData(p);
 	}
 	
 }

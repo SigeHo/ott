@@ -175,10 +175,11 @@ CREATE TABLE IF NOT EXISTS ott.ott_snooker_league_level (
 );
 
 CREATE TABLE IF NOT EXISTS ott.ott_snooker_person (
-	player_id INT PRIMARY KEY,
-	player_name_cn VARCHAR(50),
-	player_name_en VARCHAR(50),
-	player_name_tr VARCHAR(50),
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	player_id INT,
+	name_cn VARCHAR(50),
+	name_en VARCHAR(50),
+	name_tr VARCHAR(50),
 	sex VARCHAR(10),
 	nationality VARCHAR(50),
 	birthday TIMESTAMP,
@@ -188,12 +189,12 @@ CREATE TABLE IF NOT EXISTS ott.ott_snooker_person (
 	max_score_num INT,
 	current_rank INT,
 	highest_rank INT,
-	transfer_time INT,
+	transfer_time VARCHAR(10),
 	total_money INT,
-	win_num INT,
+	win_record INT,
 	point INT,
-	experience VARCHAR(200),
-	remark VARCHAR(200),
+	experience VARCHAR(500),
+	remark VARCHAR(500),
 	last_published_date TIMESTAMP
 );
 
