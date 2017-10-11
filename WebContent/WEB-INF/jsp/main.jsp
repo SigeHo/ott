@@ -190,6 +190,13 @@ ul li {
 				    </ul>
 			</tr>
 			
+			<tr>
+				<td class="base_menu">
+					<span style="font-weight:bold;color:#06c">NPVR</span>
+					<ul>
+						<li><a href="javascript:void(0)" onclick="addTab('NPVR Mapping', '${ctx}/npvr/goToNpvrMappingPage.html', ' ');return false;">NPVR Mapping</a><br/></li>
+				    </ul>
+			</tr>
 <!--            	<tr> -->
 <!-- 				<td class="base_menu"> -->
 <%-- 					<c:if test="${hasAuditTrailPermission eq 'Y'}"> --%>

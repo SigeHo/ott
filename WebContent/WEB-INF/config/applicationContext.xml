@@ -70,13 +70,13 @@
         <property name="sessionFactory" ref="sessionFactory" />
     </bean>
     
-	<task:scheduler id="scheduler" pool-size="5" />
-	<task:annotation-driven/>
-	<bean id="myTask" class="com.pccw.ott.schedual.OttSchedualTask"></bean>
-	<task:scheduled-tasks>
-		<task:scheduled ref="myTask" method="retrieveSnookerFixtureData" cron="${task.cron}" />
+<!-- 	<task:scheduler id="scheduler" pool-size="5" /> -->
+<!-- 	<task:annotation-driven/> -->
+<!-- 	<bean id="myTask" class="com.pccw.ott.schedual.OttSchedualTask"></bean> -->
+<!-- 	<task:scheduled-tasks> -->
+<!-- 		<task:scheduled ref="myTask" method="retrieveSnookerFixtureData" cron="${task.cron}" /> -->
 <!-- 		<task:scheduled ref="myTask" method="retrieveSnookerRankData" cron="${task.cron}" /> -->
-	</task:scheduled-tasks>    
-	<context:component-scan base-package="com.pccw.ott.schedual" />      
+<!-- 	</task:scheduled-tasks>     -->
+<!-- 	<context:component-scan base-package="com.pccw.ott.schedual" />       -->
 
 </beans>
