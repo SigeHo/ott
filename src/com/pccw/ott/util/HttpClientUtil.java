@@ -7,10 +7,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -32,20 +34,13 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonParser.Feature;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.pccw.ott.controller.AccessRightFilter;
-import com.pccw.ott.model.OttSnookerRank;
 
 public class HttpClientUtil {
 
 	private static Logger logger = LoggerFactory.getLogger(AccessRightFilter.class);
 
-	private RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(60000).setConnectTimeout(60000).setConnectionRequestTimeout(60000)
-			.build();
+	private RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(60000).setConnectTimeout(60000).setConnectionRequestTimeout(60000).build();
 
 	private static HttpClientUtil instance = null;
 
@@ -110,6 +105,7 @@ public class HttpClientUtil {
 			httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
 		} catch (Exception e) {
 			e.printStackTrace();
+			logger.error(e.toString());
 		}
 		return sendHttpPost(httpPost);
 	}
@@ -271,7 +267,45 @@ public class HttpClientUtil {
 		}
 		return responseContent;
 	}
+	
+	public String sendHttpGetWithProxy(String httpUrl, String hostname, int port, String scheme) {
+		HttpGet httpGet = new HttpGet(httpUrl);
+		CloseableHttpClient httpClient = null;
+		CloseableHttpResponse response = null;
+		HttpEntity entity = null;
+		String responseContent = null;
+		try {
+			//设置代理IP、端口、协议（请分别替换）
+			HttpHost proxy = new HttpHost(hostname, port, scheme);
 
+	        //把代理设置到请求配置
+			RequestConfig defaultRequestConfig = RequestConfig.custom().setProxy(proxy).build();
+			
+			// 创建默认的httpClient实例.
+			httpClient = HttpClients.custom().setDefaultRequestConfig(defaultRequestConfig).build();
+//			httpGet.setConfig(defaultRequestConfig);
+			// 执行请求
+			response = httpClient.execute(httpGet);
+			entity = response.getEntity();
+			responseContent = EntityUtils.toString(entity, "UTF-8");
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				// 关闭连接,释放资源
+				if (response != null) {
+					response.close();
+				}
+				if (httpClient != null) {
+					httpClient.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return responseContent;
+	}
+	
 	public String readFile(String filePath) {
 		StringBuffer sb = new StringBuffer();
 		File file = new File(filePath);// 打开文件
@@ -296,23 +330,5 @@ public class HttpClientUtil {
 		}
 		return sb.toString();
 	}
-
-	public static void main(String[] args) {
-		// String response =
-		// getInstance().sendHttpPost("http://vpn.gooooal.com:8023/api/sports.json?v=1&uId=now&pwd=pccw&sport=snk&target=snk_rank");
-		String response = getInstance().readFile("e:/desktop/json.txt");
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.enable(SerializationFeature.INDENT_OUTPUT);
-		mapper.configure(Feature.AUTO_CLOSE_SOURCE, true);
-		try {
-			JsonNode rootNode = mapper.readTree(response);
-			JsonNode rankNode = rootNode.get("rank");
-			JsonNode personNode = rankNode.get("person");
-			List<OttSnookerRank> list = mapper.readValue(personNode.toString(), new TypeReference<List<OttSnookerRank>>() {});
-			System.out.println(list);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
+	
 }

@@ -198,5 +198,13 @@ CREATE TABLE IF NOT EXISTS ott.ott_snooker_person (
 	last_published_date TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS ott.ott_npvr_mapping (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	channelNo INT(3),
+	sport_type VARCHAR(20),
+	fixture_id VARCHAR(20),
+	npvr_id VARCHAR(20)
+);
+
 insert into ott.ott_user(username, password, user_email, created_by) values('admin','21232f297a57a5a743894a0e4a801fc3','admin@pccw.com', 0);
 commit;

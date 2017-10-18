@@ -4,16 +4,22 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.pccw.ott.dto.OttNpvrMappingDto;
+import com.pccw.ott.dto.OttNpvrSearchDto;
 import com.pccw.ott.model.OttSnookerFrame;
 import com.pccw.ott.model.OttSnookerLeague;
 import com.pccw.ott.model.OttSnookerLevel;
@@ -261,9 +267,98 @@ public class JsonUtil {
 		return ottSnookerPerson;
 	}
 	
-	public static void main(String[] args) {
-		String response = HttpClientUtil.getInstance().readFile("e:/desktop/person.json");
-		parseJson2SnookerPersonList(response);
+	public static List<OttNpvrMappingDto> parseJson2NpvrMapping(String jsonData) {
+		ObjectMapper mapper = new ObjectMapper();
+		List<OttNpvrMappingDto> list = new ArrayList<>();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		try {
+			OttNpvrMappingDto npvrMappingDto = null;
+			JsonNode rootNode = mapper.readTree(jsonData);
+			Iterator<JsonNode> fixturesNodeIt = rootNode.path("data").path("fixtures").path("fixture").elements();
+			while (fixturesNodeIt.hasNext()) {
+				npvrMappingDto = new OttNpvrMappingDto();
+				JsonNode fixtureNode = fixturesNodeIt.next();
+				npvrMappingDto.setFixtureId(fixtureNode.path("id").asText());
+				npvrMappingDto.setTournament(fixtureNode.path("league").path("tour_name").path("lang").get(0).path("short_name").asText());
+				String officialStartTime = fixtureNode.path("official_start_time").asText();
+				npvrMappingDto.setStartDateTime(officialStartTime.replace("T", " "));
+				JsonNode homeTeamNode = fixtureNode.path("home_team");
+				JsonNode awayTeamNode = fixtureNode.path("away_team");
+				npvrMappingDto.setTeamA(homeTeamNode.path("name").path("lang").get(0).path("full_name").asText());
+				npvrMappingDto.setTeamB(awayTeamNode.path("name").path("lang").get(0).path("full_name").asText());
+				JsonNode fixtureStatus = fixtureNode.path("fixture_status");
+				npvrMappingDto.setStatus(fixtureStatus.path("match_status_name").path("lang").get(0).path("full_name").asText());
+				list.add(npvrMappingDto);
+			}
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+		return list;
+	}
+	
+	public static List<OttNpvrMappingDto> filterByNpvrSearchDto(String jsonData, OttNpvrSearchDto npvrSearchDto) {
+		ObjectMapper mapper = new ObjectMapper();
+		List<OttNpvrMappingDto> list = new ArrayList<>();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		try {
+			OttNpvrMappingDto npvrMappingDto = null;
+			JsonNode rootNode = mapper.readTree(jsonData);
+			Iterator<JsonNode> fixturesNodeIt = rootNode.path("data").path("fixtures").elements();
+			while (fixturesNodeIt.hasNext()) {
+				JsonNode fixtureNode = fixturesNodeIt.next().path("fixture");
+				String tour_name = fixtureNode.path("league").path("tour_name").path("lang").get(0).path("short_name").asText();
+				String officialStartTimeStr = fixtureNode.path("official_start_time").asText().replace("T", " ");
+				Date officialStartTime = sdf.parse(officialStartTimeStr);
+				Date fromDateTime  = sdf.parse(npvrSearchDto.getFromDate() + " " + npvrSearchDto.getFromTime());
+				Date toDateTime  = sdf.parse(npvrSearchDto.getToDate() + " " + npvrSearchDto.getToTime());
+				if (!npvrSearchDto.getTournament().equals(tour_name)) {
+					continue;
+				}
+				if (!(fromDateTime.before(officialStartTime) && toDateTime.after(officialStartTime))) {
+					continue;
+				}
+				npvrMappingDto = new OttNpvrMappingDto();
+				npvrMappingDto.setFixtureId(fixtureNode.path("id").asText());
+				npvrMappingDto.setStartDateTime(officialStartTimeStr);
+				JsonNode homeTeamNode = fixtureNode.path("home_team");
+				JsonNode awayTeamNode = fixtureNode.path("away_team");
+				npvrMappingDto.setTeamA(homeTeamNode.path("name").path("lang").get(0).path("full_name").asText());
+				npvrMappingDto.setTeamA(awayTeamNode.path("name").path("lang").get(0).path("full_name").asText());
+				JsonNode fixtureStatus = fixtureNode.path("fixture_status");
+				npvrMappingDto.setStatus(fixtureStatus.path("match_status_name").path("lang").get(0).path("full_name").asText());
+				
+				list.add(npvrMappingDto);
+			}
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		} catch (ParseException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+		return list;
+	}
+
+	public static List<Map<String, String>> parseJson2SoccerLeagueList(String response) {
+		ObjectMapper mapper = new ObjectMapper();
+		List<Map<String, String>> leagueList = new ArrayList<>();
+		try {
+			JsonNode rootNode = mapper.readTree(response);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+		return null;
 	}
 
 }

@@ -47,7 +47,7 @@ $.extend($.fn.validatebox.defaults.rules, {
 				return true;
 			}
 		},
-		message:'只能输入正整数.'
+		message:'Postive integer only.'
 	},
 	numeric:{
 		validator:function(value,param){
