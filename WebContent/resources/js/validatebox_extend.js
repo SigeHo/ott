@@ -99,9 +99,22 @@ $.extend($.fn.validatebox.defaults.rules, {
 			}
 		},
 		message:'Please enter a valid email address of pccw.com.'		
+	},
+	npvrIds : {
+		validator:function(value,param){
+			if (value){
+				return /^[0-9]*$/.test(value);
+			} else {
+				return true;
+			}
+		},
+		message:'Number only.'		
 	}
-		
+	
 });
+
+
+
 /*
 *@param elemId 元素的id
 *删除easyui已有的验证

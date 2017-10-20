@@ -7,13 +7,17 @@
 <title>NPVR Mapping</title>
 <script type="text/javascript">
 	$(document).ready(function() {
+		
 		$("#fromTime").timespinner("setValue", "00:00");
 		$("#toTime").timespinner("setValue", "00:00");
-
+		
 		$("#fixture_dg").datagrid({
 			singleSelect : true,
 		    columns : [[
 		        {field : 'fixtureId', hidden : true},
+		        {field: 'channelNo', hidden : true},
+		        {field: 'sportType', hidden : true},
+		        {field: 'tournament', hidden : true},
 		        {field : 'tvCoverageCk', title : 'TV<br>Coverage', align : 'center', formatter : function(value, row, index) {
 		        	if (row.npvrIds && row.npvrIds.length > 0) {
 		        		return "<input id='tvCoverageCk_" + index + "' type='checkbox' checked='checked' onclick='changeTvCoverage(this)'>";
@@ -46,12 +50,12 @@
 		        }},
 		        {field : 'copyNpvrFrom', title : 'Copy<br>NPVR IDs<br>from', align : 'center', formatter : function(value,row,index) {
 		        	if (row.npvrIds && row.npvrIds.length > 0) {
-		        		return "<input name='copyNpvrFrom' type='radio'>";
+		        		return "<input name='copyNpvrFrom' type='radio' value='" + index + "'>";
 		        	}
 		        }},
 		        {field : 'copyNpvrTo', title : 'Copy<br>NPVR IDs<br>to', align : 'center', formatter : function(value, row, index) {
 		        	if (!row.npvrIds || row.npvrIds.length == 0) {
-		        		return "<a class='copy_npvr_to_btn' onclick='copyNpvr()'>Here</a>";
+		        		return "<a class='copy_npvr_to_btn' onclick='copyNpvrIds(" + index + ")'>Here</a>";
 		        	}
 		        }}
 		    ]],
@@ -59,6 +63,12 @@
 		    	$(".copy_npvr_to_btn").linkbutton();
 		    }
 		});
+		
+		var data = [{
+			fixtureId : 1,
+			npvrIds : []
+		}];
+		$("#fixture_dg").datagrid("loadData", data);
 		
 		$("#editNpvrPopup").dialog({
 			title : "Edit NPVR IDs",
@@ -69,22 +79,7 @@
 			buttons : [{
 				text : "Save",
 				handler : function() {
-					var npvrIdArr = $("#npvrIds").textbox("getText").split("\n");
-					var row = $("#fixture_dg").datagrid("getSelected");
-					if (npvrIdArr.length) {
-						$.post("${ctx}/npvr/verifyNpvrIds.html", npvrIdArr,
-							function(response) {
-								if (response.success) {
-									saveNpvrIds(npvrIdArr);
-								} else if (response.msg) {
-									$.messager.alert("", response.msg, "error");
-								} else {
-									$.messager.alert("", "Failed to verify NPVR IDs. Please try again later.", "error");
-								}
-							}, 'JSON').error(function() {
-								$.messager.alert("", "Failed to verify NPVR IDs. Please try again later.", "error");
-						});
-					}
+					verifyNpvrIds();
 				}
 			}, {
 				text : "Cancel",
@@ -95,10 +90,40 @@
 		});
 	});
 	
-	function saveNpvrIds(npvrIdArr) {
+	function verifyNpvrIds() {
+		var npvrIdArr = $("#npvrIds").textbox("getText").trim().replace("\s", ",").split(",");
+		var row = $("#fixture_dg").datagrid("getSelected");
+		if (npvrIdArr.length) {
+			var data = {
+				npvrIdArr : npvrIdArr
+			};
+			$.ajax({
+				url : '${ctx}/npvr/verifyNpvrIds.html',
+				data : data,
+				type : 'post',
+				traditional : true,
+				success : function(response) {
+					if (response.success) {
+// 						saveNpvrIds(row, npvrIdArr);
+						$.messager.alert("", "Save NPVR IDs successfully.", "info");
+						$("#editNpvrPopup").dialog("close");
+					} else if (response.msg) {
+						$.messager.alert("", response.msg, "error");
+					} else {
+						$.messager.alert("", "Failed to verify NPVR IDs. Please try again later.", "error");
+					}
+				},
+				error : function() {
+					$.messager.alert("", "Failed to verify NPVR IDs. Please try again later.", "error");
+				}
+			});
+		}
+	}
+	
+	function saveNpvrIds(row, npvrIdArr) {
 		var data = {
-			sportType : $("#sportType").val(),
-			channelNo : $("#channelNo").val(),
+			sportType : row.sportType,
+			channelNo : row.channelNp,
 			fixtureId : row.fixtureId,
 			npvrIds : npvrIdArr.join(",")
 		};
@@ -170,12 +195,39 @@
 		$("#editNpvrPopup").dialog("open");
 	}
 	
-	function copyNpvr() {
-		var from = $("input[name=copyNpvrFrom]:checked").val();
-		if (from != undefined) {
+	function copyNpvrIds(index) {
+		var fromIndex = $("input[name=copyNpvrFrom]:checked").val();
+		if (fromIndex != undefined) {
 			$.messager.confirm("Confirm", "Are you sure to copy the NPVR IDs to this fixture?", function(r) {
 				if (r) {
-					
+					var fromRow = $("#fixture_dg").datagrid("getRows")[fromIndex];
+					var toRow = $("#fixture_dg").datagrid("getRows")[index];
+					$.ajax({
+						url : "${ctx}/npvr/saveNpvrIds.html",
+						data : {
+							fixtureId : toRow.fixtureId,
+							sportType : toRow.sportType,
+							channelNo : toRow.channelNo,
+							npvrIds : fromRow.npvrIds
+						},
+						type : "post",
+						success : function(response) {
+							if (response.success) {
+								$.messager.alert("", "Copy NPVR IDs successfully.", "info");
+								$("#fixture_dg").datagrid("updateRow", {
+									index : index,
+									row : {
+										npvrIds : fromRow.npvrIds
+									}
+								});
+							} else {
+								$.messager.alert("", response.msg, "error");
+							}
+						},
+						error : function() {
+							$.messager.alert("", "Failed to copy NPVR IDs.", "error");
+						}
+					});
 				}
 			});
 		} else {
@@ -213,8 +265,8 @@
 					</td>
 					<td align="right">From</td>
 					<td>
-						<input id="fromDate"  name="fromDate" type="text" class="easyui-datebox" required="required">
-						<input id="fromTime" name="fromTime" class="easyui-timespinner"  style="width:80px;" required="required">
+						<input id="fromDate"  name="fromDate" type="text" class="easyui-datebox" required="required" validType="validDate">
+						<input id="fromTime" name="fromTime" class="easyui-timespinner"  style="width:80px;" required="required" >
 					</td>
 				</tr>
 				<tr>
@@ -229,8 +281,8 @@
 					</td>
 					<td align="right">To</td>
 					<td>
-						<input id="toDate"  name="toDate" type="text" class="easyui-datebox" required="required">
-						<input id="toTime" name="toTime" class="easyui-timespinner"  style="width:80px;" required="required">
+						<input id="toDate"  name="toDate" type="text" class="easyui-datebox" required="required" validType="validDate">
+						<input id="toTime" name="toTime" class="easyui-timespinner"  style="width:80px;" required="required" >
 					</td>
 				</tr>
 				<tr>
@@ -257,7 +309,7 @@
 					</tr>
 					<tr>
 						<td align="center">
-							<input id="npvrIds" class="easyui-textbox" data-options="multiline:true, width:300, height:150, required: true" >
+							<input id="npvrIds" class="easyui-textbox" data-options="multiline:true, width:300, height:150, required: true, validType: 'npvrIds'" >
 						</td>
 					</tr>
 				</table>

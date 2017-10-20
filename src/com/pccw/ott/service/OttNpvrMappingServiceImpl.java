@@ -45,6 +45,8 @@ public class OttNpvrMappingServiceImpl implements OttNpvrMappingService {
 						}
 					}
 					dto.setNpvrIds(npvrIds);
+					dto.setChannelNo(npvrSearchDto.getChannelNo());
+					dto.setSportType(npvrSearchDto.getSportType());
 					filterList.add(dto);
 				} else if (StringUtils.isBlank(npvrSearchDto.getTvCoverage())) {
 					filterList.add(dto);

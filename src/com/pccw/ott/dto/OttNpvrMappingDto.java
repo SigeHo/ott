@@ -7,6 +7,8 @@ public class OttNpvrMappingDto implements Serializable {
 	private static final long serialVersionUID = 6726978821081396451L;
 
 	private String fixtureId;
+	private Integer channelNo;
+	private String sportType;
 	private String tournament;
 	private String startDateTime;
 	private String teamA;
@@ -24,6 +26,22 @@ public class OttNpvrMappingDto implements Serializable {
 
 	public void setFixtureId(String fixtureId) {
 		this.fixtureId = fixtureId;
+	}
+
+	public Integer getChannelNo() {
+		return channelNo;
+	}
+
+	public void setChannelNo(Integer channelNo) {
+		this.channelNo = channelNo;
+	}
+
+	public String getSportType() {
+		return sportType;
+	}
+
+	public void setSportType(String sportType) {
+		this.sportType = sportType;
 	}
 
 	public String getTournament() {

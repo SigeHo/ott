@@ -4,12 +4,13 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -359,6 +360,29 @@ public class JsonUtil {
 			logger.error(e.getMessage());
 		}
 		return null;
+	}
+
+	public static List<String> getInvalidNpvrIds(String response, String[] npvrIdArr) {
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			JsonNode rootNode = mapper.readTree(response);
+			Iterator<JsonNode> docsIt = rootNode.path("data").path("response").path("docs").elements();
+			while(docsIt.hasNext()) {
+				JsonNode docNode = docsIt.next();
+				String id = docNode.path("p_vimProgId").asText();
+				int index = ArrayUtils.indexOf(npvrIdArr, id);
+				if (index > -1) {
+					npvrIdArr = (String[]) ArrayUtils.remove(npvrIdArr, index);
+				}
+			}
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+		return Arrays.asList(npvrIdArr);
 	}
 
 }

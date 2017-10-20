@@ -62,7 +62,27 @@ $.extend($.fn.validatebox.defaults.rules, {
         	return $(param[0]).val() == value;
         },
         message: 'Dose not match.'
-    }
+    },
+    npvrIds : {
+		validator:function(value,param){
+			var ids = value.split("\n");
+			var flag = true;
+			for (var i = 0; i < ids.length; i++) {
+				if (ids[i]) {
+					flag = /^[0-9]*$/.test(ids[i]);
+				}
+			}
+			return flag;
+		},
+		message:'Number only.'		
+	},
+	validDate :  {
+		validator:function(value,param){
+			var reg = /^(((0?[13578]|1[02])\/(0?[1-9]|[12]\d|3[01])\/((1[6-9]|[2-9]\d)\d{2}))|((0?[13456789]|1[012])\/(0?[1-9]|[12]\d|30)\/((1[6-9]|[2-9]\d)\d{2}))|(0?2\/(0?[1-9]|1\d|2[0-8])\/((1[6-9]|[2-9]\d)\d{2}))|(0?2\/29\/((1[6-9]|[2-9]\d)(0[48]|[2468][048]|[13579][26])|((16|[2468][048]|[3579][26])00))))$/;
+			return reg.test(value);
+		},
+		message:'Invalid date. Format: MM/DD/YYYY'		
+	}
 });
 
 /**

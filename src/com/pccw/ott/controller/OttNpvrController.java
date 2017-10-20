@@ -10,16 +10,19 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pccw.ott.dto.OttNpvrMappingDto;
 import com.pccw.ott.dto.OttNpvrSearchDto;
 import com.pccw.ott.model.OttNpvrMapping;
@@ -81,7 +84,8 @@ public class OttNpvrController {
 	}
 	
 	@RequestMapping("/verifyNpvrIds.html")
-	public Map<String, Object> verifyNpvrIds(@RequestAttribute String[] npvrIdArr) {
+	@ResponseBody
+	public Map<String, Object> verifyNpvrIds(@RequestParam String[] npvrIdArr) {
 		Map<String, Object> returnMap = new HashMap<>();
 		String q = "&q=";
 		if (npvrIdArr.length > 0) {
@@ -90,21 +94,39 @@ public class OttNpvrController {
 			} else {
 				q += "(p_vimProgId%3A" + npvrIdArr[0];
 				for (int i = 1; i < npvrIdArr.length; i++) {
-					q += "%20OR%20p_vimProgId%3A" + npvrIdArr[i];
 					if (i == npvrIdArr.length - 1) {
 						q += "%20OR%20p_vimProgId%3A" + npvrIdArr[i] + ")%20AND%20p_recordable%3Atrue";
+					} else {
+						q += "%20OR%20p_vimProgId%3A" + npvrIdArr[i];
 					}
 				}
 			}
+			String api = CustomizedPropertyConfigurer.getContextProperty("api.npvr_verification") + q;
+			String response = HttpClientUtil.getInstance().sendHttpGet(api);
+			List<String> invalidIds = JsonUtil.getInvalidNpvrIds(response, npvrIdArr);
+			if (invalidIds.size() > 0) {
+				returnMap.put("success", false);
+				String msg = "Invalid NPVR IDs: ";
+				for (int i = 0; i < invalidIds.size(); i++) {
+					msg += "\n" + invalidIds.get(i);	
+				}
+				msg += "\nPlease check again.";
+				returnMap.put("msg", msg);
+			} else {
+				returnMap.put("success", true);	
+			}
+		} else {
+			returnMap.put("success", false);
+			returnMap.put("msg", "No valid NPVR IDs.");
 		}
-		String api = CustomizedPropertyConfigurer.getContextProperty("api.npvr_verification") + q;
-		String response = HttpClientUtil.getInstance().sendHttpGet(api);
 		
 		return returnMap;
 	}
 	
 	@RequestMapping("/saveNpvrIds.html")
-	public void saveNpvrIds(HttpServletRequest request) {
+	@ResponseBody
+	public Map<String, Object> saveNpvrIds(HttpServletRequest request) {
+		Map<String, Object> returnMap = new HashMap<>();
 		String channelNo = request.getParameter("channelNo");
 		String sportType = request.getParameter("sportType").toUpperCase();
 		String fixtureId = request.getParameter("fixtureId");
@@ -120,9 +142,10 @@ public class OttNpvrController {
 			list.add(ottNpvrMapping);
 		}
 		ottNpvrMappingService.batchSave(list);
+		return returnMap;
 	}
 	
-	private List<Map<String, String>> retrieveLeagueList(String sportType) {
+	/*private List<Map<String, String>> retrieveLeagueList(String sportType) {
 		List<Map<String, String>> leagueList = new ArrayList<>();
 		Map<String, String> leagueMap = new HashMap<>();
 		String api = "";
@@ -134,6 +157,6 @@ public class OttNpvrController {
 			leagueList = JsonUtil.parseJson2SoccerLeagueList(response);
 		}
 		return leagueList;
-	}
+	}*/
 
 }
