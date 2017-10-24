@@ -12,4 +12,8 @@ public interface OttNpvrMappingDao {
 
 	void batchSave(List<OttNpvrMapping> list);
 
+	List<OttNpvrMapping> findByParameters(String sportType, String fixtureId, Integer channelNo);
+
+	void deleteByParameters(Integer channelNo, String sportType, String fixtureId);
+
 }

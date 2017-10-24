@@ -20,9 +20,9 @@
 		        {field: 'tournament', hidden : true},
 		        {field : 'tvCoverageCk', title : 'TV<br>Coverage', align : 'center', formatter : function(value, row, index) {
 		        	if (row.npvrIds && row.npvrIds.length > 0) {
-		        		return "<input id='tvCoverageCk_" + index + "' type='checkbox' checked='checked' onclick='changeTvCoverage(this)'>";
+		        		return "<input id='tvCoverageCk_" + index + "' type='checkbox' checked='checked' onclick='changeTvCoverage(" + index + ")'>";
 		        	} else {
-		        		return "<input id='tvCoverageCk_" + index + "' type='checkbox' onclick='changeTvCoverage(this)'>";
+		        		return "<input id='tvCoverageCk_" + index + "' type='checkbox' onclick='changeTvCoverage(" + index + ")'>";
 		        	}
 		        }},
 		        {field : 'startDateTime', title : 'Start Datetime', width : 150, align : 'center'},
@@ -39,12 +39,15 @@
 		        {field : 'actualStartTime', title : 'Actual Start Time', width : 150, align : 'center'},
 		        {field : 'actualEndDate', title : 'Actual End Date', width : 150, align : 'center'},
 		        {field : 'actualEndTime', title : 'Actual End Time', width : 150, align : 'center'},
-		        {field : 'npvrIds', title : 'NPVR IDs', width : 100, align : 'center', formatter : function(value,row,index) {
+		        {field : 'npvrIds', title : 'NPVR IDs', width : 120, align : 'center', formatter : function(value,row,index) {
 		        	var cell = "";
 		        	if (value) {
-		        		for (var i = 0; i < value.length; i++) {
-		        			cell += value[i] + "<br>";
-		        		}
+		        		var npvrs = value.split(",");
+			        	if (npvrs.length) {
+			        		for (var i = 0; i < npvrs.length; i++) {
+			        			cell += npvrs[i] + "<br>";
+			        		}
+			        	}
 		        	}
 					return cell += "<a href='#' onclick='openEditPopup(" + index + ")'>Edit</a>";
 		        }},
@@ -63,12 +66,6 @@
 		    	$(".copy_npvr_to_btn").linkbutton();
 		    }
 		});
-		
-		var data = [{
-			fixtureId : 1,
-			npvrIds : []
-		}];
-		$("#fixture_dg").datagrid("loadData", data);
 		
 		$("#editNpvrPopup").dialog({
 			title : "Edit NPVR IDs",
@@ -91,9 +88,13 @@
 	});
 	
 	function verifyNpvrIds() {
-		var npvrIdArr = $("#npvrIds").textbox("getText").trim().replace("\s", ",").split(",");
+		var npvrIdArr = $("#npvrIds").textbox("getText").trim().split("\n");
 		var row = $("#fixture_dg").datagrid("getSelected");
-		if (npvrIdArr.length) {
+		if (npvrIdArr.length && $("#editNpvrForm").form("validate")) {
+			$.messager.progress({
+				msg : 'Loading...',
+				text : ''
+			});
 			var data = {
 				npvrIdArr : npvrIdArr
 			};
@@ -103,10 +104,9 @@
 				type : 'post',
 				traditional : true,
 				success : function(response) {
+					$.messager.progress("close");
 					if (response.success) {
-// 						saveNpvrIds(row, npvrIdArr);
-						$.messager.alert("", "Save NPVR IDs successfully.", "info");
-						$("#editNpvrPopup").dialog("close");
+ 						saveNpvrIds(row, response.npvrIdArr);
 					} else if (response.msg) {
 						$.messager.alert("", response.msg, "error");
 					} else {
@@ -123,7 +123,7 @@
 	function saveNpvrIds(row, npvrIdArr) {
 		var data = {
 			sportType : row.sportType,
-			channelNo : row.channelNp,
+			channelNo : row.channelNo,
 			fixtureId : row.fixtureId,
 			npvrIds : npvrIdArr.join(",")
 		};
@@ -132,6 +132,13 @@
 				if (response.success) {
 					$.messager.alert("", "Save NPVR IDs successfully.", "info");
 					$("#editNpvrPopup").dialog("close");
+					var updateIndex = $("#fixture_dg").datagrid("getRowIndex", row); 
+					$("#fixture_dg").datagrid("updateRow", {
+						index : updateIndex,
+						row : {
+							npvrIds : npvrIdArr.join(",")
+						}
+					});
 				} else if (response.msg) {
 					$.messager.alert("", response.msg, "error");
 				} else {
@@ -148,7 +155,7 @@
 			var data = $("#searchForm").serialize();
 			$.post("${ctx}/npvr/doSearch.html", data,
 				function(response) {
-				ajaxLoadEnd();
+					ajaxLoadEnd();
 					if (response.success) {
 						if (response.list.length) {
 							$("#fixture_dg").datagrid("loadData", response.list);
@@ -158,20 +165,48 @@
 					} else if (response.msg) {
 						$.messager.alert("", response.msg, "error");
 					} else {
-						$.messager.alert("", "Failed to search.", "error");
+						$.messager.alert("", "Failed to search. Please try again.", "error");
 					}
 				}, 'JSON').error(function() {
 					ajaxLoadEnd();
-					$.messager.alert("", "Failed to search.", "error");
+					$.messager.alert("", "Failed to search. Please try again.", "error");
 			});
 		}
 	}
 	
-	function changeTvCoverage(_this) {
-		var ck = $(_this);
+	function changeTvCoverage(index) {
+		var ck = $("#tvCoverage_" + index);
 		if (!ck.is(':checked')) {
 			$.messager.confirm("Confirm", "Are you sure to clear the NPVR IDs?", function(r) {
-				if (!r) {
+				if (r) {
+					var row = $("#fixture_dg").datagrid("getRows")[index];
+					var data = {
+							channelNo : row.channelNo,
+							fixtureId : row.fixtureId,
+							sportType : row.sportType
+					}
+					$.ajax({
+						url : '${ctx}/npvr/clearNpvrIds.html',
+						data : data,
+						type : "post",
+						success : function(response) {
+							if (response.success) {
+								$.messager.alert("", "Clear NPVR IDs successfully.", "info");
+								$("#fixture_dg").datagrid("updateRow", {
+									index : index,
+									row : {
+										npvrIds : ""
+									}
+								});
+							} else {
+								$.messager.alert("", response.msg, "error");
+							}
+						},
+						error : function() {
+							$.messager.alert("", "Failed to clear NPVR IDs. Please try again.", "error");
+						}
+					});
+				} else {
 					ck.prop("checked", "checked");
 				}
 			});

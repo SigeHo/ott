@@ -5,12 +5,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,8 +22,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pccw.ott.dto.OttNpvrMappingDto;
 import com.pccw.ott.dto.OttNpvrSearchDto;
 import com.pccw.ott.model.OttNpvrMapping;
@@ -68,6 +67,8 @@ public class OttNpvrController {
 						List<OttNpvrMappingDto> filterList = ottNpvrMappingService.filterByNpvrSearchDto(allList, npvrSearchDto);
 						returnMap.put("success", true);
 						returnMap.put("list", filterList);
+					} else {
+						returnMap.put("success", false);
 					}
 				}
 			} else {
@@ -87,12 +88,19 @@ public class OttNpvrController {
 	@ResponseBody
 	public Map<String, Object> verifyNpvrIds(@RequestParam String[] npvrIdArr) {
 		Map<String, Object> returnMap = new HashMap<>();
+		Set<String> tempSet = new HashSet<>();
+		for (int i = 0; i < npvrIdArr.length; i++) {
+			if (StringUtils.isNotEmpty(npvrIdArr[i])) {
+				tempSet.add(npvrIdArr[i]);
+			}
+		}
+		npvrIdArr = this.convert2StringArray(tempSet.toArray());
 		String q = "&q=";
 		if (npvrIdArr.length > 0) {
 			if (npvrIdArr.length == 1) {
 				q += "p_vimProgId%3A" + npvrIdArr[0] + "%20AND%20p_recordable%3Atrue";
 			} else {
-				q += "(p_vimProgId%3A" + npvrIdArr[0];
+					q += "(p_vimProgId%3A" + npvrIdArr[0];	
 				for (int i = 1; i < npvrIdArr.length; i++) {
 					if (i == npvrIdArr.length - 1) {
 						q += "%20OR%20p_vimProgId%3A" + npvrIdArr[i] + ")%20AND%20p_recordable%3Atrue";
@@ -103,23 +111,41 @@ public class OttNpvrController {
 			}
 			String api = CustomizedPropertyConfigurer.getContextProperty("api.npvr_verification") + q;
 			String response = HttpClientUtil.getInstance().sendHttpGet(api);
-			List<String> invalidIds = JsonUtil.getInvalidNpvrIds(response, npvrIdArr);
-			if (invalidIds.size() > 0) {
-				returnMap.put("success", false);
-				String msg = "Invalid NPVR IDs: ";
-				for (int i = 0; i < invalidIds.size(); i++) {
-					msg += "\n" + invalidIds.get(i);	
+			if (StringUtils.isNotBlank(response)) {
+				List<String> invalidIds = JsonUtil.getInvalidNpvrIds(response, npvrIdArr);
+				if (invalidIds.size() > 0) {
+					returnMap.put("success", false);
+					String msg = "Invalid NPVR IDs: ";
+					for (int i = 0; i < invalidIds.size(); i++) {
+						msg += "<br>" + invalidIds.get(i);	
+					}
+					msg += "<br>Please check again.";
+					returnMap.put("msg", msg);
+				} else {
+					returnMap.put("success", true);	
+					returnMap.put("npvrIdArr", npvrIdArr);
 				}
-				msg += "\nPlease check again.";
-				returnMap.put("msg", msg);
 			} else {
-				returnMap.put("success", true);	
+				returnMap.put("success", false);
 			}
+			
 		} else {
 			returnMap.put("success", false);
 			returnMap.put("msg", "No valid NPVR IDs.");
 		}
 		
+		return returnMap;
+	}
+	
+	@RequestMapping("/clearNpvrIds.html")
+	@ResponseBody
+	public Map<String, Object> clearNpvrIds(HttpServletRequest request) {
+		Map<String, Object> returnMap = new HashMap<>();
+		String channelNo = request.getParameter("channelNo");
+		String sportType = request.getParameter("sportType").toUpperCase();
+		String fixtureId = request.getParameter("fixtureId");
+		ottNpvrMappingService.clearNpvrIds(Integer.valueOf(channelNo), sportType.toUpperCase(), fixtureId);
+		returnMap.put("success", true);
 		return returnMap;
 	}
 	
@@ -142,7 +168,17 @@ public class OttNpvrController {
 			list.add(ottNpvrMapping);
 		}
 		ottNpvrMappingService.batchSave(list);
+		returnMap.put("success", true);
+		returnMap.put("npvrIds", String.join(",", npvrIdArr));
 		return returnMap;
+	}
+	
+	private String[] convert2StringArray(Object[] objArr) {
+		String[] strArr = new String[objArr.length];
+		for (int i = 0; i < objArr.length; i++) {
+			strArr[i] = (String) objArr[i];
+		}
+		return strArr;
 	}
 	
 	/*private List<Map<String, String>> retrieveLeagueList(String sportType) {

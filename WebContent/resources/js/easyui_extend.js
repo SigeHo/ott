@@ -70,6 +70,8 @@ $.extend($.fn.validatebox.defaults.rules, {
 			for (var i = 0; i < ids.length; i++) {
 				if (ids[i]) {
 					flag = /^[0-9]*$/.test(ids[i]);
+					if (!flag)
+						return flag;
 				}
 			}
 			return flag;
