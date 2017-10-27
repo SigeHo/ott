@@ -2,6 +2,7 @@ package com.pccw.ott.service;
 
 import java.text.ParseException;
 import java.util.List;
+import java.util.Map;
 
 import javax.transaction.Transactional;
 
@@ -141,6 +142,11 @@ public class OttSnookerServiceImpl implements OttSnookerService {
 	@Override
 	public void batchDeleteSnookerPointList(List<OttSnookerPoint> deletedList) {
 		ottSnookerRankDao.batchDeleteSnookerPointList(deletedList);
+	}
+	
+	@Override
+	public List<Map<String, Integer>> getLeagueParams() {
+		return ottSnookerScoreDao.getLeagueParams();
 	}
 
 	@Override

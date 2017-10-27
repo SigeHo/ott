@@ -27,6 +27,7 @@ import org.hibernate.annotations.CreationTimestamp;
 public class OttSnookerScore implements Serializable {
 	private static final long serialVersionUID = -7000740508755967868L;
 	private Long scoreId;
+	private String scoreType;
 	private Integer matchId;
 	private Integer seasonId;
 	private Date matchTime;
@@ -73,6 +74,15 @@ public class OttSnookerScore implements Serializable {
 
 	public void setScoreId(Long scoreId) {
 		this.scoreId = scoreId;
+	}
+
+	@Column(name = "score_type")
+	public String getScoreType() {
+		return scoreType;
+	}
+
+	public void setScoreType(String scoreType) {
+		this.scoreType = scoreType;
 	}
 
 	@Column(name = "match_id")

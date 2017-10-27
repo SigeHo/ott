@@ -2,6 +2,7 @@ package com.pccw.ott.service;
 
 import java.text.ParseException;
 import java.util.List;
+import java.util.Map;
 
 import com.pccw.ott.model.OttSnookerFrame;
 import com.pccw.ott.model.OttSnookerLeague;
@@ -58,6 +59,8 @@ public interface OttSnookerService {
 	public void batchDeleteSnookerPointList(List<OttSnookerPoint> deletedList);
 
 	/* Snooker League */
+	public List<Map<String, Integer>> getLeagueParams();
+	
 	public void flushSnookerLeagueData(OttSnookerLeague league);
 
 	public List<OttSnookerLeague> findSnookerLeagueList(String leagueName, int first, int max, String sort, String order);
@@ -89,5 +92,6 @@ public interface OttSnookerService {
 	public void batchUpdateSnookerPersonList(List<OttSnookerPerson> updatedList) throws ParseException;
 
 	public void batchDeleteSnookerPersonList(List<OttSnookerPerson> deletedList);
+
 
 }

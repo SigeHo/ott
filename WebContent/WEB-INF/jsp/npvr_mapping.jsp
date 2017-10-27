@@ -25,7 +25,7 @@
 		        		return "<input id='tvCoverageCk_" + index + "' type='checkbox' onclick='changeTvCoverage(" + index + ")'>";
 		        	}
 		        }},
-		        {field : 'startDateTime', title : 'Start Datetime', width : 150, align : 'center'},
+		        {field : 'startDateTime', title : 'Start Datetime', width : 120, align : 'center'},
 		        {field : 'teamA', title : 'Team / Player A', width : 150, align : 'center'},
 		        {field : 'teamB', title : 'Team / Player B', width : 150, align : 'center'},
 		        {field : 'status', title : 'Status', width : 100, align : 'center'},
@@ -281,8 +281,8 @@
 					<td align="right">Sport Type</td>
 					<td>
 						<select id="sportType" name="sportType" class="easyui-combobox" style="width:200px;" required="required">
-							<option value="Soccer">Soccer</option>
-							<option value="Tennis">Tennis</option>
+							<option value=SOCCER>Soccer</option>
+							<option value="TENNIS">Tennis</option>
 						</select>
 					</td>
 					<td align="right">Channel</td>

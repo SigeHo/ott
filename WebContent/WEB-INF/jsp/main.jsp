@@ -183,6 +183,7 @@ ul li {
 				<td class="base_menu">
 					<span style="font-weight:bold;color:#06c">Snooker Management</span>
 					<ul>
+						<li><a href="javascript:void(0)" onclick="addTab('Snooker Live', '${ctx}/snooker/fixture/goToListLivePage.html', ' ');return false;">Snooker Live</a><br/></li>
 						<li><a href="javascript:void(0)" onclick="addTab('Snooker Fixture', '${ctx}/snooker/fixture/goToListFixturePage.html', ' ');return false;">Snooker Fixture</a><br/></li>
 			   			<li><a href="javascript:void(0)" onclick="addTab('Snooker Rank', '${ctx}/snooker/rank/goToListRankPage.html', ' ');return false;">Snooker Rank</a><br/></li>
 			   			<li><a href="javascript:void(0)" onclick="addTab('Snooker League', '${ctx}/snooker/league/goToListLeaguePage.html', ' ');return false;">Snooker League</a><br/></li>

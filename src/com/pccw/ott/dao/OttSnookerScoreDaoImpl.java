@@ -2,12 +2,16 @@ package com.pccw.ott.dao;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.query.Query;
+import org.hibernate.transform.ResultTransformer;
 import org.springframework.orm.hibernate5.HibernateCallback;
 import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
 import org.springframework.stereotype.Repository;
@@ -248,6 +252,20 @@ public class OttSnookerScoreDaoImpl extends HibernateDaoSupport implements OttSn
 				return null;
 			}
 		});
+	}
+	
+	@Override
+	public List<Map<String, Integer>> getLeagueParams() {
+		List<Map<String, Integer>> params = new ArrayList<>();
+		params = (List<Map<String, Integer>>) this.getHibernateTemplate().execute(new HibernateCallback() {
+			@Override
+			public Object doInHibernate(Session session) throws HibernateException {
+				String hql = "select distinct new map(seasonId as sid, leagueId as lid) from OttSnookerScore where scoreType = 'FIXTURE' order by seasonId";
+				Query query = session.createQuery(hql);
+				return query.list();
+			}
+		});
+		return params;
 	}
 
 }

@@ -86,7 +86,7 @@ public class JsonUtil {
 		return list;
 	}
 	
-	public static List<OttSnookerScore> parseJson2SnookerScore(String jsonData) {
+	public static List<OttSnookerScore> parseJson2SnookerScore(String jsonData, String scoreType) {
 		List<OttSnookerScore> list = new ArrayList<>();
 
 		ObjectMapper mapper = new ObjectMapper();
@@ -99,6 +99,7 @@ public class JsonUtil {
 			while (matchIt.hasNext()) {
 				JsonNode matchNode = matchIt.next();
 				snookerLive = new OttSnookerScore();
+				snookerLive.setScoreType(scoreType);
 				snookerLive.setMatchId(matchNode.path("mid").asInt());
 				snookerLive.setSeasonId(matchNode.path("sid").asInt());
 				String mt = matchNode.path("mt").asText();

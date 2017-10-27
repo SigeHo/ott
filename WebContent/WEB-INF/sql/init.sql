@@ -57,6 +57,7 @@ CREATE TABLE IF NOT EXISTS ott.ott_audit_trail (
 
 CREATE TABLE IF NOT EXISTS ott.ott_snooker_score (
 	score_id INT AUTO_INCREMENT PRIMARY KEY,
+	score_type VARCHAR(10),
     match_id INT,
     season_id INT,
     match_time TIMESTAMP,
@@ -94,7 +95,8 @@ CREATE TABLE IF NOT EXISTS ott.ott_snooker_score (
 );
 
 CREATE TABLE IF NOT EXISTS ott.ott_snooker_frame (
-	frame_id INT AUTO_INCREMENT PRIMARY KEY, 
+	frame_id INT AUTO_INCREMENT PRIMARY KEY,
+	frame_type VARCHAR(10),
 	match_sort INT,
 	sort INT,
 	score_a INT,

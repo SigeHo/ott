@@ -1,9 +1,9 @@
 package com.pccw.ott.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import com.pccw.ott.model.OttSnookerFrame;
-import com.pccw.ott.model.OttSnookerRank;
 import com.pccw.ott.model.OttSnookerScore;
 
 public interface OttSnookerScoreDao {
@@ -25,5 +25,7 @@ public interface OttSnookerScoreDao {
 	public void batchUpdateSnookerFrameList(List<OttSnookerFrame> updatedList);
 
 	public void batchDeleteSnookerFrameList(List<OttSnookerFrame> deletedList);
+
+	public List<Map<String, Integer>> getLeagueParams();
 
 }

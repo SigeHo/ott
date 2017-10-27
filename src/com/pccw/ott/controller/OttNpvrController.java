@@ -60,8 +60,8 @@ public class OttNpvrController {
 //				List<Map<String, String>> leagueList = this.retrieveLeagueList(npvrSearchDto.getSportType());
 				if (npvrSearchDto.getSportType().equals("Soccer")) {
 					api = CustomizedPropertyConfigurer.getContextProperty("api.soccer_fixture") + "&start_date=" + start_date + "&days=" + days;
-//					String response = HttpClientUtil.getInstance().sendHttpGet(api);
-					String response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
+					String response = HttpClientUtil.getInstance().sendHttpGet(api);
+//					String response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
 					if (StringUtils.isNotBlank(response)) {
 						List<OttNpvrMappingDto> allList = JsonUtil.parseJson2NpvrMapping(response);
 						List<OttNpvrMappingDto> filterList = ottNpvrMappingService.filterByNpvrSearchDto(allList, npvrSearchDto);
@@ -181,18 +181,4 @@ public class OttNpvrController {
 		return strArr;
 	}
 	
-	/*private List<Map<String, String>> retrieveLeagueList(String sportType) {
-		List<Map<String, String>> leagueList = new ArrayList<>();
-		Map<String, String> leagueMap = new HashMap<>();
-		String api = "";
-		if (sportType.equals("Soccer")) {
-			api = CustomizedPropertyConfigurer.getContextProperty("api.soccer_league");
-		}
-		String response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
-		if (sportType.equals("Soccer")) {
-			leagueList = JsonUtil.parseJson2SoccerLeagueList(response);
-		}
-		return leagueList;
-	}*/
-
 }
