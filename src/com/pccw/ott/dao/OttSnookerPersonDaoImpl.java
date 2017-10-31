@@ -19,7 +19,6 @@ import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
 import org.springframework.stereotype.Repository;
 
 import com.pccw.ott.model.OttSnookerPerson;
-import com.pccw.ott.model.OttSnookerScore;
 
 @Repository("ottSnookerPersonDao")
 @SuppressWarnings({"unchecked", "rawtypes"})

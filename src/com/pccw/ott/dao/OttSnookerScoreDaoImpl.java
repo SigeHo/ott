@@ -141,8 +141,8 @@ public class OttSnookerScoreDaoImpl extends HibernateDaoSupport implements OttSn
 				this.getHibernateTemplate().execute(new HibernateCallback() {
 					@Override
 					public Object doInHibernate(Session session) throws HibernateException {
-						Query query = session.createQuery("delete from OttSnookerScore where rankId = :rankId");
-						query.setParameter("rankId", ottSnookerScore.getScoreId());
+						Query query = session.createQuery("delete from OttSnookerScore where scoreId = :scoreId");
+						query.setParameter("scoreId", ottSnookerScore.getScoreId());
 						query.executeUpdate();
 						return null;
 					}
@@ -266,6 +266,20 @@ public class OttSnookerScoreDaoImpl extends HibernateDaoSupport implements OttSn
 			}
 		});
 		return params;
+	}
+	
+	@Override
+	public void deleteByMatchId(Integer matchId, String scoreType) {
+		List<OttSnookerScore> list = (List<OttSnookerScore>) this.getHibernateTemplate().find("from OttSnookerScore where scoreType = ? and matchId = ?", scoreType, matchId);
+		if (list.size() > 0) {
+			this.getHibernateTemplate().delete(list.get(0));
+		}
+	}
+	
+	@Override
+	public void save(OttSnookerScore ottSnookerScore) {
+		this.getHibernateTemplate().save(ottSnookerScore);
+		
 	}
 
 }

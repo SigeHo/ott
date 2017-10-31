@@ -21,10 +21,9 @@ public class OttSnookerLeagueDaoImpl extends HibernateDaoSupport implements OttS
 
 	@Override
 	public void deleteByLeagueId(Integer leagueId) {
-		List<Long> ids = (List<Long>) this.getHibernateTemplate().find("select id from OttSnookerLeague where leagueId = ?", leagueId);
-		if (ids.size() == 1) {
-			OttSnookerLeague league = this.getHibernateTemplate().load(OttSnookerLeague.class, ids.get(0));
-			this.getHibernateTemplate().delete(league);
+		List<OttSnookerLeague> list = (List<OttSnookerLeague>) this.getHibernateTemplate().find("from OttSnookerLeague where leagueId = ?", leagueId);
+		if (list.size() > 0) {
+			this.getHibernateTemplate().delete(list.get(0));
 		}
 	}
 

@@ -21,6 +21,7 @@ public class OttSnookerFrame implements Serializable {
 	private static final long serialVersionUID = -7644031061099497124L;
 
 	private Long frameId;
+	private String frameType;
 	private Integer matchSort;
 	private Integer sort;
 	private Integer scoreA;
@@ -39,6 +40,15 @@ public class OttSnookerFrame implements Serializable {
 
 	public void setFrameId(Long frameId) {
 		this.frameId = frameId;
+	}
+	
+	@Column(name = "frame_type")
+	public String getFrameType() {
+		return frameType;
+	}
+
+	public void setFrameType(String frameType) {
+		this.frameType = frameType;
 	}
 
 	@Column(name = "match_sort")

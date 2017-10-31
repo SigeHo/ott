@@ -19,7 +19,7 @@ import javax.persistence.Transient;
 public class OttSnookerPerson implements Serializable {
 
 	private static final long serialVersionUID = -4155965740118633554L;
-	
+
 	private Long id;
 	private Integer playerId;
 	private String nameCn;
@@ -34,7 +34,7 @@ public class OttSnookerPerson implements Serializable {
 	private Integer maxScoreNum;
 	private Integer currentRank;
 	private Integer highestRank;
-	private String transferTime;
+	private Date transferTime;
 	private Integer totalMoney;
 	private Integer winRecord;
 	private Integer point;
@@ -42,8 +42,8 @@ public class OttSnookerPerson implements Serializable {
 	private String remark;
 	private Date lastPublishedDate;
 	private String birthdayStr;
-	
-	
+	private String transferTimeStr;
+
 	@Column(name = "id")
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -110,7 +110,7 @@ public class OttSnookerPerson implements Serializable {
 	}
 
 	@Column(name = "birthday")
-	@Temporal(TemporalType.TIMESTAMP)
+	@Temporal(TemporalType.DATE)
 	public Date getBirthday() {
 		if (null != birthday) {
 			SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
@@ -178,11 +178,16 @@ public class OttSnookerPerson implements Serializable {
 	}
 
 	@Column(name = "transfer_time")
-	public String getTransferTime() {
+	@Temporal(TemporalType.DATE)
+	public Date getTransferTime() {
+		if (null != transferTime) {
+			SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+			this.setTransferTimeStr(sdf.format(transferTime));
+		}
 		return transferTime;
 	}
 
-	public void setTransferTime(String transferTime) {
+	public void setTransferTime(Date transferTime) {
 		this.transferTime = transferTime;
 	}
 
@@ -248,6 +253,15 @@ public class OttSnookerPerson implements Serializable {
 
 	public void setBirthdayStr(String birthdayStr) {
 		this.birthdayStr = birthdayStr;
+	}
+
+	@Transient
+	public String getTransferTimeStr() {
+		return transferTimeStr;
+	}
+
+	public void setTransferTimeStr(String transferTimeStr) {
+		this.transferTimeStr = transferTimeStr;
 	}
 
 }

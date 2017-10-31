@@ -174,7 +174,8 @@ tr.changed-row {
 				<th field="maxScoreNum" editor="numberbox" width="150px">Max Score Num</th>
 				<th field="currentRank" editor="numberbox" width="150px">Current Rank</th>
 				<th field="highestRank" editor="numberbox" width="150px">Highest Rank</th>
-				<th field="transferTime" editor="numberbox" width="150px">Transfer Time</th>
+				<th field="transferTimeStr" editor="datebox" width="150px">Transfer Time</th>
+				<th field="transferTime" hidden="true" width="150px">Transfer Time</th>
 				<th field="totalMoney" editor="numberbox" width="150px">Total Money</th>
 				<th field="winRecord" editor="numberbox" width="150px">Win Record</th>
 				<th field="point" editor="numberbox" width="150px">Point</th>

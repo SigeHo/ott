@@ -4,10 +4,9 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
-import javax.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.pccw.ott.dao.OttSnookerLeagueDao;
 import com.pccw.ott.dao.OttSnookerPersonDao;
@@ -38,9 +37,11 @@ public class OttSnookerServiceImpl implements OttSnookerService {
 	private OttSnookerPersonDao ottSnookerPersonDao;
 	
 	@Override
-	public void flushSnookerScoreData(List<OttSnookerScore> list) {
-		clearSnookerScoreData();
-		batchSaveSnookerScoreList(list);
+	public void renewSnookerScoreData(List<OttSnookerScore> list, String scoreType) {
+		for (OttSnookerScore ottSnookerScore : list) {
+			ottSnookerScoreDao.deleteByMatchId(ottSnookerScore.getMatchId(), scoreType);
+			ottSnookerScoreDao.save(ottSnookerScore);
+		}
 	}
 	
 	@Override
@@ -114,7 +115,7 @@ public class OttSnookerServiceImpl implements OttSnookerService {
 	}
 
 	@Override
-	public void flushSnookerRankData(List<OttSnookerRank> list) {
+	public void renewSnookerRankData(List<OttSnookerRank> list) {
 		clearSnookerRankData();
 		batchSaveSnookerRankList(list);
 	}
@@ -150,7 +151,7 @@ public class OttSnookerServiceImpl implements OttSnookerService {
 	}
 
 	@Override
-	public void flushSnookerLeagueData(OttSnookerLeague league) {
+	public void renewSnookerLeagueData(OttSnookerLeague league) {
 		this.deleteSnookerLeaugeByLeagueId(league.getLeagueId());
 		this.saveSnookerLeauge(league);
 	}
@@ -212,9 +213,13 @@ public class OttSnookerServiceImpl implements OttSnookerService {
 	}
 	
 	@Override
-	public void flushSnookerPersonData(OttSnookerPerson person) {
-		ottSnookerPersonDao.deleteById(person.getPlayerId());
-		ottSnookerPersonDao.save(person);
+	public void batchRenewSnookerPersonData(List<OttSnookerPerson> personDetailList) {
+		OttSnookerPerson person = null;
+		for (int i = 0; i < personDetailList.size(); i++) {
+			person = personDetailList.get(i);
+			ottSnookerPersonDao.deleteById(person.getPlayerId());
+			ottSnookerPersonDao.save(person);
+		}
 	}
 
 	@Override

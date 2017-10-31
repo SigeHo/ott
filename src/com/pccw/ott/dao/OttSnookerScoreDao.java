@@ -28,4 +28,8 @@ public interface OttSnookerScoreDao {
 
 	public List<Map<String, Integer>> getLeagueParams();
 
+	public void deleteByMatchId(Integer matchId, String scoreType);
+
+	public void save(OttSnookerScore ottSnookerScore);
+
 }

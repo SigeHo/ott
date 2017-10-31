@@ -15,7 +15,7 @@ import com.pccw.ott.model.OttSnookerScore;
 public interface OttSnookerService {
 
 	/* Snook Fixture */
-	public void flushSnookerScoreData(List<OttSnookerScore> list);
+	public void renewSnookerScoreData(List<OttSnookerScore> list, String scoreType);
 
 	public List<OttSnookerScore> findSnookerScoreList(String leagueName, int first, int max, String sort, String order);
 
@@ -36,7 +36,7 @@ public interface OttSnookerService {
 	/* Snook Rank */
 	public void batchSaveSnookerRankList(List<OttSnookerRank> list);
 
-	public void flushSnookerRankData(List<OttSnookerRank> list);
+	public void renewSnookerRankData(List<OttSnookerRank> list);
 
 	public List<OttSnookerRank> findSnookerRankList(String playerName, int first, int max);
 
@@ -61,8 +61,8 @@ public interface OttSnookerService {
 	/* Snooker League */
 	public List<Map<String, Integer>> getLeagueParams();
 	
-	public void flushSnookerLeagueData(OttSnookerLeague league);
-
+	public void renewSnookerLeagueData(OttSnookerLeague league);
+	
 	public List<OttSnookerLeague> findSnookerLeagueList(String leagueName, int first, int max, String sort, String order);
 
 	public Long findSnookerLeagueListSize(String leagueName);
@@ -81,8 +81,8 @@ public interface OttSnookerService {
 	
 	/* Snooker Player */
 	
-	public void flushSnookerPersonData(OttSnookerPerson person);
-
+	public void batchRenewSnookerPersonData(List<OttSnookerPerson> personDetailList);
+	
 	public List<OttSnookerPerson> findSnookerPersonList(String playerName, int first, int max, String sort, String order);
 
 	public Long findSnookerPersonListSize(String playerName);
@@ -92,6 +92,10 @@ public interface OttSnookerService {
 	public void batchUpdateSnookerPersonList(List<OttSnookerPerson> updatedList) throws ParseException;
 
 	public void batchDeleteSnookerPersonList(List<OttSnookerPerson> deletedList);
+
+
+
+
 
 
 }

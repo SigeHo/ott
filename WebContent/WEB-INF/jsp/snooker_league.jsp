@@ -55,40 +55,14 @@ tr.changed-row {
 	}
 
 	function onDblClickCell(index,field,value) {
-		var id  = $(this).attr("id");
-		var editIndex = undefined;
-		var dg = null;
-		var type = undefined;
-		if (id == "league_dg") {
-			dg = $("#league_dg");
-			type = "league";
-			editIndex = leagueEditIndex;
-			$("#saveLeagueBtn").linkbutton("enable");
-		} else {
-			dg = $("#level_dg");
-			editIndex = levelEditIndex;
-			type = "level";
-			$("#saveLevelBtn").linkbutton("enable");
-		}
-		if (endEditing(type)) {
-			dg.datagrid('selectRow', index).datagrid('beginEdit', index);
-			var ed = dg.datagrid('getEditor', {
-				index : index,
-				field : field
-			});
-			if (ed) {
-				($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
-				$(ed.target).focus();
-			}
-			if (id == "league_dg") {
-				leagueEditIndex = index;
-			} else {
-				levelEditIndex = index;
-			}
-		} else {
-			setTimeout(function() {
-				dg.datagrid('selectRow', editIndex);
-			}, 0);
+		var dg = $(this);
+		dg.datagrid('selectRow', index).datagrid('beginEdit', index);
+		var ed = dg.datagrid('getEditor', {
+			index : index,
+			field : field
+		});
+		if (ed) {
+			($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
 		}
 	}
 
@@ -115,17 +89,35 @@ tr.changed-row {
 	}
 	
 	function onClickRow(index, row) {
+		var editIndex = undefined;
 		var id = $(this).attr("id");
+		var type = undefined;
 		if (id == 'league_dg') {
+			type = "league"
+			editIndex = leagueEditIndex;
 			var levelData = row.ottSnookerLevelList;
 			if (levelData) {
 				$("#level_dg").datagrid('loadData', levelData);	
 			} else {
 				$("#level_dg").datagrid('loadData', {rows : []});
 			}
-			//leagueEditIndex = index;
 		} else {
-			//levelEditIndex = index;
+			type = "level";
+			editIndex = levelEditIndex;
+		}
+		
+		if (editIndex != index) {
+			if (endEditing(type)) {
+				if (id == "league_dg") {
+					leagueEditIndex = index;
+				} else {
+					levelEditIndex = index;
+				}
+			} else {
+				setTimeout(function() {
+					dg.datagrid('selectRow', index);
+				}, 0);
+			}
 		}
 	}
 

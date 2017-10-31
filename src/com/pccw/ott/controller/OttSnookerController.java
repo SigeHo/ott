@@ -9,6 +9,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +32,9 @@ import com.pccw.ott.model.OttSnookerPerson;
 import com.pccw.ott.model.OttSnookerPoint;
 import com.pccw.ott.model.OttSnookerRank;
 import com.pccw.ott.model.OttSnookerScore;
+import com.pccw.ott.schedual.OttSchedualTask;
 import com.pccw.ott.service.OttSnookerService;
+import com.pccw.ott.util.CustomizedPropertyConfigurer;
 import com.pccw.ott.util.HttpClientUtil;
 import com.pccw.ott.util.JsonUtil;
 
@@ -425,11 +428,44 @@ public class OttSnookerController {
 		return returnMap;
 	}
 	
-	@RequestMapping("/testSql")
-	public void testSave() {
-		String jsonData = HttpClientUtil.getInstance().readFile("e:/desktop/person_detail.json");
-		OttSnookerPerson p  = JsonUtil.parseJson2SnookerPerson(jsonData);
-		ottSnookerService.flushSnookerPersonData(p);
+	@RequestMapping("/test.html")
+	public void test() {
+		logger.info("############ OttSchedualTask.retrieveSnookerPersonData() ############");
+		List<Map<String, Integer>> params = ottSnookerService.getLeagueParams();
+		Integer sid = null;
+		Integer lid = null;
+		String api = null;
+		String response = null;
+		OttSnookerPerson ottSnookerPerson = null;
+		List<OttSnookerPerson> personList = null;
+		List<OttSnookerPerson> personDetailList = null;
+		String personApi = CustomizedPropertyConfigurer.getContextProperty("api.snooker_person");
+		for (Map<String, Integer> map : params) {
+			sid = map.get("sid");
+			lid = map.get("lid");
+			sid = 2016;
+			api = personApi + "&sId=" + sid + "&lId=" + lid;
+			response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
+			if (StringUtils.isNotBlank(response)) {
+				personList = JsonUtil.parseJson2SnookerPersonList(response);
+				if (personList.size() > 0) {
+					personDetailList = new ArrayList<>();
+					for (OttSnookerPerson person : personList) {
+						api = personApi + "&sId=" + sid + "&lId=" + lid + "&pId=" + person.getPlayerId();
+						response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
+						if (StringUtils.isNotBlank(response)) {
+							ottSnookerPerson = JsonUtil.parseJson2SnookerPerson(response);
+							personDetailList.add(ottSnookerPerson);
+						} else {
+							logger.error("OttSchedualTask.retrieveSnookerPersonData() person detail failed on sid = " + sid + ", lid = " + lid + ", pid = " + person.getPlayerId());
+						}
+					}
+					ottSnookerService.batchRenewSnookerPersonData(personDetailList);
+				}
+			} else {
+				logger.error("OttSchedualTask.retrieveSnookerPersonData() person list failed on sid = " + sid + ", lid = " + lid);
+			}
+		}
 	}
 	
 }
