@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS ott.ott_snooker_score (
 	score_type VARCHAR(10),
     match_id INT,
     season_id INT,
-    match_time DATETIME,
+    match_time DATETIME NULL,
     league_id INT,
     league_name_en VARCHAR(50),
     league_name_cn VARCHAR(50),
@@ -148,7 +148,7 @@ CREATE TABLE IF NOT EXISTS ott.ott_snooker_rank_point (
 );
 
 CREATE TABLE IF NOT EXISTS ott.ott_snooker_league (
-	id INT AUTO_INCREMENT PRIMARY KEY,
+	league_t_id INT AUTO_INCREMENT PRIMARY KEY,
 	league_id INT,
 	league_name_cn VARCHAR(50),
 	league_name_en VARCHAR(50),
@@ -172,7 +172,7 @@ CREATE TABLE IF NOT EXISTS ott.ott_snooker_level (
 
 CREATE TABLE IF NOT EXISTS ott.ott_snooker_league_level (
 	id INT AUTO_INCREMENT PRIMARY KEY,
-	league_id INT,
+	league_t_id INT,
 	level_id INT
 );
 

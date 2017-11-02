@@ -16,9 +16,9 @@ public interface OttSnookerScoreDao {
 
 	public void deleteAll();
 
-	public List<OttSnookerScore> findByParam(String leagueName, int first, int max, String sort, String order);
+	public List<OttSnookerScore> findByParam(String leagueName, String scoreType, int first, int max, String sort, String order);
 
-	public Long findCountByParam(String leagueName);
+	public Long findCountByParam(String leagueName, String scoreType);
 
 	public void batchSaveSnookerFrameList(OttSnookerScore score, List<OttSnookerFrame> insertedList);
 

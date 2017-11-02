@@ -143,8 +143,7 @@ public class OttSnookerScoreDaoImpl extends HibernateDaoSupport implements OttSn
 					public Object doInHibernate(Session session) throws HibernateException {
 						Query query = session.createQuery("delete from OttSnookerScore where scoreId = :scoreId");
 						query.setParameter("scoreId", ottSnookerScore.getScoreId());
-						query.executeUpdate();
-						return null;
+						return query.executeUpdate();
 					}
 				});
 			}
@@ -165,13 +164,14 @@ public class OttSnookerScoreDaoImpl extends HibernateDaoSupport implements OttSn
 	}
 
 	@Override
-	public List<OttSnookerScore> findByParam(String leagueName, int first, int max, String sort, String order) {
+	public List<OttSnookerScore> findByParam(String leagueName, String scoreType, int first, int max, String sort, String order) {
 		return this.getHibernateTemplate().execute(new HibernateCallback<List<OttSnookerScore>>() {
 			@Override
 			public List<OttSnookerScore> doInHibernate(Session session) throws HibernateException {
 				String hql = "from OttSnookerScore ";
+				hql += "where scoreType = '" + scoreType + "' ";
 				if (StringUtils.isNotBlank(leagueName)) {
-					hql += "where leagueNameCn like '%" + leagueName + "%' or leagueNameEn like '%" + leagueName + "%' or leagueNameTr like '%"
+					hql += "and leagueNameCn like '%" + leagueName + "%' or leagueNameEn like '%" + leagueName + "%' or leagueNameTr like '%"
 							+ leagueName + "%' ";
 				}
 				if (StringUtils.isNotBlank(sort) && StringUtils.isNotBlank(order)) {
@@ -186,10 +186,11 @@ public class OttSnookerScoreDaoImpl extends HibernateDaoSupport implements OttSn
 	}
 
 	@Override
-	public Long findCountByParam(String leagueName) {
+	public Long findCountByParam(String leagueName, String scoreType) {
 		String hql = "select count(*) from OttSnookerScore ";
+		hql += "where scoreType = '" + scoreType + "' ";
 		if (StringUtils.isNotBlank(leagueName)) {
-			hql += "where leagueNameCn like '%" + leagueName + "%' or leagueNameEn like '%" + leagueName + "%' or leagueNameTr like '%" + leagueName
+			hql += "and leagueNameCn like '%" + leagueName + "%' or leagueNameEn like '%" + leagueName + "%' or leagueNameTr like '%" + leagueName
 					+ "%' ";
 		}
 		return (Long) this.getHibernateTemplate().find(hql).get(0);

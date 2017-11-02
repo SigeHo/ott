@@ -103,7 +103,6 @@ tr.changed-row {
 						if (response.success) {
 							$.messager.alert("", "Save changes successfully .", "info", function() {
 								$("#player_dg").datagrid("reload");
-								$("#savePlayerBtn").linkbutton("disable");
 							});
 						} else if (response.msg) {
 							$.messager.alert("", response.msg, "error");
@@ -121,7 +120,6 @@ tr.changed-row {
 	
 	function reset() {
 		$("#player_dg").datagrid("rejectChanges");
-		$("#savePlayerBtn").linkbutton("disable");
 	}
 
 	function addRow() {
@@ -160,6 +158,7 @@ tr.changed-row {
 	">
 		<thead>
 			<tr>
+				<th field="id" hidden="true"></th>
 				<th field="playerId" width="150px">Player ID</th>
 				<th field="nameCn" editor="textbox" width="150px">Player Name CN</th>
 				<th field="nameEn" editor="textbox" width="150px">Player Name EN</th>

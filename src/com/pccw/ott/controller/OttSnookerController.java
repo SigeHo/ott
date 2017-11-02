@@ -47,34 +47,40 @@ public class OttSnookerController {
 	@Autowired
 	private OttSnookerService ottSnookerService;
 	
-	
-	// ------------------ Snooker Fixture ------------------
+	// ------------------ Snooker Score ------------------
 
-	@RequestMapping("/fixture/goToListFixturePage.html")
+	@RequestMapping("/score/goToListLivePage.html")
+	public ModelAndView goToListLivePage() {
+		ModelAndView mv = new ModelAndView("snooker_live");
+		return mv;
+	}
+	
+	@RequestMapping("/score/goToListFixturePage.html")
 	public ModelAndView goToListFixturePage() {
 		ModelAndView mv = new ModelAndView("snooker_fixture");
 		return mv;
 	}
 	
-	@RequestMapping("/fixture/listFixture.html")
+	@RequestMapping("/score/listScore.html")
 	@ResponseBody
-	public Map<String, Object> listFixture(HttpServletRequest request, @RequestParam int page, @RequestParam int rows) {
+	public Map<String, Object> listScore(HttpServletRequest request, @RequestParam int page, @RequestParam int rows) {
 		Map<String, Object> returnMap = new HashMap<String, Object>();
 		String leagueName = request.getParameter("leagueNameForSearch");
+		String scoreType = request.getParameter("scoreType");
 		String sort = request.getParameter("sort");
 		String order = request.getParameter("order");
 		int first = (page - 1) * rows;
 		int max = rows;
-		List<OttSnookerScore> list = ottSnookerService.findSnookerScoreList(leagueName, first, max, sort, order);
-		Long total = ottSnookerService.findSnookerScoreListSize(leagueName);
+		List<OttSnookerScore> list = ottSnookerService.findSnookerScoreList(leagueName, scoreType, first, max, sort, order);
+		Long total = ottSnookerService.findSnookerScoreListSize(leagueName, scoreType);
 		returnMap.put("rows", list);
 		returnMap.put("total", total);
 		return returnMap;
 	}
 	
-	@RequestMapping("/fixture/saveScoreChanges.html")
+	@RequestMapping("/score/saveScoreChanges.html")
 	@ResponseBody
-	public Map<String, Object> saveFixtureChanges(HttpServletRequest request) {
+	public Map<String, Object> saveScoreChanges(HttpServletRequest request) {
 		Map<String, Object> returnMap = new HashMap<String, Object>();
 		String inserted = request.getParameter("inserted");
 		String updated = request.getParameter("updated");
@@ -112,7 +118,7 @@ public class OttSnookerController {
 		return returnMap;
 	}
 	
-	@RequestMapping("/fixture/saveFrameChanges.html")
+	@RequestMapping("/score/saveFrameChanges.html")
 	@ResponseBody
 	public Map<String, Object> saveFrameChanges(HttpServletRequest request) {
 		Map<String, Object> returnMap = new HashMap<String, Object>();
@@ -430,42 +436,27 @@ public class OttSnookerController {
 	
 	@RequestMapping("/test.html")
 	public void test() {
-		logger.info("############ OttSchedualTask.retrieveSnookerPersonData() ############");
 		List<Map<String, Integer>> params = ottSnookerService.getLeagueParams();
+		logger.info("############ OttSchedualTask.retrieveSnookerLeagueData() ############");
 		Integer sid = null;
 		Integer lid = null;
 		String api = null;
 		String response = null;
-		OttSnookerPerson ottSnookerPerson = null;
-		List<OttSnookerPerson> personList = null;
-		List<OttSnookerPerson> personDetailList = null;
-		String personApi = CustomizedPropertyConfigurer.getContextProperty("api.snooker_person");
+		OttSnookerLeague ottSnookerLeague = null;
+		String leagueApi = CustomizedPropertyConfigurer.getContextProperty("api.snooker_league");
 		for (Map<String, Integer> map : params) {
 			sid = map.get("sid");
 			lid = map.get("lid");
-			sid = 2016;
-			api = personApi + "&sId=" + sid + "&lId=" + lid;
+			api = leagueApi + "&lId=" + lid + "&sId=" + sid;
 			response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
 			if (StringUtils.isNotBlank(response)) {
-				personList = JsonUtil.parseJson2SnookerPersonList(response);
-				if (personList.size() > 0) {
-					personDetailList = new ArrayList<>();
-					for (OttSnookerPerson person : personList) {
-						api = personApi + "&sId=" + sid + "&lId=" + lid + "&pId=" + person.getPlayerId();
-						response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
-						if (StringUtils.isNotBlank(response)) {
-							ottSnookerPerson = JsonUtil.parseJson2SnookerPerson(response);
-							personDetailList.add(ottSnookerPerson);
-						} else {
-							logger.error("OttSchedualTask.retrieveSnookerPersonData() person detail failed on sid = " + sid + ", lid = " + lid + ", pid = " + person.getPlayerId());
-						}
-					}
-					ottSnookerService.batchRenewSnookerPersonData(personDetailList);
-				}
+				ottSnookerLeague = JsonUtil.parseJson2SnookerLeague(response);
+				ottSnookerService.renewSnookerLeagueData(ottSnookerLeague);
 			} else {
-				logger.error("OttSchedualTask.retrieveSnookerPersonData() person list failed on sid = " + sid + ", lid = " + lid);
+				logger.error("OttSchedualTask.retrieveSnookerLeagueData() failed on sid = " + sid + ", lid = " + lid);
 			}
 		}
+	
 	}
 	
 }

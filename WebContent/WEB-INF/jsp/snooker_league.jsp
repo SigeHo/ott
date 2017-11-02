@@ -69,13 +69,10 @@ tr.changed-row {
 	function onLoadSuccess(data) {
 		var id = $(this).attr("id");
 		if (id == "league_dg") {
-			$("#saveLeagueBtn").linkbutton("disable");
 			var league = $("#league_dg").datagrid("getSelected");
 			if (!league || undefined == league) {
 				$("#level_dg").datagrid("loadData", {rows : []});
 			}
-		} else {
-			$("#saveLevelBtn").linkbutton("disable");
 		}
 	}
 	
@@ -91,17 +88,14 @@ tr.changed-row {
 	function onClickRow(index, row) {
 		var editIndex = undefined;
 		var id = $(this).attr("id");
+		var dg = null;
 		var type = undefined;
 		if (id == 'league_dg') {
+			dg = $("#league_dg");
 			type = "league"
 			editIndex = leagueEditIndex;
-			var levelData = row.ottSnookerLevelList;
-			if (levelData) {
-				$("#level_dg").datagrid('loadData', levelData);	
-			} else {
-				$("#level_dg").datagrid('loadData', {rows : []});
-			}
 		} else {
+			dg = $("#level_dg");
 			type = "level";
 			editIndex = levelEditIndex;
 		}
@@ -109,6 +103,12 @@ tr.changed-row {
 		if (editIndex != index) {
 			if (endEditing(type)) {
 				if (id == "league_dg") {
+					var levelData = row.ottSnookerLevelList;
+					if (levelData) {
+						$("#level_dg").datagrid('loadData', levelData);	
+					} else {
+						$("#level_dg").datagrid('loadData', {rows : []});
+					}
 					leagueEditIndex = index;
 				} else {
 					levelEditIndex = index;
@@ -155,7 +155,6 @@ tr.changed-row {
 						if (response.success) {
 							$.messager.alert("", "Save changes successfully .", "info", function() {
 								$("#league_dg").datagrid("reload");
-								$("#saveLeagueBtn").linkbutton("disable");
 							});
 						} else if (response.msg) {
 							$.messager.alert("", response.msg, "error");
@@ -193,7 +192,6 @@ tr.changed-row {
 					if (response.success) {
 						$.messager.alert("", "Save changes successfully .", "info", function() {
 							$("#level_dg").datagrid("reload");
-							$("#saveLevelBtn").linkbutton("disable");
 						});
 					} else if (response.msg) {
 						$.messager.alert("", response.msg, "error");
@@ -212,11 +210,9 @@ tr.changed-row {
 		var dg = null;
 		if (type == "league") {
 			$("#league_dg").datagrid("rejectChanges");
-			$("#saveLeagueBtn").linkbutton("disable");
 			$("#level_dg").datagrid("loadData", {rows : []});
 		} else {
 			$("#level_dg").datagrid("rejectChanges");
-			$("#saveLevelBtn").linkbutton("disable");
 		}
 	}
 
@@ -245,7 +241,6 @@ tr.changed-row {
 			} else {
 				levelEditIndex = editIndex;
 			}
-			toggleSaveBtn(type);
 		}
 	}
 	
@@ -272,27 +267,8 @@ tr.changed-row {
 		} else {
 			levelEditIndex = undefined;
 		}
-		toggleSaveBtn(type);
 	}
 	
-	function toggleSaveBtn(type) {
-		var dg = null;
-		if (type == "league") {
-			dg = $("#league_dg");
-			if (dg.datagrid("getChanges").length) {
-				$("#saveLeagueBtn").linkbutton("enable");
-			} else {
-				$("#saveLeagueBtn").linkbutton("disable");
-			}
-		} else {
-			dg = $("#level_dg");
-			if (dg.datagrid("getChanges").length) {
-				$("#saveLevelBtn").linkbutton("enable");
-			} else {
-				$("#saveLevelBtn").linkbutton("disable");
-			}
-		}
-	}
 </script>
 </head>
 <body>
@@ -310,7 +286,8 @@ tr.changed-row {
 	">
 		<thead>
 			<tr>
-				<th field="leagueId"  editor="numberbox" width="150px">League ID</th>
+				<th field="leagueTId"  hidden="true">League T ID</th>
+				<th field="leagueId"  width="150px">League ID</th>
 				<th field="leagueNameCn" editor="textbox" width="150px">League Name CN</th>
 				<th field="leagueNameEn" editor="textbox" width="150px">League Name EN</th>
 				<th field="leagueNameTr" editor="textbox" width="150px">League Name TR</th>
@@ -353,7 +330,7 @@ tr.changed-row {
 		<table width="100%">
 			<tr>
 				<td>
-						<a id="saveLeagueBtn" href="#" class="easyui-linkbutton" iconCls="icon-save" plain="true" onclick="saveLeague()" disabled="true">Save</a>
+						<a id="saveLeagueBtn" href="#" class="easyui-linkbutton" iconCls="icon-save" plain="true" onclick="saveLeague()">Save</a>
 						<a href="#" class="easyui-linkbutton" iconCls="icon-undo" plain="true" onclick="reset('league')">Reset</a>
 						<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="addRow('league')">Add</a>
 						<a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="deleteRow('league')">Delete</a>
@@ -371,7 +348,7 @@ tr.changed-row {
 		<table width="100%">
 			<tr>
 				<td>
-						<a id="saveLevelBtn" href="#" class="easyui-linkbutton" iconCls="icon-save" plain="true" onclick="saveLevel()" disabled="true">Save</a>
+						<a id="saveLevelBtn" href="#" class="easyui-linkbutton" iconCls="icon-save" plain="true" onclick="saveLevel()">Save</a>
 						<a href="#" class="easyui-linkbutton" iconCls="icon-undo" plain="true" onclick="reset('level')">Reset</a>
 						<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="addRow('level')">Add</a>
 						<a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="deleteRow('level')">Delete</a>

@@ -140,7 +140,7 @@ tr.changed-row {
 		$('#leagueNameForSearch').val(leagueNameForSearch);
 		$('#score_dg').datagrid('load', {
 			leagueNameForSearch : leagueNameForSearch,
-			scoreType : "FIXTURE"
+			scoreType : "LIVE"
 		});
 	}
 
@@ -246,12 +246,12 @@ tr.changed-row {
 		if (endEditing(type)) {
 			if (type == "score") {
 				dg.datagrid('appendRow', {
-					scoreType : "FIXTURE",
+					scoreType : "LIVE",
 					lastPublishedDate : ""
 				});
 			} else {
 				dg.datagrid('appendRow', {
-					frameType : "FIXTURE",
+					frameType : "LIVE",
 					lastPublishedDate : ""
 				});
 			}
@@ -295,12 +295,12 @@ tr.changed-row {
 </head>
 <body>
 	<table id="score_dg" class="easyui-datagrid" data-options="
-		title: 'Snooker Fixture(double click to edit)',
+		title: 'Snooker Live(double click to edit)',
 		singleSelect: true,
-		toolbar: '#fixture_toolbar',
+		toolbar: '#live_toolbar',
 		pagination: true,
 		pageSize: 10,
-		url: '${ctx}/snooker/score/listScore.html?scoreType=FIXTURE',
+		url: '${ctx}/snooker/score/listScore.html?scoreType=LIVE',
 		singleSelect: true,
 		onClickRow: onClickRow,
 		onDblClickCell: onDblClickCell,
@@ -375,7 +375,7 @@ tr.changed-row {
 		</thead>
 	</table>	
 	
-	<div id="fixture_toolbar" style="padding:5px;height:auto;margin-bottom:5px">
+	<div id="live_toolbar" style="padding:5px;height:auto;margin-bottom:5px">
 		<table width="100%">
 			<tr>
 				<td>

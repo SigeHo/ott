@@ -117,7 +117,7 @@ public class OttSnookerLeagueDaoImpl extends HibernateDaoSupport implements OttS
 					query.setParameter("color", ottSnookerLeague.getColor());
 					query.setParameter("remark", ottSnookerLeague.getRemark());
 					query.setParameter("money", ottSnookerLeague.getMoney());
-					query.setParameter("id", ottSnookerLeague.getId());
+					query.setParameter("leagueTId", ottSnookerLeague.getLeagueTId());
 					query.executeUpdate();
 				}
 				session.flush();
@@ -131,16 +131,15 @@ public class OttSnookerLeagueDaoImpl extends HibernateDaoSupport implements OttS
 	public void batchDeleteSnookerLeagueList(List<OttSnookerLeague> deletedList) {
 		for (OttSnookerLeague ottSnookerLeague : deletedList) {
 			if (null != ottSnookerLeague.getOttSnookerLevelList() && ottSnookerLeague.getOttSnookerLevelList().size() > 0) {
-				OttSnookerLeague rank = this.getHibernateTemplate().load(OttSnookerLeague.class, ottSnookerLeague.getLeagueId());
-				this.getHibernateTemplate().delete(rank);
+				OttSnookerLeague league = this.getHibernateTemplate().load(OttSnookerLeague.class, ottSnookerLeague.getLeagueTId());
+				this.getHibernateTemplate().delete(league);
 			} else {
 				this.getHibernateTemplate().execute(new HibernateCallback() {
 					@Override
 					public Object doInHibernate(Session session) throws HibernateException {
-						Query query = session.createQuery("delete from OttSnookerLeague where rankId = :rankId");
-						query.setParameter("rankId", ottSnookerLeague.getLeagueId());
-						query.executeUpdate();
-						return null;
+						Query query = session.createQuery("delete from OttSnookerLeague where leagueTId = :leagueTId");
+						query.setParameter("leagueTId", ottSnookerLeague.getLeagueTId());
+						return query.executeUpdate();
 					}
 				});
 			}

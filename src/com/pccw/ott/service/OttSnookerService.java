@@ -14,12 +14,12 @@ import com.pccw.ott.model.OttSnookerScore;
 
 public interface OttSnookerService {
 
-	/* Snook Fixture */
+	/* Snook Score */
 	public void renewSnookerScoreData(List<OttSnookerScore> list, String scoreType);
 
-	public List<OttSnookerScore> findSnookerScoreList(String leagueName, int first, int max, String sort, String order);
+	public List<OttSnookerScore> findSnookerScoreList(String leagueName, String scoreType, int first, int max, String sort, String order);
 
-	public Long findSnookerScoreListSize(String leagueName);
+	public Long findSnookerScoreListSize(String leagueName, String scoreType);
 	
 	public void batchSaveSnookerScoreList(List<OttSnookerScore> insertedList);
 

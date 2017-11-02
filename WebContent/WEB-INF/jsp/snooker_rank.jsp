@@ -319,7 +319,7 @@ tr.changed-row {
 	">
 		<thead>
 			<tr>
-				<th field="rankId" rowspan="2" editor="text" hidden="true" width="150px">Rank Id</th>
+				<th field="rankId" rowspan="2" hidden="true" width="150px">Rank Id</th>
 				<th field="rankTitle" rowspan="2" editor="text" width="150px">Rank Title</th>
 				<th field="rankYear" rowspan="2" editor="text" width="100px">Season</th>
 				<th field="playerId" rowspan="2" editor="numberbox" sortable="true" width="100px">Player ID</th>

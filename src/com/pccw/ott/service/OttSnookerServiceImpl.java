@@ -45,13 +45,13 @@ public class OttSnookerServiceImpl implements OttSnookerService {
 	}
 	
 	@Override
-	public List<OttSnookerScore> findSnookerScoreList(String leagueName, int first, int max, String sort, String order) {
-		return ottSnookerScoreDao.findByParam(leagueName, first, max, sort, order);
+	public List<OttSnookerScore> findSnookerScoreList(String leagueName, String scoreType, int first, int max, String sort, String order) {
+		return ottSnookerScoreDao.findByParam(leagueName, scoreType, first, max, sort, order);
 	}
 
 	@Override
-	public Long findSnookerScoreListSize(String leagueName) {
-		return ottSnookerScoreDao.findCountByParam(leagueName);
+	public Long findSnookerScoreListSize(String leagueName, String scoreType) {
+		return ottSnookerScoreDao.findCountByParam(leagueName, scoreType);
 	}
 	
 	@Override

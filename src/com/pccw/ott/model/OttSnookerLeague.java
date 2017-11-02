@@ -28,7 +28,7 @@ public class OttSnookerLeague implements Serializable {
 
 	private static final long serialVersionUID = 8515438242967614307L;
 
-	private Long id;
+	private Long leagueTId;
 	private Integer leagueId;
 	private String leagueNameCn;
 	private String leagueNameEn;
@@ -43,15 +43,15 @@ public class OttSnookerLeague implements Serializable {
 	private Date lastPublishedDate;
 	private List<OttSnookerLevel> ottSnookerLevelList;
 
-	@Column(name = "id")
+	@Column(name = "league_t_id")
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	public Long getId() {
-		return id;
+	public Long getLeagueTId() {
+		return leagueTId;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public void setLeagueTId(Long leagueTId) {
+		this.leagueTId = leagueTId;
 	}
 
 	@Column(name = "league_id")
@@ -158,7 +158,7 @@ public class OttSnookerLeague implements Serializable {
 	
 	@OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
 	@JoinTable(name = "ott_snooker_league_level", joinColumns = {
-			@JoinColumn(name = "league_id", referencedColumnName = "league_id") }, inverseJoinColumns = {
+			@JoinColumn(name = "league_t_id", referencedColumnName = "league_t_id") }, inverseJoinColumns = {
 					@JoinColumn(name = "level_id", referencedColumnName = "level_id") })
 	public List<OttSnookerLevel> getOttSnookerLevelList() {
 		return ottSnookerLevelList;
