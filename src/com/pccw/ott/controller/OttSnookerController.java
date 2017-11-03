@@ -9,7 +9,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +31,6 @@ import com.pccw.ott.model.OttSnookerPerson;
 import com.pccw.ott.model.OttSnookerPoint;
 import com.pccw.ott.model.OttSnookerRank;
 import com.pccw.ott.model.OttSnookerScore;
-import com.pccw.ott.schedual.OttSchedualTask;
 import com.pccw.ott.service.OttSnookerService;
 import com.pccw.ott.util.CustomizedPropertyConfigurer;
 import com.pccw.ott.util.HttpClientUtil;
@@ -219,15 +217,6 @@ public class OttSnookerController {
 		return returnMap;
 	}
 
-/*	@RequestMapping("/rank/listPoint.html")
-	@ResponseBody
-	public Map<String, Object> listPoint(HttpServletRequest request, @RequestParam String playerId) {
-		Map<String, Object> returnMap = new HashMap<String, Object>();
-		List<OttSnookerPoint> list = ottSnookerService.findSnookerPointList(playerId);
-		returnMap.put("rows", list);
-		return returnMap;
-	}*/
-	
 	@RequestMapping("/rank/savePointChanges.html")
 	@ResponseBody
 	public Map<String, Object> savePointChanges(HttpServletRequest request) {
@@ -436,27 +425,15 @@ public class OttSnookerController {
 	
 	@RequestMapping("/test.html")
 	public void test() {
-		List<Map<String, Integer>> params = ottSnookerService.getLeagueParams();
-		logger.info("############ OttSchedualTask.retrieveSnookerLeagueData() ############");
-		Integer sid = null;
-		Integer lid = null;
-		String api = null;
-		String response = null;
-		OttSnookerLeague ottSnookerLeague = null;
-		String leagueApi = CustomizedPropertyConfigurer.getContextProperty("api.snooker_league");
-		for (Map<String, Integer> map : params) {
-			sid = map.get("sid");
-			lid = map.get("lid");
-			api = leagueApi + "&lId=" + lid + "&sId=" + sid;
-			response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
-			if (StringUtils.isNotBlank(response)) {
-				ottSnookerLeague = JsonUtil.parseJson2SnookerLeague(response);
-				ottSnookerService.renewSnookerLeagueData(ottSnookerLeague);
-			} else {
-				logger.error("OttSchedualTask.retrieveSnookerLeagueData() failed on sid = " + sid + ", lid = " + lid);
-			}
+		logger.info("############ OttSchedualTask.retrieveSnookerRankData() ############");
+		String api = CustomizedPropertyConfigurer.getContextProperty("api.snooker_rank");
+		 String response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
+		if (StringUtils.isNotBlank(response)) {
+			List<OttSnookerRank> list = JsonUtil.parseJson2SnookerRank(response);
+			ottSnookerService.renewSnookerRankData(list);
+		} else {
+			logger.error("OttSchedualTask.retrieveSnookerRankData() failed.");
 		}
-	
 	}
 	
 }

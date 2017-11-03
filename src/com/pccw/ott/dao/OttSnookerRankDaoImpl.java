@@ -173,8 +173,8 @@ public class OttSnookerRankDaoImpl extends HibernateDaoSupport implements OttSno
 			public Object doInHibernate(Session session) throws HibernateException {
 				for (OttSnookerPoint ottSnookerPoint : insertedList) {
 					Long pointId = (Long) session.save(ottSnookerPoint);
-					Query query = session.createNativeQuery("insert into ott_snooker_rank_point (player_id, point_id) values(:playerId, :pointId)");
-					query.setParameter("playerId", rank.getPlayerId());
+					Query query = session.createNativeQuery("insert into ott_snooker_rank_point (rank_id, point_id) values(:rankId, :pointId)");
+					query.setParameter("rankId", rank.getRankId());
 					query.setParameter("pointId", pointId);
 					query.executeUpdate();
 				}

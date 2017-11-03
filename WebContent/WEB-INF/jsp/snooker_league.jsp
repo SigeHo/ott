@@ -211,8 +211,10 @@ tr.changed-row {
 		if (type == "league") {
 			$("#league_dg").datagrid("rejectChanges");
 			$("#level_dg").datagrid("loadData", {rows : []});
+			leagueEditIndex = undefined;
 		} else {
 			$("#level_dg").datagrid("rejectChanges");
+			levelEditIndex = undefined;
 		}
 	}
 
@@ -287,14 +289,14 @@ tr.changed-row {
 		<thead>
 			<tr>
 				<th field="leagueTId"  hidden="true">League T ID</th>
-				<th field="leagueId"  width="150px">League ID</th>
+				<th field="leagueId"  width="150px" sortable="true">League ID</th>
 				<th field="leagueNameCn" editor="textbox" width="150px">League Name CN</th>
 				<th field="leagueNameEn" editor="textbox" width="150px">League Name EN</th>
 				<th field="leagueNameTr" editor="textbox" width="150px">League Name TR</th>
 				<th field="startTime" hidden="true"></th>
-				<th field="startTimeStr" editor="datetimebox" width="150px">Start Time</th>
+				<th field="startTimeStr" editor="datetimebox" width="150px" sortable="true">Start Time</th>
 				<th field="endTime" hidden="true"></th>
-				<th field="endTimeStr" editor="datetimebox" width="150px">End Time</th>
+				<th field="endTimeStr" editor="datetimebox" width="150px" sortable="true">End Time</th>
 				<th field="color" editor="textbox" width="150px">Color</th>
 				<th field="remark" editor="{type:'textarea', options:{rows:5}}" width="150px">Remark</th>
 				<th field="money" editor="numberbox" width="150px">Money</th>

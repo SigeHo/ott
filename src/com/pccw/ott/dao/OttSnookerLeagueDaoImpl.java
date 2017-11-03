@@ -153,8 +153,8 @@ public class OttSnookerLeagueDaoImpl extends HibernateDaoSupport implements OttS
 			public Object doInHibernate(Session session) throws HibernateException {
 				for (OttSnookerLevel ottSnookerLevel : insertedList) {
 					Long levelId = (Long) session.save(ottSnookerLevel);
-					Query query = session.createNativeQuery("insert into ott_snooker_league_level (league_id, level_id) values(:leagueId, :levelId)");
-					query.setParameter("leagueId", league.getLeagueId());
+					Query query = session.createNativeQuery("insert into ott_snooker_league_level (league_t_id, level_id) values(:leagueTId, :levelId)");
+					query.setParameter("leagueTId", league.getLeagueTId());
 					query.setParameter("levelId", levelId);
 					query.executeUpdate();
 				}

@@ -70,11 +70,10 @@ tr.changed-row {
 		}
 		if (editIndex != index) {
 			if (endEditing(type)) {
-				editIndex = index;
 				if (type == "score") {
 					var frameData = row.ottSnookerFrameList;
 					if (frameData) {
-						$("#frame_dg").datagrid('loadData', frameData);	
+						$("#frame_dg").datagrid('loadData', {rows : frameData, total : frameData.length});	
 					} else {
 						$("#frame_dg").datagrid('loadData', {rows : []});
 					}
@@ -91,19 +90,6 @@ tr.changed-row {
 	}
 
 	function onDblClickCell(index,field,value) {
-		/* var id  = $(this).attr("id");
-		var editIndex = undefined;
-		var dg = null;
-		var type = undefined;
-		if (id == "score_dg") {
-			dg = $("#score_dg");
-			type = "score";
-			editIndex = scoreEditIndex;
-		} else {
-			dg = $("#frame_dg");
-			editIndex = frameEditIndex;
-			type = "frame";
-		} */
 		var dg = $(this);
 		dg.datagrid('selectRow', index).datagrid('beginEdit', index);
 		var ed = dg.datagrid('getEditor', {
@@ -185,38 +171,41 @@ tr.changed-row {
 	}
 	
 	function saveFrame() {
-		if ($("#frame_dg").datagrid("getChanges").length) {
-			var inserted = $("#frame_dg").datagrid('getChanges', 'inserted');
-			var updated = $("#frame_dg").datagrid('getChanges', 'updated');
-			var deleted = $("#frame_dg").datagrid('getChanges', 'deleted');
-			var effectRow = new Object();
-			if(inserted.length) {
-				effectRow['inserted'] = JSON.stringify(inserted);
+		if (endEditing("frame")) {
+			if ($("#frame_dg").datagrid("getChanges").length) {
+				var inserted = $("#frame_dg").datagrid('getChanges', 'inserted');
+				var updated = $("#frame_dg").datagrid('getChanges', 'updated');
+				var deleted = $("#frame_dg").datagrid('getChanges', 'deleted');
+				var effectRow = new Object();
+				if(inserted.length) {
+					effectRow['inserted'] = JSON.stringify(inserted);
+				}
+				if(updated.length) {
+					effectRow['updated'] = JSON.stringify(updated);
+				}
+				if(deleted.length) {
+					effectRow['deleted'] = JSON.stringify(deleted);
+				}
+				var score = $("#score_dg").datagrid("getSelected");
+				effectRow['score'] = JSON.stringify(score);
+				$.post("${ctx}/snooker/score/saveFrameChanges.html", effectRow,
+					function(response) {
+						if (response.success) {
+							$.messager.alert("", "Save changes successfully .", "info", function() {
+								$("#score_dg").datagrid("reload");
+								scoreEditIndex = undefined;
+							});
+						} else if (response.msg) {
+							$.messager.alert("", response.msg, "error");
+						} else {
+							$.messager.alert("", "Failed to save the changes.", "error");
+						}
+					}, 'JSON').error(function() {
+					$.messager.alert("", "Failed to save the changes.", "error");
+				});
+			} else {
+				$.messager.alert("", "Nothing is changed.", "warning");
 			}
-			if(updated.length) {
-				effectRow['updated'] = JSON.stringify(updated);
-			}
-			if(deleted.length) {
-				effectRow['deleted'] = JSON.stringify(deleted);
-			}
-			var score = $("#score_dg").datagrid("getSelected");
-			effectRow['score'] = JSON.stringify(score);
-			$.post("${ctx}/snooker/score/saveFrameChanges.html", effectRow,
-				function(response) {
-					if (response.success) {
-						$.messager.alert("", "Save changes successfully .", "info", function() {
-							$("#frame_dg").datagrid("reload");
-						});
-					} else if (response.msg) {
-						$.messager.alert("", response.msg, "error");
-					} else {
-						$.messager.alert("", "Failed to save the changes.", "error");
-					}
-				}, 'JSON').error(function() {
-				$.messager.alert("", "Failed to save the changes.", "error");
-			});
-		} else {
-			$.messager.alert("", "Nothing is changed.", "warning");
 		}
 	}	
 
@@ -225,8 +214,10 @@ tr.changed-row {
 		if (type == "score") {
 			$("#score_dg").datagrid("rejectChanges");
 			$("#frame_dg").datagrid("loadData", {rows : []});
+			scoreEditIndex = undefined;
 		} else {
 			$("#frame_dg").datagrid("rejectChanges");
+			frameEditIndex = undefined;
 		}
 	}
 
@@ -310,11 +301,11 @@ tr.changed-row {
 			<tr>
 				<th field="scoreId"  hidden="true" width="150px">Score ID</th>
 				<th field="scoreType" hidden="true">Score Type</th>
-				<th field="matchId" width="150px">Match ID</th>
-				<th field="seasonId" editor="numberbox" width="150px">Season ID</th>
+				<th field="matchId" width="150px" sortable="true">Match ID</th>
+				<th field="seasonId" editor="numberbox" width="150px" sortable="true">Season ID</th>
 				<th field="matchTime" hidden="true" width="150px">Match Time</th>
 				<th field="matchTimeStr" editor="datetimebox" width="150px">Match Time</th>
-				<th field="leagueId" editor="numberbox" width="150px">League ID</th>
+				<th field="leagueId" editor="numberbox" width="150px" sortable="true">League ID</th>
 				<th field="leagueNameCn" editor="text" width="150px">League Name CN</th>
 				<th field="leagueNameEn" editor="text" width="150px">League Name EN</th>
 				<th field="leagueNameTr" editor="text" width="150px">League Name TR</th>
@@ -358,6 +349,8 @@ tr.changed-row {
 		onClickRow: onClickRow,
 		onDblClickCell: onDblClickCell,
 		onLoadSuccess: onLoadSuccess,
+		pagination: true,
+		pageSize: 10,
 	">
 		<thead>
 			<tr>

@@ -183,7 +183,7 @@ public class OttSnookerRank implements Serializable {
 
 	@OneToMany(cascade = { CascadeType.ALL}, fetch = FetchType.EAGER)
 	@JoinTable(name = "ott_snooker_rank_point", joinColumns = {
-			@JoinColumn(name = "player_id", referencedColumnName = "player_id") }, inverseJoinColumns = {
+			@JoinColumn(name = "rank_id", referencedColumnName = "rank_id") }, inverseJoinColumns = {
 					@JoinColumn(name = "point_id", referencedColumnName = "point_id") })
 	public List<OttSnookerPoint> getSnookerPointList() {
 		return snookerPointList;

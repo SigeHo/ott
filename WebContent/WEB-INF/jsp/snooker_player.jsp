@@ -120,6 +120,7 @@ tr.changed-row {
 	
 	function reset() {
 		$("#player_dg").datagrid("rejectChanges");
+		editIndex = undefined;
 	}
 
 	function addRow() {
@@ -159,9 +160,9 @@ tr.changed-row {
 		<thead>
 			<tr>
 				<th field="id" hidden="true"></th>
-				<th field="playerId" width="150px">Player ID</th>
+				<th field="playerId" width="150px" sortable="true">Player ID</th>
 				<th field="nameCn" editor="textbox" width="150px">Player Name CN</th>
-				<th field="nameEn" editor="textbox" width="150px">Player Name EN</th>
+				<th field="nameEn" editor="textbox" width="150px" sortable="true">Player Name EN</th>
 				<th field="nameTr" editor="textbox" width="150px">Player Name TR</th>
 				<th field="sex" editor="textbox" width="150px">Sex</th>
 				<th field="nationality" editor="textbox" width="150px">Nationality</th>

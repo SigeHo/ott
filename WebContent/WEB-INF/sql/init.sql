@@ -143,7 +143,7 @@ CREATE TABLE IF NOT EXISTS ott.ott_snooker_point (
 
 CREATE TABLE IF NOT EXISTS ott.ott_snooker_rank_point (
 	id INT AUTO_INCREMENT PRIMARY KEY,
-	player_id INT NOT NULL,
+	rank_id INT NOT NULL,
 	point_id INT NOT NULL UNIQUE
 );
 

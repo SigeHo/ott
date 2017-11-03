@@ -55,53 +55,24 @@ tr.changed-row {
 	}
 
 	function onDblClickCell(index,field,value) {
-		var id  = $(this).attr("id");
-		var editIndex = undefined;
-		var dg = null;
-		var type = undefined;
-		if (id == "rank_dg") {
-			dg = $("#rank_dg");
-			type = "rank";
-			editIndex = rankEditIndex;
-			$("#saveRankBtn").linkbutton("enable");
-		} else {
-			dg = $("#point_dg");
-			editIndex = pointEditIndex;
-			type = "point";
-			$("#savePointBtn").linkbutton("enable");
-		}
-		
-		if (endEditing(type)) {
-			dg.datagrid('selectRow', index).datagrid('beginEdit', index);
-			var ed = dg.datagrid('getEditor', {
-				index : index,
-				field : field
-			});
-			if (ed) {
-				($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
-			}
-			if (id == "rank_dg") {
-				rankEditIndex = index;
-			} else {
-				pointEditIndex = index;
-			}
-		} else {
-			setTimeout(function() {
-				dg.datagrid('selectRow', editIndex);
-			}, 0);
+		var dg = $(this);
+		dg.datagrid('selectRow', index).datagrid('beginEdit', index);
+		var ed = dg.datagrid('getEditor', {
+			index : index,
+			field : field
+		});
+		if (ed) {
+			($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
 		}
 	}
 	
 	function onLoadSuccess(data) {
 		var id = $(this).attr("id");
 		if (id == "rank_dg") {
-			$("#saveBtn").linkbutton("disable");
 			var rank = $("#rank_dg").datagrid("getSelected");
 			if (!rank || undefined == rank) {
 				$("#point_dg").datagrid("loadData", {rows : []});
 			}
-		} else {
-			$("#savePointBtn").linkbutton("disable");
 		}
 	}
 
@@ -115,17 +86,38 @@ tr.changed-row {
 	}
 	
 	function onClickRow(index, row) {
-		var id = $(this).attr("id");
+		var id  = $(this).attr("id");
+		var editIndex = undefined;
+		var dg = null;
+		var type = undefined;
 		if (id == "rank_dg") {
-			var pointData = row.snookerPointList;
-			if (pointData) {
-				$("#point_dg").datagrid('loadData', pointData);
-			} else {
-				$("#point_dg").datagrid('loadData', {rows : []});
-			}
-			//rankEditIndex = index;
+			dg = $("#rank_dg");
+			type = "rank";
+			editIndex = rankEditIndex;
 		} else {
-			//pointEditIndex = index;
+			dg = $("#point_dg");
+			editIndex = pointEditIndex;
+			type = "point";
+		}
+		
+		if (editIndex != index) {
+			if (endEditing(type)) {
+				if (id == "rank_dg") {
+					var pointData = row.snookerPointList;
+					if (pointData) {
+						$("#point_dg").datagrid('loadData', pointData);
+					} else {
+						$("#point_dg").datagrid('loadData', {rows : []});
+					}
+					rankEditIndex = index;
+				} else {
+					pointEditIndex = index;
+				}
+			} else {
+				setTimeout(function() {
+					dg.datagrid('selectRow', index);
+				}, 0);
+			}
 		}
 	}
 
@@ -163,7 +155,6 @@ tr.changed-row {
 						if (response.success) {
 							$.messager.alert("", "Save changes successfully .", "info", function() {
 								$("#rank_dg").datagrid("reload");
-								$("#saveRankBtn").linkbutton("disable");
 							});
 						} else if (response.msg) {
 							$.messager.alert("", response.msg, "error");
@@ -180,39 +171,41 @@ tr.changed-row {
 	}
 	
 	function savePoint() {
-		if ($("#point_dg").datagrid("getChanges").length) {
-			var inserted = $("#point_dg").datagrid('getChanges', 'inserted');
-			var updated = $("#point_dg").datagrid('getChanges', 'updated');
-			var deleted = $("#point_dg").datagrid('getChanges', 'deleted');
-			var effectRow = new Object();
-			if(inserted.length) {
-				effectRow['inserted'] = JSON.stringify(inserted);
+		if (endEditing("point")) {
+			if ($("#point_dg").datagrid("getChanges").length) {
+				var inserted = $("#point_dg").datagrid('getChanges', 'inserted');
+				var updated = $("#point_dg").datagrid('getChanges', 'updated');
+				var deleted = $("#point_dg").datagrid('getChanges', 'deleted');
+				var effectRow = new Object();
+				if(inserted.length) {
+					effectRow['inserted'] = JSON.stringify(inserted);
+				}
+				if(updated.length) {
+					effectRow['updated'] = JSON.stringify(updated);
+				}
+				if(deleted.length) {
+					effectRow['deleted'] = JSON.stringify(deleted);
+				}
+				var rank = $("#rank_dg").datagrid("getSelected");
+				effectRow['rank'] = JSON.stringify(rank);
+				$.post("${ctx}/snooker/rank/savePointChanges.html", effectRow,
+					function(response) {
+						if (response.success) {
+							$.messager.alert("", "Save changes successfully .", "info", function() {
+								$("#rank_dg").datagrid("reload");
+								rankEditIndex = undefined;
+							});
+						} else if (response.msg) {
+							$.messager.alert("", response.msg, "error");
+						} else {
+							$.messager.alert("", "Failed to save the changes.", "error");
+						}
+					}, 'JSON').error(function() {
+					$.messager.alert("", "Failed to save the changes.", "error");
+				});
+			} else {
+				$.messager.alert("", "Nothing is changed.", "warning");
 			}
-			if(updated.length) {
-				effectRow['updated'] = JSON.stringify(updated);
-			}
-			if(deleted.length) {
-				effectRow['deleted'] = JSON.stringify(deleted);
-			}
-			var rank = $("#rank_dg").datagrid("getSelected");
-			effectRow['rank'] = JSON.stringify(rank);
-			$.post("${ctx}/snooker/rank/savePointChanges.html", effectRow,
-				function(response) {
-					if (response.success) {
-						$.messager.alert("", "Save changes successfully .", "info", function() {
-							$("#point_dg").datagrid("reload");
-							$("#savePointBtn").linkbutton("disable");
-						});
-					} else if (response.msg) {
-						$.messager.alert("", response.msg, "error");
-					} else {
-						$.messager.alert("", "Failed to save the changes.", "error");
-					}
-				}, 'JSON').error(function() {
-				$.messager.alert("", "Failed to save the changes.", "error");
-			});
-		} else {
-			$.messager.alert("", "Nothing is changed.", "warning");
 		}
 	}	
 
@@ -220,11 +213,11 @@ tr.changed-row {
 		var dg = null;
 		if (type == "rank") {
 			$("#rank_dg").datagrid("rejectChanges");
-			$("#saveRankBtn").linkbutton("disable");
 			$("#point_dg").datagrid("loadData", {rows : []});
+			rankEditIndex = undefined;
 		} else {
 			$("#point_dg").datagrid("rejectChanges");
-			$("#savePointBtn").linkbutton("disable");
+			pointEditIndex = undefined;
 		}
 	}
 
@@ -253,7 +246,6 @@ tr.changed-row {
 			} else {
 				pointEditIndex = editIndex;
 			}
-			toggleSaveBtn(type);
 		}
 	}
 	
@@ -280,28 +272,8 @@ tr.changed-row {
 		} else {
 			pointEditIndex = undefined;
 		}
-		toggleSaveBtn(type);
 	}
 	
-	function toggleSaveBtn(type) {
-		var dg = null;
-		if (type == "rank") {
-			dg = $("#rank_dg");
-			if (dg.datagrid("getChanges").length) {
-				$("#saveRankBtn").linkbutton("enable");
-			} else {
-				$("#saveRankBtn").linkbutton("disable");
-			}
-		} else {
-			dg = $("#point_dg");
-			if (dg.datagrid("getChanges").length) {
-				$("#savePointBtn").linkbutton("enable");
-			} else {
-				$("#savePointBtn").linkbutton("disable");
-			}
-		}
-
-	}
 </script>
 </head>
 <body>
@@ -369,7 +341,7 @@ tr.changed-row {
 		<table width="100%">
 			<tr>
 				<td>
-						<a id="saveRankBtn" href="#" class="easyui-linkbutton" iconCls="icon-save" plain="true" onclick="saveRank()" disabled="true">Save</a>
+						<a id="saveRankBtn" href="#" class="easyui-linkbutton" iconCls="icon-save" plain="true" onclick="saveRank()">Save</a>
 						<a href="#" class="easyui-linkbutton" iconCls="icon-undo" plain="true" onclick="reset('rank')">Reset</a>
 						<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="addRow('rank')">Add</a>
 						<a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="deleteRow('rank')">Delete</a>
@@ -387,7 +359,7 @@ tr.changed-row {
 		<table width="100%">
 			<tr>
 				<td>
-						<a id="savePointBtn" href="#" class="easyui-linkbutton" iconCls="icon-save" plain="true" onclick="savePoint()" disabled="true">Save</a>
+						<a id="savePointBtn" href="#" class="easyui-linkbutton" iconCls="icon-save" plain="true" onclick="savePoint()">Save</a>
 						<a href="#" class="easyui-linkbutton" iconCls="icon-undo" plain="true" onclick="reset('point')">Reset</a>
 						<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="addRow('point')">Add</a>
 						<a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="deleteRow('point')">Delete</a>
