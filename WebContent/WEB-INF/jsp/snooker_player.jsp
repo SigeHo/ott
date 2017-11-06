@@ -166,7 +166,7 @@ tr.changed-row {
 				<th field="nameTr" editor="textbox" width="150px">Player Name TR</th>
 				<th field="sex" editor="textbox" width="150px">Sex</th>
 				<th field="nationality" editor="textbox" width="150px">Nationality</th>
-				<th field="birthdayStr" editor="datebox" width="150px">Birthday</th>
+				<th field="birthdayStr" editor="{type:'datebox', options:{editable:false}}" width="150px">Birthday</th>
 				<th field="birthday" hidden="true" width="150px">Birthday</th>
 				<th field="height" editor="numberbox" width="150px">Height</th>
 				<th field="weight" editor="numberbox" width="150px">Weight</th>
@@ -174,7 +174,7 @@ tr.changed-row {
 				<th field="maxScoreNum" editor="numberbox" width="150px">Max Score Num</th>
 				<th field="currentRank" editor="numberbox" width="150px">Current Rank</th>
 				<th field="highestRank" editor="numberbox" width="150px">Highest Rank</th>
-				<th field="transferTimeStr" editor="datebox" width="150px">Transfer Time</th>
+				<th field="transferTimeStr" editor="{type:'datebox', options:{editable:false}}" width="150px">Transfer Time</th>
 				<th field="transferTime" hidden="true" width="150px">Transfer Time</th>
 				<th field="totalMoney" editor="numberbox" width="150px">Total Money</th>
 				<th field="winRecord" editor="numberbox" width="150px">Win Record</th>

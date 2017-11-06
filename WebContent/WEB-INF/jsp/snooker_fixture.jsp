@@ -304,7 +304,7 @@ tr.changed-row {
 				<th field="matchId" width="150px" sortable="true">Match ID</th>
 				<th field="seasonId" editor="numberbox" width="150px" sortable="true">Season ID</th>
 				<th field="matchTime" hidden="true" width="150px">Match Time</th>
-				<th field="matchTimeStr" editor="datetimebox" width="150px">Match Time</th>
+				<th field="matchTimeStr" editor="{type:'datetimebox', options:{editable:false}}" width="150px">Match Time</th>
 				<th field="leagueId" editor="numberbox" width="150px" sortable="true">League ID</th>
 				<th field="leagueNameCn" editor="text" width="150px">League Name CN</th>
 				<th field="leagueNameEn" editor="text" width="150px">League Name EN</th>
@@ -348,9 +348,7 @@ tr.changed-row {
 		fitColumns: true,
 		onClickRow: onClickRow,
 		onDblClickCell: onDblClickCell,
-		onLoadSuccess: onLoadSuccess,
-		pagination: true,
-		pageSize: 10,
+		onLoadSuccess: onLoadSuccess
 	">
 		<thead>
 			<tr>
