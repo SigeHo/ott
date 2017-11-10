@@ -32,8 +32,8 @@ public class OttSchedualTask {
 	public void retrieveSnookerLiveData() {
 		logger.info("############ OttSchedualTask.retrieveSnookerLiveData() ############");
 		String api = CustomizedPropertyConfigurer.getContextProperty("api.snooker_live");
-//		String response = HttpClientUtil.getInstance().sendHttpPost(api);
-		String response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
+		String response = HttpClientUtil.getInstance().sendHttpPost(api);
+//		String response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
 		if (StringUtils.isNotBlank(response)) {
 			List<OttSnookerScore> list = JsonUtil.parseJson2SnookerScore(response, "LIVE");
 			if (list.size() > 0)
@@ -60,8 +60,8 @@ public class OttSchedualTask {
 			endDate = calendar.getTime();
 			String api = CustomizedPropertyConfigurer.getContextProperty("api.snooker_fixture");
 			api += "&startDate=" + sdf.format(startDate) + "&endDate=" + sdf.format(endDate);
-//			 String response = HttpClientUtil.getInstance().sendHttpPost(api);
-			String response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
+			 String response = HttpClientUtil.getInstance().sendHttpPost(api);
+//			String response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
 			if (StringUtils.isNotBlank(response)) {
 				List<OttSnookerScore> list = JsonUtil.parseJson2SnookerScore(response, "FIXTURE");
 				if (list.size() > 0) {
@@ -84,8 +84,8 @@ public class OttSchedualTask {
 	public void retrieveSnookerRankData() {
 		logger.info("############ OttSchedualTask.retrieveSnookerRankData() ############");
 		String api = CustomizedPropertyConfigurer.getContextProperty("api.snooker_rank");
-//		 String response = HttpClientUtil.getInstance().sendHttpPost(api);
-		String response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
+		 String response = HttpClientUtil.getInstance().sendHttpPost(api);
+//		String response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
 		if (StringUtils.isNotBlank(response)) {
 			List<OttSnookerRank> list = JsonUtil.parseJson2SnookerRank(response);
 			if (list.size() > 0) 
@@ -107,8 +107,8 @@ public class OttSchedualTask {
 			sid = map.get("sid");
 			lid = map.get("lid");
 			api = leagueApi + "&lId=" + lid + "&sId=" + sid;
-//			response = HttpClientUtil.getInstance().sendHttpPost(api);
-			response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
+			response = HttpClientUtil.getInstance().sendHttpPost(api);
+//			response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
 			if (StringUtils.isNotBlank(response)) {
 				ottSnookerLeague = JsonUtil.parseJson2SnookerLeague(response);
 				ottSnookerService.renewSnookerLeagueData(ottSnookerLeague);
@@ -132,16 +132,16 @@ public class OttSchedualTask {
 			sid = map.get("sid");
 			lid = map.get("lid");
 			api = personApi + "&sId=" + sid + "&lId=" + lid;
-//			response = HttpClientUtil.getInstance().sendHttpPost(api);
-			response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
+			response = HttpClientUtil.getInstance().sendHttpPost(api);
+//			response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
 			if (StringUtils.isNotBlank(response)) {
 				personList = JsonUtil.parseJson2SnookerPersonList(response);
 				if (personList.size() > 0) {
 					personDetailList = new ArrayList<>();
 					for (OttSnookerPerson person : personList) {
 						api = personApi + "&sId=" + sid + "&lId=" + lid + "&pId=" + person.getPlayerId();
-//						response = HttpClientUtil.getInstance().sendHttpPost(api);
-						response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
+						response = HttpClientUtil.getInstance().sendHttpPost(api);
+//						response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
 						if (StringUtils.isNotBlank(response)) {
 							ottSnookerPerson = JsonUtil.parseJson2SnookerPerson(response);
 							personDetailList.add(ottSnookerPerson);

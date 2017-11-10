@@ -83,8 +83,8 @@ public class OttNpvrController {
 				switch (npvrSearchDto.getSportType()) {
 				case "SOCCER":
 					api = CustomizedPropertyConfigurer.getContextProperty("api.soccer_fixture") + "&start_date=" + start_date + "&days=" + days;
-//					String response = HttpClientUtil.getInstance().sendHttpGet(api);
-					String response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
+					String response = HttpClientUtil.getInstance().sendHttpGet(api);
+//					String response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
 					if (StringUtils.isNotBlank(response)) {
 						allList = JsonUtil.parseJson2NpvrMapping(response);
 					}
