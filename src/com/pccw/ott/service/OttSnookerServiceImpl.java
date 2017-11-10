@@ -213,6 +213,11 @@ public class OttSnookerServiceImpl implements OttSnookerService {
 	}
 	
 	@Override
+	public List<Map<String, Object>> retrieveLeagueListForNpvr() {
+		return ottSnookerLeagueDao.findLeagueList();
+	}
+	
+	@Override
 	public void batchRenewSnookerPersonData(List<OttSnookerPerson> personDetailList) {
 		OttSnookerPerson person = null;
 		for (int i = 0; i < personDetailList.size(); i++) {

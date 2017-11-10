@@ -8,6 +8,34 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 		
+		$("#sportType").combobox({
+			onChange : function(newValue, oldValue) {
+				if (newValue != oldValue) {
+					$.ajax({
+						url : "${ctx}/npvr/retrieveLeagueList.html",
+						data : {
+							sportType : newValue
+						},
+						type : "POST",
+						success : function(response) {
+							if (response.success) {
+								$("#tournament").combobox({
+									valueField : "id",
+									textField : "leagueName",
+									data : response.leagueList
+								});
+							} else {
+								$.messager.alert("", "Failed to retrieve league list. Please try again.", "error");
+							}
+						},
+						error : function() {
+							$.messager.alert("", "Failed to retrieve league list. Please try again.", "error");
+						}
+					});
+				}
+			}
+		});
+		
 		$("#fromTime").timespinner("setValue", "00:00");
 		$("#toTime").timespinner("setValue", "00:00");
 		
@@ -86,6 +114,7 @@
 			}]
 		});
 	});
+	
 	
 	function verifyNpvrIds() {
 		var npvrIdArr = $("#npvrIds").textbox("getText").trim().split("\n");
@@ -175,7 +204,7 @@
 	}
 	
 	function changeTvCoverage(index) {
-		var ck = $("#tvCoverage_" + index);
+		var ck = $("#tvCoverageCk_" + index);
 		if (!ck.is(':checked')) {
 			$.messager.confirm("Confirm", "Are you sure to clear the NPVR IDs?", function(r) {
 				if (r) {
@@ -281,8 +310,9 @@
 					<td align="right">Sport Type</td>
 					<td>
 						<select id="sportType" name="sportType" class="easyui-combobox" style="width:200px;" required="required">
-							<option value=SOCCER>Soccer</option>
+							<option value="SOCCER" selected>Soccer</option>
 							<option value="TENNIS">Tennis</option>
+							<option value="SNOOKER">Snooker</option>
 						</select>
 					</td>
 					<td align="right">Channel</td>
@@ -295,8 +325,7 @@
 				<tr align="right">
 					<td>Tournament</td>
 					<td>
-						<select id="tournament" name="tournament" class="easyui-combobox" style="width:200px;">
-						</select>
+						<select id="tournament" name="tournament" class="easyui-combobox" style="width:200px;"></select>
 					</td>
 					<td align="right">From</td>
 					<td>

@@ -79,6 +79,8 @@ public interface OttSnookerService {
 
 	public void batchDeleteSnookerLevelList(List<OttSnookerLevel> deletedList);
 	
+	public List<Map<String, Object>> retrieveLeagueListForNpvr();
+	
 	/* Snooker Player */
 	
 	public void batchRenewSnookerPersonData(List<OttSnookerPerson> personDetailList);
@@ -92,9 +94,6 @@ public interface OttSnookerService {
 	public void batchUpdateSnookerPersonList(List<OttSnookerPerson> updatedList) throws ParseException;
 
 	public void batchDeleteSnookerPersonList(List<OttSnookerPerson> deletedList);
-
-
-
 
 
 

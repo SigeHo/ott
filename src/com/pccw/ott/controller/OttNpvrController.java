@@ -26,6 +26,7 @@ import com.pccw.ott.dto.OttNpvrMappingDto;
 import com.pccw.ott.dto.OttNpvrSearchDto;
 import com.pccw.ott.model.OttNpvrMapping;
 import com.pccw.ott.service.OttNpvrMappingService;
+import com.pccw.ott.service.OttSnookerService;
 import com.pccw.ott.util.CustomizedPropertyConfigurer;
 import com.pccw.ott.util.HttpClientUtil;
 import com.pccw.ott.util.JsonUtil;
@@ -38,11 +39,32 @@ public class OttNpvrController {
 	
 	@Autowired
 	private OttNpvrMappingService ottNpvrMappingService;
-
+	
+	@Autowired
+	private OttSnookerService ottSnookerService;
+	
 	@RequestMapping("/goToNpvrMappingPage.html")
 	public ModelAndView goToNpvrMappingPage() {
 		ModelAndView mv = new ModelAndView("npvr_mapping");
 		return mv;
+	}
+	
+	@RequestMapping("retrieveLeagueList.html")
+	@ResponseBody
+	public Map<String, Object> retrieveLeagueList(HttpServletRequest request, @RequestParam String sportType) {
+		Map<String, Object> returnMap = new HashMap<>();
+		switch (sportType) {
+		case "SOCCER":
+			returnMap.put("success", true);
+			returnMap.put("leagueList", new ArrayList<>());
+			break;
+		case "SNOOKER":
+			List<Map<String, Object>> leagueList = ottSnookerService.retrieveLeagueListForNpvr();
+			returnMap.put("success", true);
+			returnMap.put("leagueList", leagueList);
+			break;
+		}
+		return returnMap;
 	}
 
 	@RequestMapping("doSearch.html")
@@ -57,20 +79,23 @@ public class OttNpvrController {
 			if (toDate.after(fromDate)) {
 				long days = (toDate.getTime() - fromDate.getTime()) / 86400000;
 				String start_date = new SimpleDateFormat("yyyyMMdd").format(fromDate);
-//				List<Map<String, String>> leagueList = this.retrieveLeagueList(npvrSearchDto.getSportType());
-				if (npvrSearchDto.getSportType().equals("Soccer")) {
+				List<OttNpvrMappingDto> allList = new ArrayList<>();
+				switch (npvrSearchDto.getSportType()) {
+				case "SOCCER":
 					api = CustomizedPropertyConfigurer.getContextProperty("api.soccer_fixture") + "&start_date=" + start_date + "&days=" + days;
-					String response = HttpClientUtil.getInstance().sendHttpGet(api);
-//					String response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
+//					String response = HttpClientUtil.getInstance().sendHttpGet(api);
+					String response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
 					if (StringUtils.isNotBlank(response)) {
-						List<OttNpvrMappingDto> allList = JsonUtil.parseJson2NpvrMapping(response);
-						List<OttNpvrMappingDto> filterList = ottNpvrMappingService.filterByNpvrSearchDto(allList, npvrSearchDto);
-						returnMap.put("success", true);
-						returnMap.put("list", filterList);
-					} else {
-						returnMap.put("success", false);
+						allList = JsonUtil.parseJson2NpvrMapping(response);
 					}
+					break;
+				case "SNOOKER":
+					allList = ottNpvrMappingService.findForSnookerFixture();
+					break;
 				}
+				List<OttNpvrMappingDto> filterList = ottNpvrMappingService.filterByNpvrSearchDto(allList, npvrSearchDto);
+				returnMap.put("success", true);
+				returnMap.put("list", filterList);
 			} else {
 				returnMap.put("success", false);
 				returnMap.put("msg", "From Date must earlier than to To Date.");

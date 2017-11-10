@@ -12,9 +12,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.pccw.ott.dao.OttNpvrMappingDao;
+import com.pccw.ott.dao.OttSnookerScoreDao;
 import com.pccw.ott.dto.OttNpvrMappingDto;
 import com.pccw.ott.dto.OttNpvrSearchDto;
 import com.pccw.ott.model.OttNpvrMapping;
+import com.pccw.ott.model.OttSnookerScore;
 
 @Service("ottNpvrMappingService")
 @Transactional
@@ -22,6 +24,29 @@ public class OttNpvrMappingServiceImpl implements OttNpvrMappingService {
 	
 	@Autowired
 	private OttNpvrMappingDao ottNpvrMappingDao;
+	
+	@Autowired
+	private OttSnookerScoreDao ottSnookerScoreDao;
+	
+	@Override
+	public List<OttNpvrMappingDto> findForSnookerFixture() {
+		List<OttNpvrMappingDto> list = new ArrayList<>();
+		OttNpvrMappingDto dto = null;
+		List<OttSnookerScore> fixtureList = ottSnookerScoreDao.findAllFixture();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		for (OttSnookerScore ottSnookerScore : fixtureList) {
+			dto = new OttNpvrMappingDto();
+			dto.setFixtureId(ottSnookerScore.getMatchId().toString());
+			dto.setSportType("SNOOKER");
+//			dto.setTournament(ottSnookerScore.getLeagueId());
+			dto.setStartDateTime(sdf.format(ottSnookerScore.getMatchTime()));
+			dto.setTeamA(ottSnookerScore.getPlayerANameEn());
+			dto.setTeamB(ottSnookerScore.getPlayerBNameEn());
+			dto.setStatus(ottSnookerScore.getStatus());
+			list.add(dto);
+		}
+		return list;
+	}
 
 	@Override
 	public List<OttNpvrMappingDto> filterByNpvrSearchDto(List<OttNpvrMappingDto> allList, OttNpvrSearchDto npvrSearchDto) throws ParseException {

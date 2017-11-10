@@ -280,8 +280,12 @@ public class OttSnookerScoreDaoImpl extends HibernateDaoSupport implements OttSn
 	@Override
 	public void save(OttSnookerScore ottSnookerScore) {
 		this.getHibernateTemplate().save(ottSnookerScore);
-		
 	}
+	
+@Override
+	public List<OttSnookerScore> findAllFixture() {
+		return (List<OttSnookerScore>) this.getHibernateTemplate().find("from OttSnookerScore where scoreType = 'FIXTURE'");
+	}	
 
 }
 

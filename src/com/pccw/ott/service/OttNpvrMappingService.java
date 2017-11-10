@@ -9,10 +9,13 @@ import com.pccw.ott.model.OttNpvrMapping;
 
 public interface OttNpvrMappingService {
 
+	public List<OttNpvrMappingDto> findForSnookerFixture();
+	
 	public List<OttNpvrMappingDto> filterByNpvrSearchDto(List<OttNpvrMappingDto> allList, OttNpvrSearchDto npvrSearchDto) throws ParseException;
 
 	public void batchSave(List<OttNpvrMapping> list);
 
 	public void clearNpvrIds(Integer valueOf, String sportType, String fixtureId);
+
 
 }

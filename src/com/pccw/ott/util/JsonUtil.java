@@ -95,67 +95,69 @@ public class JsonUtil {
 		try {
 			JsonNode rootNode = mapper.readTree(jsonData);
 			JsonNode liveNode = rootNode.path("live");
-			Iterator<JsonNode> matchIt = liveNode.path("m").elements();
-			OttSnookerScore snookerScore = null;
-			while (matchIt.hasNext()) {
-				JsonNode matchNode = matchIt.next();
-				snookerScore = new OttSnookerScore();
-				snookerScore.setScoreType(scoreType);
-				snookerScore.setMatchId(matchNode.path("mid").asInt());
-				snookerScore.setSeasonId(matchNode.path("sid").asInt());
-				String mt = matchNode.path("mt").asText();
-				if (StringUtils.isNotBlank(mt))
-					snookerScore.setMatchTime(sdf.parse(mt));
-				snookerScore.setLeagueId(matchNode.path("lid").asInt());
-				String[] leagueNameArr = matchNode.path("ln").asText().split("\\|");
-				snookerScore.setLeagueNameCn(leagueNameArr[0]);
-				snookerScore.setLeagueNameEn(leagueNameArr[1]);
-				snookerScore.setLeagueNameTr(leagueNameArr[2]);
-				snookerScore.setLeagueType(matchNode.path("lt").asText());
-				snookerScore.setMatchLevel1(matchNode.path("mml").asText());
-				snookerScore.setMatchLevel2(matchNode.path("ml").asText());
-				snookerScore.setMatchGroup(matchNode.path("group").asText());
-				snookerScore.setPlayerAId(matchNode.path("playA_id").asInt());
-				String[] playerANameArr = matchNode.path("playA_cn").asText().split("\\|");
-				snookerScore.setPlayerANameCn(playerANameArr[0]);
-				snookerScore.setPlayerANameEn(playerANameArr[1]);
-				snookerScore.setPlayerANameTr(playerANameArr[2]);
-				snookerScore.setPlayerBId(matchNode.path("playB_id").asInt());
-				String[] playerBNameArr = matchNode.path("playB_cn").asText().split("\\|");
-				snookerScore.setPlayerBNameCn(playerBNameArr[0]);
-				snookerScore.setPlayerBNameEn(playerBNameArr[1]);
-				snookerScore.setPlayerBNameTr(playerBNameArr[2]);
-				snookerScore.setPlayerAWinNum(matchNode.path("playA_wn").asInt());
-				snookerScore.setPlayerBWinNum(matchNode.path("playB_wn").asInt());
-				snookerScore.setMaxField(matchNode.path("mf").asInt());
-				snookerScore.setCurrentField(matchNode.path("cf").asInt());
-				snookerScore.setWinnerId(matchNode.path("wid").asInt());
-				snookerScore.setWinReason(matchNode.path("wr").asText());
-				snookerScore.setQuiterId(matchNode.path("qid").asInt());
-				snookerScore.setQuitReason(matchNode.path("qr").asText());
-				snookerScore.setBestPlayer(matchNode.path("bestId").asInt());
-				snookerScore.setBestScore(matchNode.get("bestscore").asInt());
-				snookerScore.setCurrentPlayer(matchNode.path("curId").asInt());
-				snookerScore.setCurrentScore(matchNode.path("curscore").asInt());
-				snookerScore.setSort(matchNode.path("sort").asInt());
-				Iterator<JsonNode> framesIt = matchNode.path("frames").elements();
-				List<OttSnookerFrame> frameList = new ArrayList<>();
-				OttSnookerFrame frame = null;
-				while(framesIt.hasNext()) {
-					JsonNode frameNode = framesIt.next();
-					frame = new OttSnookerFrame();
-					frame.setFrameType(scoreType);
-					frame.setMatchSort(frameNode.path("match_sort").asInt());
-					frame.setSort(frameNode.path("sort").asInt());
-					frame.setScoreA(frameNode.path("score_A").asInt());
-					frame.setScoreB(frameNode.path("score_B").asInt());
-					frame.setBestPlayer(frameNode.path("best_play").asInt());
-					frame.setCscoreA(frameNode.path("cscore_A").asInt());
-					frame.setCscoreB(frameNode.path("cscore_B").asInt());
-					frameList.add(frame);
+			if (!liveNode.isMissingNode()) {
+				Iterator<JsonNode> matchIt = liveNode.path("m").elements();
+				OttSnookerScore snookerScore = null;
+				while (matchIt.hasNext()) {
+					JsonNode matchNode = matchIt.next();
+					snookerScore = new OttSnookerScore();
+					snookerScore.setScoreType(scoreType);
+					snookerScore.setMatchId(matchNode.path("mid").asInt());
+					snookerScore.setSeasonId(matchNode.path("sid").asInt());
+					String mt = matchNode.path("mt").asText();
+					if (StringUtils.isNotBlank(mt))
+						snookerScore.setMatchTime(sdf.parse(mt));
+					snookerScore.setLeagueId(matchNode.path("lid").asInt());
+					String[] leagueNameArr = matchNode.path("ln").asText().split("\\|");
+					snookerScore.setLeagueNameCn(leagueNameArr[0]);
+					snookerScore.setLeagueNameEn(leagueNameArr[1]);
+					snookerScore.setLeagueNameTr(leagueNameArr[2]);
+					snookerScore.setLeagueType(matchNode.path("lt").asText());
+					snookerScore.setMatchLevel1(matchNode.path("mml").asText());
+					snookerScore.setMatchLevel2(matchNode.path("ml").asText());
+					snookerScore.setMatchGroup(matchNode.path("group").asText());
+					snookerScore.setPlayerAId(matchNode.path("playA_id").asInt());
+					String[] playerANameArr = matchNode.path("playA_cn").asText().split("\\|");
+					snookerScore.setPlayerANameCn(playerANameArr[0]);
+					snookerScore.setPlayerANameEn(playerANameArr[1]);
+					snookerScore.setPlayerANameTr(playerANameArr[2]);
+					snookerScore.setPlayerBId(matchNode.path("playB_id").asInt());
+					String[] playerBNameArr = matchNode.path("playB_cn").asText().split("\\|");
+					snookerScore.setPlayerBNameCn(playerBNameArr[0]);
+					snookerScore.setPlayerBNameEn(playerBNameArr[1]);
+					snookerScore.setPlayerBNameTr(playerBNameArr[2]);
+					snookerScore.setPlayerAWinNum(matchNode.path("playA_wn").asInt());
+					snookerScore.setPlayerBWinNum(matchNode.path("playB_wn").asInt());
+					snookerScore.setMaxField(matchNode.path("mf").asInt());
+					snookerScore.setCurrentField(matchNode.path("cf").asInt());
+					snookerScore.setWinnerId(matchNode.path("wid").asInt());
+					snookerScore.setWinReason(matchNode.path("wr").asText());
+					snookerScore.setQuiterId(matchNode.path("qid").asInt());
+					snookerScore.setQuitReason(matchNode.path("qr").asText());
+					snookerScore.setBestPlayer(matchNode.path("bestId").asInt());
+					snookerScore.setBestScore(matchNode.get("bestscore").asInt());
+					snookerScore.setCurrentPlayer(matchNode.path("curId").asInt());
+					snookerScore.setCurrentScore(matchNode.path("curscore").asInt());
+					snookerScore.setSort(matchNode.path("sort").asInt());
+					Iterator<JsonNode> framesIt = matchNode.path("frames").elements();
+					List<OttSnookerFrame> frameList = new ArrayList<>();
+					OttSnookerFrame frame = null;
+					while(framesIt.hasNext()) {
+						JsonNode frameNode = framesIt.next();
+						frame = new OttSnookerFrame();
+						frame.setFrameType(scoreType);
+						frame.setMatchSort(frameNode.path("match_sort").asInt());
+						frame.setSort(frameNode.path("sort").asInt());
+						frame.setScoreA(frameNode.path("score_A").asInt());
+						frame.setScoreB(frameNode.path("score_B").asInt());
+						frame.setBestPlayer(frameNode.path("best_play").asInt());
+						frame.setCscoreA(frameNode.path("cscore_A").asInt());
+						frame.setCscoreB(frameNode.path("cscore_B").asInt());
+						frameList.add(frame);
+					}
+					snookerScore.setOttSnookerFrameList(frameList);
+					list.add(snookerScore);
 				}
-				snookerScore.setOttSnookerFrameList(frameList);
-				list.add(snookerScore);
 			}
 		} catch (IOException | ParseException e) {
 			logger.error(e.getMessage());
@@ -166,36 +168,39 @@ public class JsonUtil {
 	}
 	
 	public static OttSnookerLeague parseJson2SnookerLeague(String jsonData) {
-		OttSnookerLeague ottSnookerLeague = new OttSnookerLeague();
+		OttSnookerLeague ottSnookerLeague = null;
 		ObjectMapper mapper = new ObjectMapper();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		try {
 			JsonNode rootNode = mapper.readTree(jsonData);
 			JsonNode leagueNode = rootNode.path("league");
-			ottSnookerLeague.setLeagueId(leagueNode.path("lid").asInt());
-			ottSnookerLeague.setLeagueNameCn(leagueNode.path("lcn").asText());
-			ottSnookerLeague.setLeagueNameEn(leagueNode.path("len").asText());
-			ottSnookerLeague.setLeagueNameTr(leagueNode.path("ltr").asText());
-			String st = leagueNode.path("st").asText();
-			if (StringUtils.isNotBlank(st)) 
-				ottSnookerLeague.setStartTime(sdf.parse(st));
-			String et = leagueNode.path("et").asText();
-			if (StringUtils.isNotBlank(et)) 
-				ottSnookerLeague.setEndTime(sdf.parse(et));
-			ottSnookerLeague.setColor(leagueNode.path("color").asText());
-			ottSnookerLeague.setRemark(leagueNode.path("rmark").asText());
-			Iterator<JsonNode> levelIt = leagueNode.path("level").elements();
-			List<OttSnookerLevel> ottSnookerLevelList = new ArrayList<>();
-			while (levelIt.hasNext()) {
-				JsonNode levelNode = levelIt.next();
-				OttSnookerLevel level = new OttSnookerLevel();
-				level.setLevelRounds(levelNode.path("levelRounds").asText());
-				level.setMatchLevels(levelNode.path("matchLevels").asText());
-				level.setMatchGroup(levelNode.path("group").asInt());
-				level.setRemark(leagueNode.path("remark").asText());
-				ottSnookerLevelList.add(level);
+			if (!leagueNode.isMissingNode()) {
+				ottSnookerLeague = new OttSnookerLeague();
+				ottSnookerLeague.setLeagueId(leagueNode.path("lid").asInt());
+				ottSnookerLeague.setLeagueNameCn(leagueNode.path("lcn").asText());
+				ottSnookerLeague.setLeagueNameEn(leagueNode.path("len").asText());
+				ottSnookerLeague.setLeagueNameTr(leagueNode.path("ltr").asText());
+				String st = leagueNode.path("st").asText();
+				if (StringUtils.isNotBlank(st)) 
+					ottSnookerLeague.setStartTime(sdf.parse(st));
+				String et = leagueNode.path("et").asText();
+				if (StringUtils.isNotBlank(et)) 
+					ottSnookerLeague.setEndTime(sdf.parse(et));
+				ottSnookerLeague.setColor(leagueNode.path("color").asText());
+				ottSnookerLeague.setRemark(leagueNode.path("rmark").asText());
+				Iterator<JsonNode> levelIt = leagueNode.path("level").elements();
+				List<OttSnookerLevel> ottSnookerLevelList = new ArrayList<>();
+				while (levelIt.hasNext()) {
+					JsonNode levelNode = levelIt.next();
+					OttSnookerLevel level = new OttSnookerLevel();
+					level.setLevelRounds(levelNode.path("levelRounds").asText());
+					level.setMatchLevels(levelNode.path("matchLevels").asText());
+					level.setMatchGroup(levelNode.path("group").asInt());
+					level.setRemark(leagueNode.path("remark").asText());
+					ottSnookerLevelList.add(level);
+				}
+				ottSnookerLeague.setOttSnookerLevelList(ottSnookerLevelList);
 			}
-			ottSnookerLeague.setOttSnookerLevelList(ottSnookerLevelList);
 		} catch (IOException e) {
 			e.printStackTrace();
 			logger.error(e.toString());
@@ -276,7 +281,6 @@ public class JsonUtil {
 	public static List<OttNpvrMappingDto> parseJson2NpvrMapping(String jsonData) {
 		ObjectMapper mapper = new ObjectMapper();
 		List<OttNpvrMappingDto> list = new ArrayList<>();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		try {
 			OttNpvrMappingDto npvrMappingDto = null;
 			JsonNode rootNode = mapper.readTree(jsonData);

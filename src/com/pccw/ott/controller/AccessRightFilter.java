@@ -52,15 +52,15 @@ public class AccessRightFilter implements Filter {
 		  ||permissionURL.equals(Constants.MAIN_PAGE_URL)
 		  ||permissionURL.equals(Constants.NO_PERMISSION_URL)
 		  
-		  ||permissionURL.equals(Constants.USER_LIST_USER_URL)
-		  ||permissionURL.equals(Constants.USER_LIST_USER_ROLES_URL)
-		  ||permissionURL.equals(Constants.USER_GET_USER_PARAM_URL)
-		  
-		  ||permissionURL.equals(Constants.ROLE_LIST_ROLE_URL)
-		  ||permissionURL.equals(Constants.ROLE_LIST_ROLE_PERMISSIONS_URL)
-		  
-		  ||permissionURL.equals(Constants.PERMISSION_LIST_PERMISSION_URL)
-		  ||permissionURL.equals(Constants.PERMISSION_GET_ALL_TABLE_FIELDS_URL)		  
+//		  ||permissionURL.equals(Constants.USER_LIST_USER_URL)
+//		  ||permissionURL.equals(Constants.USER_LIST_USER_ROLES_URL)
+//		  ||permissionURL.equals(Constants.USER_GET_USER_PARAM_URL)
+//		  
+//		  ||permissionURL.equals(Constants.ROLE_LIST_ROLE_URL)
+//		  ||permissionURL.equals(Constants.ROLE_LIST_ROLE_PERMISSIONS_URL)
+//		  
+//		  ||permissionURL.equals(Constants.PERMISSION_LIST_PERMISSION_URL)
+//		  ||permissionURL.equals(Constants.PERMISSION_GET_ALL_TABLE_FIELDS_URL)		  
 		  ) {
 			// do nothing, ignore session checking
 		} 

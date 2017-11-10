@@ -3,6 +3,7 @@ package com.pccw.ott.dao;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.HibernateException;
@@ -201,5 +202,12 @@ public class OttSnookerLeagueDaoImpl extends HibernateDaoSupport implements OttS
 			}
 		});
 	}
+	
+	@Override
+	public List<Map<String, Object>> findLeagueList() {
+		String hql = "select distinct new map(leagueId as id, leagueNameEn as leagueName) from OttSnookerLeague";
+		return (List<Map<String, Object>>) this.getHibernateTemplate().find(hql);
+	}
+	
 
 }

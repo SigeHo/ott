@@ -32,4 +32,6 @@ public interface OttSnookerScoreDao {
 
 	public void save(OttSnookerScore ottSnookerScore);
 
+	public List<OttSnookerScore> findAllFixture();
+
 }

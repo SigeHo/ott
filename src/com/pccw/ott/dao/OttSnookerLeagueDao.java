@@ -1,6 +1,7 @@
 package com.pccw.ott.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import com.pccw.ott.model.OttSnookerLeague;
 import com.pccw.ott.model.OttSnookerLevel;
@@ -26,5 +27,7 @@ public interface OttSnookerLeagueDao {
 	public void batchUpdateSnookerLevelList(List<OttSnookerLevel> updatedList);
 
 	public void batchDeleteSnookerLevelList(List<OttSnookerLevel> deletedList);
+
+	public List<Map<String, Object>> findLeagueList();
 
 }
