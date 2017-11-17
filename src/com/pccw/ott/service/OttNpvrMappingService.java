@@ -15,7 +15,11 @@ public interface OttNpvrMappingService {
 
 	public void batchSave(List<OttNpvrMapping> list);
 
-	public void clearNpvrIds(Integer valueOf, String sportType, String fixtureId);
+	public void clearNpvrIds(String sportType, String fixtureId);
+
+	public List<OttNpvrMappingDto> findByNpvrSearchDto(OttNpvrSearchDto npvrSearchDto);
+
+	public void copyNpvrIds(List<OttNpvrMapping> list);
 
 
 }

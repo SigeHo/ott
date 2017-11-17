@@ -1,6 +1,7 @@
 package com.pccw.ott.model;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -8,6 +9,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 @Entity
 @Table(name = "ott_npvr_mapping")
@@ -20,6 +23,8 @@ public class OttNpvrMapping implements Serializable {
 	private String sportType;
 	private String fixtureId;
 	private String npvrId;
+	private Date actualStartDateTime;
+	private Date acutalEndDateTime;
 
 	@Column(name = "id")
 	@Id
@@ -32,7 +37,7 @@ public class OttNpvrMapping implements Serializable {
 		this.id = id;
 	}
 
-	@Column(name = "channelNo")
+	@Column(name = "channel_no")
 	public Integer getChannelNo() {
 		return channelNo;
 	}
@@ -66,6 +71,26 @@ public class OttNpvrMapping implements Serializable {
 
 	public void setNpvrId(String npvrId) {
 		this.npvrId = npvrId;
+	}
+
+	@Column(name = "actual_start_date_time")
+	@Temporal(TemporalType.TIMESTAMP)
+	public Date getActualStartDateTime() {
+		return actualStartDateTime;
+	}
+
+	public void setActualStartDateTime(Date actualStartDateTime) {
+		this.actualStartDateTime = actualStartDateTime;
+	}
+
+	@Column(name = "actual_end_date_time")
+	@Temporal(TemporalType.TIMESTAMP)
+	public Date getAcutalEndDateTime() {
+		return acutalEndDateTime;
+	}
+
+	public void setAcutalEndDateTime(Date acutalEndDateTime) {
+		this.acutalEndDateTime = acutalEndDateTime;
 	}
 
 }

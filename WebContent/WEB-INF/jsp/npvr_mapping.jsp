@@ -43,7 +43,7 @@
 			singleSelect : true,
 		    columns : [[
 		        {field : 'fixtureId', hidden : true},
-		        {field: 'channelNo', hidden : true},
+		        {field : 'channelNos', hidden : true},
 		        {field: 'sportType', hidden : true},
 		        {field: 'tournament', hidden : true},
 		        {field : 'tvCoverageCk', title : 'TV<br>Coverage', align : 'center', formatter : function(value, row, index) {
@@ -135,7 +135,7 @@
 				success : function(response) {
 					$.messager.progress("close");
 					if (response.success) {
- 						saveNpvrIds(row, response.npvrIdArr);
+ 						saveNpvrIds(row, response.validNpvrs);
 					} else if (response.msg) {
 						$.messager.alert("", response.msg, "error");
 					} else {
@@ -149,13 +149,20 @@
 		}
 	}
 	
-	function saveNpvrIds(row, npvrIdArr) {
-		var data = {
-			sportType : row.sportType,
-			channelNo : row.channelNo,
-			fixtureId : row.fixtureId,
-			npvrIds : npvrIdArr.join(",")
-		};
+	function saveNpvrIds(row, validNpvrs) {
+		var arr = new Array();
+		for (var i in validNpvrs) {
+			var validNpvr = validNpvrs[i];
+			var npvrMapping = {
+					sportType : row.sportType,
+					channelNo : validNpvr["channelNo"],
+					fixtureId : row.fixtureId,
+					npvrId : validNpvr["npvrId"]
+			}
+			arr.push(npvrMapping);
+		}
+		var data = new Object();
+		data['npvrMappingList'] = JSON.stringify(arr);
 		$.post("${ctx}/npvr/saveNpvrIds.html", data,
 			function(response) {
 				if (response.success) {
@@ -165,7 +172,8 @@
 					$("#fixture_dg").datagrid("updateRow", {
 						index : updateIndex,
 						row : {
-							npvrIds : npvrIdArr.join(",")
+							channelNos : response.channelNos,
+							npvrIds : response.npvrIds
 						}
 					});
 				} else if (response.msg) {
@@ -210,7 +218,6 @@
 				if (r) {
 					var row = $("#fixture_dg").datagrid("getRows")[index];
 					var data = {
-							channelNo : row.channelNo,
 							fixtureId : row.fixtureId,
 							sportType : row.sportType
 					}
@@ -248,12 +255,15 @@
 	function openEditPopup(index) {
 		$("#npvrIds").textbox("clear");
 		var row = $("#fixture_dg").datagrid("getRows")[index];
-		if (row.npvrIds && row.npvrIds.length > 0) {
-			var npvrIds = "";
-			for (var i = 0; i < row.npvrIds.length; i++) {
-				npvrIds += row.npvrIds[i] + "\n";
-    		}
-			$("#npvrIds").textbox("setText", npvrIds);
+		if (row.npvrIds != null) {
+			var npvrArr = row.npvrIds.split(",");
+			if (npvrArr.length > 0) {
+				var npvrIds = "";
+				for (var i = 0; i < npvrArr.length; i++) {
+					npvrIds += npvrArr[i] + "\n";
+	    		}
+				$("#npvrIds").textbox("setText", npvrIds);
+			}
 		}
 		
 		$("#editNpvrPopup").dialog("open");
@@ -266,14 +276,23 @@
 				if (r) {
 					var fromRow = $("#fixture_dg").datagrid("getRows")[fromIndex];
 					var toRow = $("#fixture_dg").datagrid("getRows")[index];
+					var data = new Object();
+					var npvrIdArr = fromRow.npvrIds.split(",");
+					var channelNoArr = fromRow.channelNos.split(",");
+					var npvrMappingList = new Array();
+					for (var i in npvrIdArr) {
+						var npvrMapping = {
+								fixtureId : toRow.fixtureId,
+								sportType : toRow.sportType,
+								channelNo : parseInt(channelNoArr[i]),
+								npvrId : npvrIdArr[i]
+						}
+						npvrMappingList.push(npvrMapping);
+					}
+					data["npvrMappingList"] = JSON.stringify(npvrMappingList);
 					$.ajax({
 						url : "${ctx}/npvr/saveNpvrIds.html",
-						data : {
-							fixtureId : toRow.fixtureId,
-							sportType : toRow.sportType,
-							channelNo : toRow.channelNo,
-							npvrIds : fromRow.npvrIds
-						},
+						data : data,
 						type : "post",
 						success : function(response) {
 							if (response.success) {
@@ -281,6 +300,7 @@
 								$("#fixture_dg").datagrid("updateRow", {
 									index : index,
 									row : {
+										channelNos : fromRow.channelNos,
 										npvrIds : fromRow.npvrIds
 									}
 								});
@@ -317,9 +337,7 @@
 					</td>
 					<td align="right">Channel</td>
 					<td>
-<!-- 						<select id="channelNo" name="channeoNo" class="easyui-combobox" style="width:200px;" required="required"> -->
-<!-- 						</select> -->
-						<input id="channelNo" name="channelNo" class="easyui-numberbox" style="width:200px;" data-options="required: true, min: 1, max: 999">
+						<input id="channelNo" name="channelNo" class="easyui-numberbox" style="width:200px;" data-options="min: 1, max: 999">
 					</td>
 				</tr>
 				<tr align="right">
@@ -351,7 +369,7 @@
 				</tr>
 				<tr>
 					<td colspan="4" align="right">
-						<span style="display: inline-block; padding-right:10px;">Note: All fields are requried</span>
+<!-- 						<span style="display: inline-block; padding-right:10px;">Note: All fields are requried</span> -->
 						<a id="searchBtn" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-search'" onclick="doSearch()">Search</a>
 					</td>
 				</tr>

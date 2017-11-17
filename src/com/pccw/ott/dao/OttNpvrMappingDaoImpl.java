@@ -14,6 +14,11 @@ import com.pccw.ott.model.OttNpvrMapping;
 @Repository("ottNpvrMappingDao")
 @SuppressWarnings("unchecked")
 public class OttNpvrMappingDaoImpl extends HibernateDaoSupport implements OttNpvrMappingDao {
+	
+	@Override
+	public List<OttNpvrMapping> findByFixtureIdAndSportType(String fixtureId, String sportType) {
+		return (List<OttNpvrMapping>) this.getHibernateTemplate().find("from OttNpvrMapping where fixtureId = ? and sportType = ?", fixtureId, sportType);
+	}
 
 	@Override
 	public List<OttNpvrMapping> findByFixtureId(String fixtureId) {
@@ -38,12 +43,16 @@ public class OttNpvrMappingDaoImpl extends HibernateDaoSupport implements OttNpv
 	}
 	
 	@Override
-	public void deleteByParameters(Integer channelNo, String sportType, String fixtureId) {
+	public List<OttNpvrMapping> findAll() {
+		return (List<OttNpvrMapping>) this.getHibernateTemplate().find("from OttNpvrMapping");
+	}
+	
+	@Override
+	public void deleteByParameters(String sportType, String fixtureId) {
 		this.getHibernateTemplate().execute(new HibernateCallback() {
 			@Override
 			public Object doInHibernate(Session session) throws HibernateException {
-				Query query = session.createQuery("delete from OttNpvrMapping where channelNo = :channelNo and sportType = :sportType and fixtureId = :fixtureId");
-				query.setParameter("channelNo", channelNo);
+				Query query = session.createQuery("delete from OttNpvrMapping where sportType = :sportType and fixtureId = :fixtureId");
 				query.setParameter("sportType", sportType);
 				query.setParameter("fixtureId", fixtureId);
 				query.executeUpdate();

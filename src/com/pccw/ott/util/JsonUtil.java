@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -392,6 +393,39 @@ public class JsonUtil {
 			logger.error(e.getMessage());
 		}
 		return Arrays.asList(npvrIdArr);
+	}
+
+	public static Map<String, Object> verifyNpvrIds(String response, String[] npvrIdArr) {
+		Map<String, Object> returnMap = new HashMap<>();
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			JsonNode rootNode = mapper.readTree(response);
+			Iterator<JsonNode> docsIt = rootNode.path("data").path("response").path("docs").elements();
+			List<Map<String, Object>> validNpvrs = new ArrayList<>();
+			Map<String, Object> npvrMap = null;
+			while(docsIt.hasNext()) {
+				JsonNode docNode = docsIt.next();
+				String progId = docNode.path("p_vimProgId").asText();
+				int channelId = docNode.path("p_channelId").asInt();
+				int index = ArrayUtils.indexOf(npvrIdArr, progId);
+				if (index > -1) {
+					npvrIdArr = (String[]) ArrayUtils.remove(npvrIdArr, index);
+					npvrMap = new HashMap<>();
+					npvrMap.put("npvrId", progId);
+					npvrMap.put("channelNo", channelId);
+					validNpvrs.add(npvrMap);
+				}
+			}
+			returnMap.put("invalidNpvr", Arrays.asList(npvrIdArr));
+			returnMap.put("validNpvrs", validNpvrs);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+		return returnMap;
 	}
 
 }

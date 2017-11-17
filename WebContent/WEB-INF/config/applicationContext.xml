@@ -26,8 +26,7 @@
 	<!-- Scans the classpath of this application for @Components to deploy as 
 		beans -->
 	<context:component-scan base-package="com.pccw.ott.*">
-		<context:exclude-filter type="regex"
-			expression="com.pccw.ott.controller.*" />
+		<context:exclude-filter type="regex" expression="com.pccw.ott.controller.*" />
 	</context:component-scan>
 
 	<!-- Anotation Transaction -->
@@ -70,15 +69,14 @@
         <property name="sessionFactory" ref="sessionFactory" />
     </bean>
     
-        
-	<task:scheduler id="scheduler" pool-size="5" />
-	<task:annotation-driven/>
-	<bean id="myTask" class="com.pccw.ott.schedual.OttSchedualTask"></bean>
-	<task:scheduled-tasks>
-		<task:scheduled ref="myTask" method="retrieveSnookerLiveData" cron="${task.cron.snooker_live}" />
-		<task:scheduled ref="myTask" method="retrieveSnookerFixtureData" cron="${task.cron.snooker_fixture}" />
-		<task:scheduled ref="myTask" method="retrieveSnookerRankData" cron="${task.cron.snooker_rank}" />
-	</task:scheduled-tasks>    
-	<context:component-scan base-package="com.pccw.ott.schedual" />      
+<!-- 	<task:scheduler id="scheduler" pool-size="5" /> -->
+<!-- 	<task:annotation-driven/> -->
+<!-- 	<bean id="myTask" class="com.pccw.ott.schedual.OttSchedualTask"></bean> -->
+<!-- 	<task:scheduled-tasks> -->
+<!-- 		<task:scheduled ref="myTask" method="retrieveSnookerLiveData" cron="${task.cron.snooker_live}" /> -->
+<!-- 		<task:scheduled ref="myTask" method="retrieveSnookerFixtureData" cron="${task.cron.snooker_fixture}" /> -->
+<!-- 		<task:scheduled ref="myTask" method="retrieveSnookerRankData" cron="${task.cron.snooker_rank}" /> -->
+<!-- 	</task:scheduled-tasks>     -->
+<!-- 	<context:component-scan base-package="com.pccw.ott.schedual" />       -->
 
 </beans>

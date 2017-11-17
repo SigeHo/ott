@@ -202,9 +202,11 @@ CREATE TABLE IF NOT EXISTS ott.ott_snooker_person (
 
 CREATE TABLE IF NOT EXISTS ott.ott_npvr_mapping (
 	id INT AUTO_INCREMENT PRIMARY KEY,
-	channelNo INT(3),
 	sport_type VARCHAR(20),
+	channel_no INT(3),
 	fixture_id VARCHAR(20),
+	actual_start_date_time TIMESTAMP NULL,
+	actual_end_date_time TIMESTAMP NULL,
 	npvr_id VARCHAR(20)
 );
 

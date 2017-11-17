@@ -1,5 +1,6 @@
 package com.pccw.ott.controller;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,9 +23,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pccw.ott.dto.OttNpvrMappingDto;
 import com.pccw.ott.dto.OttNpvrSearchDto;
 import com.pccw.ott.model.OttNpvrMapping;
+import com.pccw.ott.model.OttSnookerScore;
 import com.pccw.ott.service.OttNpvrMappingService;
 import com.pccw.ott.service.OttSnookerService;
 import com.pccw.ott.util.CustomizedPropertyConfigurer;
@@ -77,14 +81,15 @@ public class OttNpvrController {
 			Date fromDate = sdf.parse(npvrSearchDto.getFromDate());
 			Date toDate = sdf.parse(npvrSearchDto.getToDate());
 			if (toDate.after(fromDate)) {
+				List<OttNpvrMappingDto> allList = new ArrayList<>();
+				List<OttNpvrMappingDto> filterList = new ArrayList<>();
 				long days = (toDate.getTime() - fromDate.getTime()) / 86400000;
 				String start_date = new SimpleDateFormat("yyyyMMdd").format(fromDate);
-				List<OttNpvrMappingDto> allList = new ArrayList<>();
 				switch (npvrSearchDto.getSportType()) {
 				case "SOCCER":
 					api = CustomizedPropertyConfigurer.getContextProperty("api.soccer_fixture") + "&start_date=" + start_date + "&days=" + days;
-					String response = HttpClientUtil.getInstance().sendHttpGet(api);
-//					String response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
+//					String response = HttpClientUtil.getInstance().sendHttpGet(api);
+					String response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
 					if (StringUtils.isNotBlank(response)) {
 						allList = JsonUtil.parseJson2NpvrMapping(response);
 					}
@@ -93,7 +98,8 @@ public class OttNpvrController {
 					allList = ottNpvrMappingService.findForSnookerFixture();
 					break;
 				}
-				List<OttNpvrMappingDto> filterList = ottNpvrMappingService.filterByNpvrSearchDto(allList, npvrSearchDto);
+				filterList = ottNpvrMappingService.filterByNpvrSearchDto(allList, npvrSearchDto);
+
 				returnMap.put("success", true);
 				returnMap.put("list", filterList);
 			} else {
@@ -137,7 +143,8 @@ public class OttNpvrController {
 			String api = CustomizedPropertyConfigurer.getContextProperty("api.npvr_verification") + q;
 			String response = HttpClientUtil.getInstance().sendHttpGet(api);
 			if (StringUtils.isNotBlank(response)) {
-				List<String> invalidIds = JsonUtil.getInvalidNpvrIds(response, npvrIdArr);
+				Map<String, Object> reponseMap = JsonUtil.verifyNpvrIds(response, npvrIdArr);
+				List<String> invalidIds = (List<String>) reponseMap.get("invalidNpvr");
 				if (invalidIds.size() > 0) {
 					returnMap.put("success", false);
 					String msg = "Invalid NPVR IDs: ";
@@ -148,7 +155,7 @@ public class OttNpvrController {
 					returnMap.put("msg", msg);
 				} else {
 					returnMap.put("success", true);	
-					returnMap.put("npvrIdArr", npvrIdArr);
+					returnMap.put("validNpvrs", reponseMap.get("validNpvrs"));
 				}
 			} else {
 				returnMap.put("success", false);
@@ -166,10 +173,9 @@ public class OttNpvrController {
 	@ResponseBody
 	public Map<String, Object> clearNpvrIds(HttpServletRequest request) {
 		Map<String, Object> returnMap = new HashMap<>();
-		String channelNo = request.getParameter("channelNo");
 		String sportType = request.getParameter("sportType").toUpperCase();
 		String fixtureId = request.getParameter("fixtureId");
-		ottNpvrMappingService.clearNpvrIds(Integer.valueOf(channelNo), sportType.toUpperCase(), fixtureId);
+		ottNpvrMappingService.clearNpvrIds(sportType.toUpperCase(), fixtureId);
 		returnMap.put("success", true);
 		return returnMap;
 	}
@@ -178,21 +184,52 @@ public class OttNpvrController {
 	@ResponseBody
 	public Map<String, Object> saveNpvrIds(HttpServletRequest request) {
 		Map<String, Object> returnMap = new HashMap<>();
-		String channelNo = request.getParameter("channelNo");
-		String sportType = request.getParameter("sportType").toUpperCase();
+		String npvrMappingStr = request.getParameter("npvrMappingList");
+		ObjectMapper mapper = new ObjectMapper();
+		JavaType javaType = mapper.getTypeFactory().constructParametricType(ArrayList.class, OttNpvrMapping.class);
+		List<OttNpvrMapping> mappingList = new ArrayList<>();
+		if (StringUtils.isNotBlank(npvrMappingStr)) {
+			try {
+				mappingList = mapper.readValue(npvrMappingStr, javaType);
+				String[] npvrIdArr = new String[mappingList.size()];
+				String[] channelNoArr = new String[mappingList.size()];
+				for (int i = 0; i < mappingList.size(); i++) {
+					npvrIdArr[i] = mappingList.get(i).getNpvrId();
+					channelNoArr[i] = mappingList.get(i).getChannelNo().toString();
+				}
+				ottNpvrMappingService.batchSave(mappingList);
+				returnMap.put("success", true);
+				returnMap.put("npvrIds", String.join(",", npvrIdArr));
+				returnMap.put("channelNos", String.join(",", channelNoArr));
+			} catch (IOException e) {
+				e.printStackTrace();
+				logger.error(e.getMessage());
+				returnMap.put("success", false);
+				returnMap.put("msg", "Failed to save NPVR IDs. Please try again.");
+			}
+		}
+
+		return returnMap;
+	}
+	
+	@RequestMapping("/copyNpvrIds.html")
+	@ResponseBody
+	public Map<String, Object> copyNpvrIds(HttpServletRequest request) {
+		Map<String, Object> returnMap = new HashMap<>();
 		String fixtureId = request.getParameter("fixtureId");
+		String sportType = request.getParameter("sportType");
+		String npvrIds = request.getParameter("npvrIds");
 		String[] npvrIdArr = request.getParameter("npvrIds").split(","); 
 		List<OttNpvrMapping> list = new ArrayList<>();
 		OttNpvrMapping ottNpvrMapping = null;
 		for (int i = 0; i < npvrIdArr.length; i++) {
 			ottNpvrMapping = new OttNpvrMapping();
-			ottNpvrMapping.setChannelNo(Integer.valueOf(channelNo));
 			ottNpvrMapping.setSportType(sportType);
 			ottNpvrMapping.setFixtureId(fixtureId);
 			ottNpvrMapping.setNpvrId(npvrIdArr[i]);
 			list.add(ottNpvrMapping);
 		}
-		ottNpvrMappingService.batchSave(list);
+		ottNpvrMappingService.copyNpvrIds(list);
 		returnMap.put("success", true);
 		returnMap.put("npvrIds", String.join(",", npvrIdArr));
 		return returnMap;
