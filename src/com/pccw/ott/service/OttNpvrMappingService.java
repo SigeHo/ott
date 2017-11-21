@@ -19,7 +19,7 @@ public interface OttNpvrMappingService {
 
 	public List<OttNpvrMappingDto> findByNpvrSearchDto(OttNpvrSearchDto npvrSearchDto);
 
-	public void copyNpvrIds(List<OttNpvrMapping> list);
+	public void doSaveNpvrIds(String sportType, String fixtureId, List<OttNpvrMapping> mappingList);
 
 
 }

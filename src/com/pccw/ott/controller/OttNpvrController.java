@@ -185,6 +185,8 @@ public class OttNpvrController {
 	public Map<String, Object> saveNpvrIds(HttpServletRequest request) {
 		Map<String, Object> returnMap = new HashMap<>();
 		String npvrMappingStr = request.getParameter("npvrMappingList");
+		String sportType = request.getParameter("sportType");
+		String fixtureId = request.getParameter("fixtureId");
 		ObjectMapper mapper = new ObjectMapper();
 		JavaType javaType = mapper.getTypeFactory().constructParametricType(ArrayList.class, OttNpvrMapping.class);
 		List<OttNpvrMapping> mappingList = new ArrayList<>();
@@ -197,7 +199,7 @@ public class OttNpvrController {
 					npvrIdArr[i] = mappingList.get(i).getNpvrId();
 					channelNoArr[i] = mappingList.get(i).getChannelNo().toString();
 				}
-				ottNpvrMappingService.batchSave(mappingList);
+				ottNpvrMappingService.doSaveNpvrIds(sportType.toUpperCase(), fixtureId, mappingList);
 				returnMap.put("success", true);
 				returnMap.put("npvrIds", String.join(",", npvrIdArr));
 				returnMap.put("channelNos", String.join(",", channelNoArr));
@@ -209,29 +211,6 @@ public class OttNpvrController {
 			}
 		}
 
-		return returnMap;
-	}
-	
-	@RequestMapping("/copyNpvrIds.html")
-	@ResponseBody
-	public Map<String, Object> copyNpvrIds(HttpServletRequest request) {
-		Map<String, Object> returnMap = new HashMap<>();
-		String fixtureId = request.getParameter("fixtureId");
-		String sportType = request.getParameter("sportType");
-		String npvrIds = request.getParameter("npvrIds");
-		String[] npvrIdArr = request.getParameter("npvrIds").split(","); 
-		List<OttNpvrMapping> list = new ArrayList<>();
-		OttNpvrMapping ottNpvrMapping = null;
-		for (int i = 0; i < npvrIdArr.length; i++) {
-			ottNpvrMapping = new OttNpvrMapping();
-			ottNpvrMapping.setSportType(sportType);
-			ottNpvrMapping.setFixtureId(fixtureId);
-			ottNpvrMapping.setNpvrId(npvrIdArr[i]);
-			list.add(ottNpvrMapping);
-		}
-		ottNpvrMappingService.copyNpvrIds(list);
-		returnMap.put("success", true);
-		returnMap.put("npvrIds", String.join(",", npvrIdArr));
 		return returnMap;
 	}
 	

@@ -136,8 +136,9 @@ public class OttNpvrMappingServiceImpl implements OttNpvrMappingService {
 	}
 	
 	@Override
-	public void copyNpvrIds(List<OttNpvrMapping> list) {
-		
+	public void doSaveNpvrIds(String sportType, String fixtureId, List<OttNpvrMapping> mappingList) {
+		ottNpvrMappingDao.deleteByParameters(sportType, fixtureId);
+		ottNpvrMappingDao.batchSave(mappingList);
 	}
 	
 }
