@@ -281,7 +281,6 @@
 				if (r) {
 					var fromRow = $("#fixture_dg").datagrid("getRows")[fromIndex];
 					var toRow = $("#fixture_dg").datagrid("getRows")[index];
-					var data = new Object();
 					var npvrIdArr = fromRow.npvrIds.split(",");
 					var channelNoArr = fromRow.channelNos.split(",");
 					var npvrMappingList = new Array();
@@ -294,7 +293,11 @@
 						}
 						npvrMappingList.push(npvrMapping);
 					}
-					data["npvrMappingList"] = JSON.stringify(npvrMappingList);
+					var data = {
+							"npvrMappingList" : JSON.stringify(npvrMappingList),
+							"fixtureId" : toRow.fixtureId,
+							"sportType" : toRow.sportType
+					}
 					$.ajax({
 						url : "${ctx}/npvr/saveNpvrIds.html",
 						data : data,
