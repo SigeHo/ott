@@ -166,7 +166,8 @@
 		var data = {
 				"npvrMappingList" : JSON.stringify(arr),
 				"fixtureId" : row.fixtureId,
-				"sportType" : row.sportType
+				"sportType" : row.sportType,
+				"oldNpvrIds" : row.npvrIds
 		}
 		$.post("${ctx}/npvr/saveNpvrIds.html", data,
 			function(response) {

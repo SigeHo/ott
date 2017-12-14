@@ -427,7 +427,8 @@ public class OttSnookerController {
 	public void test() {
 		logger.info("############ OttSchedualTask.retrieveSnookerRankData() ############");
 		String api = CustomizedPropertyConfigurer.getContextProperty("api.snooker_rank");
-		 String response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
+		String response = HttpClientUtil.getInstance().sendHttpGet(api);
+//		 String response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
 		if (StringUtils.isNotBlank(response)) {
 			List<OttSnookerRank> list = JsonUtil.parseJson2SnookerRank(response);
 			ottSnookerService.renewSnookerRankData(list);
