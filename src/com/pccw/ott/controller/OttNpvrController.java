@@ -1,7 +1,6 @@
 package com.pccw.ott.controller;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -14,7 +13,6 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -206,22 +204,17 @@ public class OttNpvrController {
 					channelNoArr[i] = mappingList.get(i).getChannelNo().toString();
 				}
 				ottNpvrMappingService.doSaveNpvrIds(sportType.toUpperCase(), fixtureId, mappingList);
-				if (StringUtils.isNotBlank(oldNpvrIds)) {
-					String api = CustomizedPropertyConfigurer.getContextProperty("api.update_npvr");
-					api += "&fixtureId=" + fixtureId + "&npvrId=";
-					for (int i = 0; i < npvrIdArr.length; i++) {
-						if (!oldNpvrIds.contains(npvrIdArr[i])) {
-							if (npvrIdArr.length != 1 && i < npvrIdArr.length - 1) {
-								api += npvrIdArr[i] + ",";
-							} else {
-								api += npvrIdArr[i];
-							}
-						}
+				String api = CustomizedPropertyConfigurer.getContextProperty("api.update_npvr");
+				api += "&fixtureId=" + fixtureId + "&npvrId=";
+				for (int i = 0; i < npvrIdArr.length; i++) {
+					if (npvrIdArr.length != 1 && i < npvrIdArr.length - 1) {
+						api += npvrIdArr[i] + ",";
+					} else {
+						api += npvrIdArr[i];
 					}
-					String response = HttpClientUtil.getInstance().sendHttpGet(api);
-//					String response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
-					logger.info(response);
 				}
+					String response = HttpClientUtil.getInstance().sendHttpGet(api);
+//				String response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
 				returnMap.put("success", true);
 				returnMap.put("npvrIds", String.join(",", npvrIdArr));
 				returnMap.put("channelNos", String.join(",", channelNoArr));

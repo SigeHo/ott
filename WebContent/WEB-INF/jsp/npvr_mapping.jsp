@@ -161,13 +161,10 @@
 			}
 			arr.push(npvrMapping);
 		}
-		/* var data = new Object();
-		data['npvrMappingList'] = JSON.stringify(arr); */
 		var data = {
 				"npvrMappingList" : JSON.stringify(arr),
 				"fixtureId" : row.fixtureId,
 				"sportType" : row.sportType,
-				"oldNpvrIds" : row.npvrIds
 		}
 		$.post("${ctx}/npvr/saveNpvrIds.html", data,
 			function(response) {
