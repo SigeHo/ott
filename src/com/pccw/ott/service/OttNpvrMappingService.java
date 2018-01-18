@@ -1,6 +1,7 @@
 package com.pccw.ott.service;
 
 import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 
 import com.pccw.ott.dto.OttNpvrMappingDto;
@@ -17,9 +18,11 @@ public interface OttNpvrMappingService {
 
 	public void clearNpvrIds(String sportType, String fixtureId);
 
-	public List<OttNpvrMappingDto> findByNpvrSearchDto(OttNpvrSearchDto npvrSearchDto);
-
 	public void doSaveNpvrIds(String sportType, String fixtureId, List<OttNpvrMapping> mappingList);
+
+	public void saveActualDateTime(String sportType, String fixtureId, Date actualStartDateTime, Date actualEndDateTime);
+
+	public void changeOverride(String sportType, String fixtureId, String isOverride);
 
 
 }

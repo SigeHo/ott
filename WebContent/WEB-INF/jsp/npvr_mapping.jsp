@@ -41,6 +41,7 @@
 		
 		$("#fixture_dg").datagrid({
 			singleSelect : true,
+			
 		    columns : [[
 		        {field : 'fixtureId', hidden : true},
 		        {field : 'channelNos', hidden : true},
@@ -61,12 +62,55 @@
 		        	return "<a href='#'>Edit</a>";
 		        }},
 		        {field : 'overrideCk', title : 'Override<br>Match<br>Date / Time', align : 'center', formatter : function(value, row, index) {
-		        	return "<input type='checkbox'>";
+		        	if (row.npvrIds && row.npvrIds.length > 0) {
+			        	if (row.isOverride == 'Y') {
+			        		return "<input id='isOverrideCk_" + index + "' type='checkbox' checked='checked' onclick='overrideDateTime(" + index + ")'>";	
+			        	} else {
+			        		return "<input id='isOverrideCk_" + index + "' type='checkbox' onclick='overrideDateTime(" + index + ")'>";
+			        	}
+		        	}
+		        	return "";
 		        }},
-		        {field : 'actualStartDate', title : 'Actual Start Date', width : 150, align : 'center'},
-		        {field : 'actualStartTime', title : 'Actual Start Time', width : 150, align : 'center'},
-		        {field : 'actualEndDate', title : 'Actual End Date', width : 150, align : 'center'},
-		        {field : 'actualEndTime', title : 'Actual End Time', width : 150, align : 'center'},
+		        {field : 'actualStartDate', title : 'Actual Start Date', width : 150, align : 'center', formatter : function(value,row,index) {
+		        	var cell = "";
+		        	if (value) {
+		        		cell = value + "<br>";
+		        	}
+		        	if (row.npvrIds && row.npvrIds.length > 0) {
+		        		cell += "<a href='#' onclick='openEditPopup(" + index + ", \"DateTime\")'>Edit</a>";	
+		        	}
+		        	return cell;
+		        }},
+		        {field : 'actualStartTime', title : 'Actual Start Time', width : 150, align : 'center', formatter : function(value,row,index) {
+		        	var cell = "";
+		        	if (value) {
+		        		cell = value + "<br>";
+		        	}
+		        	if (row.npvrIds && row.npvrIds.length > 0) {
+		        		cell += "<a href='#' onclick='openEditPopup(" + index + ", \"DateTime\")'>Edit</a>";	
+		        	}
+		        	return cell;
+		        }},
+		        {field : 'actualEndDate', title : 'Actual End Date', width : 150, align : 'center', formatter : function(value,row,index) {
+		        	var cell = "";
+		        	if (value) {
+		        		cell = value + "<br>";
+		        	}
+		        	if (row.npvrIds && row.npvrIds.length > 0) {
+		        		cell += "<a href='#' onclick='openEditPopup(" + index + ", \"DateTime\")'>Edit</a>";	
+		        	}
+		        	return cell;
+		        }},
+		        {field : 'actualEndTime', title : 'Actual End Time', width : 150, align : 'center', formatter : function(value,row,index) {
+		        	var cell = "";
+		        	if (value) {
+		        		cell = value + "<br>";
+		        	}
+		        	if (row.npvrIds && row.npvrIds.length > 0) {
+		        		cell += "<a href='#' onclick='openEditPopup(" + index + ", \"DateTime\")'>Edit</a>";	
+		        	}
+		        	return cell;
+		        }},
 		        {field : 'npvrIds', title : 'NPVR IDs', width : 120, align : 'center', formatter : function(value,row,index) {
 		        	var cell = "";
 		        	if (value) {
@@ -77,7 +121,7 @@
 			        		}
 			        	}
 		        	}
-					return cell += "<a href='#' onclick='openEditPopup(" + index + ")'>Edit</a>";
+					return cell += "<a href='#' onclick='openEditPopup(" + index + ", \"ID\")'>Edit</a>";
 		        }},
 		        {field : 'copyNpvrFrom', title : 'Copy<br>NPVR IDs<br>from', align : 'center', formatter : function(value,row,index) {
 		        	if (row.npvrIds && row.npvrIds.length > 0) {
@@ -93,6 +137,25 @@
 		    onLoadSuccess : function(data) {
 		    	$(".copy_npvr_to_btn").linkbutton();
 		    }
+		});
+		
+		$("#editActualDatePopup").dialog({
+			title : "Edit Actual Match Date And Time",
+			width : 400,
+			height : 250,
+			closed : true,
+			modal : true,
+			buttons : [{
+				text : "Save",
+				handler : function() {
+					saveActualDateTime();
+				}
+			}, {
+				text : "Cancel",
+				handler : function() {
+					$("#editActualDatePopup").dialog("close");
+				}
+			}]
 		});
 		
 		$("#editNpvrPopup").dialog({
@@ -114,6 +177,46 @@
 			}]
 		});
 	});
+	
+	function saveActualDateTime() {
+		if ($("#editActualDateForm").form("validate")) {
+			var row = $("#fixture_dg").datagrid("getSelected");
+			$.ajax({
+				url : '${ctx}/npvr/saveActualDateTime.html',
+				data : {
+					sportType : row.sportType,
+					fixtureId : row.fixtureId,
+					actualStartDate : $("#actualStartDate").val(),
+					actualStartTime : $("#actualStartTime").val(),
+					actualEndDate : $("#actualEndDate").val(),
+					actualEndTime :$("#actualEndTime").val()
+				},
+				success : function(response) {
+					if (response.success) {
+						$.messager.alert("", "Save actual date / time successfully.", "info");
+						$("#editActualDatePopup").dialog("close");
+						var updateIndex = $("#fixture_dg").datagrid("getRowIndex", row); 
+						$("#fixture_dg").datagrid("updateRow", {
+							index : updateIndex,
+							row : {
+								actualStartDate : $("#actualStartDate").val(),
+								actualStartTime : $("#actualStartTime").val(),
+								actualEndDate : $("#actualEndDate").val(),
+								actualEndTime :$("#actualEndTime").val()
+							}
+						});
+					} else if (response.msg) {
+						$.messager.alert("", response.msg, "error");
+					} else {
+						$.messager.alert("", "Failed to save actual date / time.", "error");
+					}
+				},
+				error : function(response) {
+					$.messager.alert("", "Failed to save actual date / time.", "error");
+				}
+			});
+		}
+	}
 	
 	
 	function verifyNpvrIds() {
@@ -243,6 +346,7 @@
 						},
 						error : function() {
 							$.messager.alert("", "Failed to clear NPVR IDs. Please try again.", "error");
+							ck.prop("checked", "checked");
 						}
 					});
 				} else {
@@ -255,21 +359,135 @@
 		}
 	}
 	
-	function openEditPopup(index) {
-		$("#npvrIds").textbox("clear");
+	function checkDateTime(row) {
+		if (!row.actualStartDate)
+			return false;
+		if (!row.actualStartTime)
+			return false;
+		if (!row.actualEndDate)
+			return false;
+		if (!row.actualEndTime)
+			return false;
+		return true;
+	}
+	
+	function overrideDateTime(index) {
+		var ck = $("#isOverrideCk_" + index);
 		var row = $("#fixture_dg").datagrid("getRows")[index];
-		if (row.npvrIds != null) {
-			var npvrArr = row.npvrIds.split(",");
-			if (npvrArr.length > 0) {
-				var npvrIds = "";
-				for (var i = 0; i < npvrArr.length; i++) {
-					npvrIds += npvrArr[i] + "\n";
-	    		}
-				$("#npvrIds").textbox("setText", npvrIds);
-			}
+		if (!checkDateTime(row)) {
+			$.messager.alert("", "Please save actual start & end date time first.", "warning");
+			ck.prop("checked", false);
+			return;
 		}
-		
-		$("#editNpvrPopup").dialog("open");
+		if (ck.is(':checked')) {
+			$.messager.confirm("Confirm", "Are you sure to override the match date / time?", function(r) {
+				if (r) {
+					var data = {
+							fixtureId : row.fixtureId,
+							sportType : row.sportType,
+							isOverride : "Y"
+					}
+					$.ajax({
+						url : '${ctx}/npvr/changeOverride.html',
+						data : data,
+						type : "post",
+						success : function(response) {
+							if (response.success) {
+								$.messager.alert("", "Override successfully.", "info");
+								$("#fixture_dg").datagrid("updateRow", {
+									index : index,
+									row : {
+										isOverride : "Y"
+									}
+								});
+							} else {
+								if (response.msg) {
+									$.messager.alert("", response.msg, "error");	
+								} else {
+									$.messager.alert("", "Failed to override match date / time. Please try again.", "error");
+								}
+								ck.prop("checked", false);
+							}
+						},
+						error : function() {
+							$.messager.alert("", "Failed to override match date / time. Please try again.", "error");
+							ck.prop("checked", false);
+						}
+					});
+				} else {
+					ck.prop("checked", false);
+				}
+			});
+		} else {
+			$.messager.confirm("Confirm", "Are you sure to clear the override?", function(r) {
+				if (r) {
+					var data = {
+						fixtureId : row.fixtureId,
+						sportType : row.sportType,
+						isOverride : "N"
+					}
+					$.ajax({
+						url : '${ctx}/npvr/changeOverride.html',
+						data : data,
+						type : "post",
+						success : function(response) {
+							if (response.success) {
+								$.messager.alert("", "Clear override successfully.", "info");
+								$("#fixture_dg").datagrid("updateRow", {
+									index : index,
+									row : {
+										isOverride : "N"
+									}
+								});
+							} else {
+								if (response.msg) {
+									$.messager.alert("", response.msg, "error");	
+								} else {
+									$.messager.alert("", "Failed to clear the override. Please try again.", "error");
+								}
+								ck.prop("checked", "checked");
+							}
+						},
+						error : function() {
+							$.messager.alert("", "Failed to clear the override. Please try again.", "error");
+							ck.prop("checked", "checked");
+						}
+					});
+				} else {
+					ck.prop("checked", "checked");
+				}
+			});
+		}
+	}
+	
+	function openEditPopup(index, type) {
+		var row = $("#fixture_dg").datagrid("getRows")[index];
+		if (type == 'ID') {
+			$("#npvrIds").textbox("clear");
+			if (row.npvrIds != null) {
+				var npvrArr = row.npvrIds.split(",");
+				if (npvrArr.length > 0) {
+					var npvrIds = "";
+					for (var i = 0; i < npvrArr.length; i++) {
+						npvrIds += npvrArr[i] + "\n";
+		    		}
+					$("#npvrIds").textbox("setText", npvrIds);
+				}
+			}
+			$("#editNpvrPopup").dialog("open");
+		} else if (type == 'DateTime') {
+			$("#actualStartDate").datebox("clear");
+			$("#actualStartTime").timespinner("clear");
+			$("#actualEndDate").datebox("clear");
+			$("#actualEndTime").timespinner("clear");
+			if (checkDateTime(row)) {
+				$("#actualStartDate").datebox("setValue", row.actualStartDate);
+				$("#actualStartTime").timespinner("setValue", row.actualStartTime);
+				$("#actualEndDate").datebox("setValue", row.actualEndDate);
+				$("#actualEndTime").timespinner("setValue", row.actualEndTime);
+			}
+			$("#editActualDatePopup").dialog("open");
+		}
 	}
 	
 	function copyNpvrIds(index) {
@@ -399,6 +617,28 @@
 						<td align="center">
 							<input id="npvrIds" class="easyui-textbox" data-options="multiline:true, width:300, height:150, required: true, validType: 'npvrIds'" >
 						</td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<div id="editActualDatePopup">
+			<form id="editActualDateForm">
+				<table style="border-collapse: separate; border-spacing: 10px; width: 100%">
+					<tr>
+						<td align="right">Actual Start Date</td>
+						<td><input id="actualStartDate" name="actualStartDate" class="easyui-datebox" required="required"></td>
+					</tr>
+					<tr>
+						<td align="right">Actual Start Time</td>
+						<td><input id="actualStartTime" name="actualStartTime" class="easyui-timespinner" required="required"></td>
+					</tr>
+					<tr>
+						<td align="right">Actual End Date</td>
+						<td><input id="actualEndDate" name="actualEndDate" class="easyui-datebox" required="required"></td>
+					</tr>
+					<tr>
+						<td align="right">Actual End Time</td>
+						<td><input id="actualEndTime" name="actualEndTime" class="easyui-timespinner" required="required"></td>
 					</tr>
 				</table>
 			</form>

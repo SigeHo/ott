@@ -29,12 +29,6 @@ public class OttNpvrMappingServiceImpl implements OttNpvrMappingService {
 	private OttSnookerScoreDao ottSnookerScoreDao;
 	
 	@Override
-	public List<OttNpvrMappingDto> findByNpvrSearchDto(OttNpvrSearchDto npvrSearchDto) {
-		// TODO
-		return null;
-	}
-	
-	@Override
 	public List<OttNpvrMappingDto> findForSnookerFixture() {
 		List<OttNpvrMappingDto> list = new ArrayList<>();
 		OttNpvrMappingDto dto = null;
@@ -79,6 +73,18 @@ public class OttNpvrMappingServiceImpl implements OttNpvrMappingService {
 								channelNos += mappings.get(i).getChannelNo().toString() + ",";
 							}
 						}
+						String isOverride = mappings.get(0).getIsOverride();
+						Date actualStartDateTime = mappings.get(0).getActualStartDateTime();
+						if (actualStartDateTime != null) {
+							dto.setActualStartDate(sdf.format(actualStartDateTime).split(" ")[0]);
+							dto.setActualStartTime(sdf.format(actualStartDateTime).split(" ")[1]);
+						}
+						Date actualEndDateTime = mappings.get(0).getActualEndDateTime();
+						if (actualEndDateTime != null) {
+							dto.setActualEndDate(sdf.format(actualEndDateTime).split(" ")[0]);
+							dto.setActualEndTime(sdf.format(actualEndDateTime).split(" ")[1]);
+						}
+						dto.setIsOverride(isOverride);
 						dto.setNpvrIds(npvrIds);
 						dto.setChannelNos(channelNos);
 						filterList.add(dto);
@@ -98,6 +104,18 @@ public class OttNpvrMappingServiceImpl implements OttNpvrMappingService {
 									channelNos += mappings.get(i).getChannelNo().toString() + ",";
 								}
 							}
+							String isOverride = mappings.get(0).getIsOverride();
+							Date actualStartDateTime = mappings.get(0).getActualStartDateTime();
+							if (actualStartDateTime != null) {
+								dto.setActualStartDate(sdf.format(actualStartDateTime).split(" ")[0]);
+								dto.setActualStartTime(sdf.format(actualStartDateTime).split(" ")[1]);
+							}
+							Date actualEndDateTime = mappings.get(0).getActualEndDateTime();
+							if (actualEndDateTime != null) {
+								dto.setActualEndDate(sdf.format(actualEndDateTime).split(" ")[0]);
+								dto.setActualEndTime(sdf.format(actualEndDateTime).split(" ")[1]);
+							}
+							dto.setIsOverride(isOverride);
 							dto.setNpvrIds(npvrIds);
 							dto.setChannelNos(channelNos);
 						}
@@ -113,6 +131,18 @@ public class OttNpvrMappingServiceImpl implements OttNpvrMappingService {
 								channelNos += mappings.get(i).getChannelNo().toString() + ",";
 							}
 						}
+						String isOverride = mappings.get(0).getIsOverride();
+						Date actualStartDateTime = mappings.get(0).getActualStartDateTime();
+						if (actualStartDateTime != null) {
+							dto.setActualStartDate(sdf.format(actualStartDateTime).split(" ")[0]);
+							dto.setActualStartTime(sdf.format(actualStartDateTime).split(" ")[1]);
+						}
+						Date actualEndDateTime = mappings.get(0).getActualEndDateTime();
+						if (actualEndDateTime != null) {
+							dto.setActualEndDate(sdf.format(actualEndDateTime).split(" ")[0]);
+							dto.setActualEndTime(sdf.format(actualEndDateTime).split(" ")[1]);
+						}
+						dto.setIsOverride(isOverride);
 						dto.setNpvrIds(npvrIds);
 						dto.setChannelNos(channelNos);
 						filterList.add(dto);
@@ -139,6 +169,16 @@ public class OttNpvrMappingServiceImpl implements OttNpvrMappingService {
 	public void doSaveNpvrIds(String sportType, String fixtureId, List<OttNpvrMapping> mappingList) {
 		ottNpvrMappingDao.deleteByParameters(sportType, fixtureId);
 		ottNpvrMappingDao.batchSave(mappingList);
+	}
+	
+	@Override
+	public void saveActualDateTime(String sportType, String fixtureId, Date actualStartDateTime, Date actualEndDateTime) {
+		ottNpvrMappingDao.saveActualDateTime(sportType, fixtureId, actualStartDateTime, actualEndDateTime);
+	}
+	
+@Override
+	public void changeOverride(String sportType, String fixtureId, String isOverride) {
+		ottNpvrMappingDao.updateIsOverride(sportType, fixtureId, isOverride);		
 	}
 	
 }

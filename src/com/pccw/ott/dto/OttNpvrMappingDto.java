@@ -14,6 +14,7 @@ public class OttNpvrMappingDto implements Serializable {
 	private String teamA;
 	private String teamB;
 	private String status;
+	private String isOverride;
 	private String actualStartDate;
 	private String actualStartTime;
 	private String actualEndDate;
@@ -82,6 +83,14 @@ public class OttNpvrMappingDto implements Serializable {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public String getIsOverride() {
+		return isOverride;
+	}
+
+	public void setIsOverride(String isOverride) {
+		this.isOverride = isOverride;
 	}
 
 	public String getActualStartDate() {

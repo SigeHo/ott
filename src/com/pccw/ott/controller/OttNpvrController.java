@@ -30,9 +30,11 @@ import com.pccw.ott.dto.OttNpvrSearchDto;
 import com.pccw.ott.model.OttNpvrMapping;
 import com.pccw.ott.service.OttNpvrMappingService;
 import com.pccw.ott.service.OttSnookerService;
+import com.pccw.ott.util.Constants;
 import com.pccw.ott.util.CustomizedPropertyConfigurer;
 import com.pccw.ott.util.HttpClientUtil;
 import com.pccw.ott.util.JsonUtil;
+import com.sun.xml.internal.ws.api.server.SDDocumentFilter;
 
 @Controller
 @RequestMapping("/npvr")
@@ -87,8 +89,13 @@ public class OttNpvrController {
 				switch (npvrSearchDto.getSportType()) {
 				case "SOCCER":
 					api = CustomizedPropertyConfigurer.getContextProperty("api.soccer_fixture") + "&start_date=" + start_date + "&days=" + days;
-					String response = HttpClientUtil.getInstance().sendHttpGet(api);
-//					String response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
+					String response = "";
+					if (Constants.PROXY.equals("true")) {
+						response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
+					} else {
+						response = HttpClientUtil.getInstance().sendHttpGet(api);						
+					}
+					
 					if (StringUtils.isNotBlank(response)) {
 						allList = JsonUtil.parseJson2NpvrMapping(response);
 					}
@@ -140,7 +147,12 @@ public class OttNpvrController {
 				}
 			}
 			String api = CustomizedPropertyConfigurer.getContextProperty("api.npvr_verification") + q;
-			String response = HttpClientUtil.getInstance().sendHttpGet(api);
+			String response = "";
+			if (Constants.PROXY.equals("true")) {
+				response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
+			} else {
+				response = HttpClientUtil.getInstance().sendHttpGet(api);						
+			}
 			if (StringUtils.isNotBlank(response)) {
 				Map<String, Object> reponseMap = JsonUtil.verifyNpvrIds(response, npvrIdArr);
 				List<String> invalidIds = (List<String>) reponseMap.get("invalidNpvr");
@@ -176,8 +188,12 @@ public class OttNpvrController {
 		String fixtureId = request.getParameter("fixtureId");
 		ottNpvrMappingService.clearNpvrIds(sportType.toUpperCase(), fixtureId);
 		String api = CustomizedPropertyConfigurer.getContextProperty("api.remove_nprv") + "&fixtureId=" + fixtureId;
-//		String response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
-		String response = HttpClientUtil.getInstance().sendHttpGet(api);
+		String response = "";
+		if (Constants.PROXY.equals("true")) {
+			response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
+		} else {
+			response = HttpClientUtil.getInstance().sendHttpGet(api);						
+		}
 		logger.info(response);
 		returnMap.put("success", true);
 		return returnMap;
@@ -190,7 +206,6 @@ public class OttNpvrController {
 		String npvrMappingStr = request.getParameter("npvrMappingList");
 		String sportType = request.getParameter("sportType");
 		String fixtureId = request.getParameter("fixtureId");
-		String oldNpvrIds = request.getParameter("oldNpvrIds");
 		ObjectMapper mapper = new ObjectMapper();
 		JavaType javaType = mapper.getTypeFactory().constructParametricType(ArrayList.class, OttNpvrMapping.class);
 		List<OttNpvrMapping> mappingList = new ArrayList<>();
@@ -213,8 +228,12 @@ public class OttNpvrController {
 						api += npvrIdArr[i];
 					}
 				}
-					String response = HttpClientUtil.getInstance().sendHttpGet(api);
-//				String response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
+				String response = "";
+				if (Constants.PROXY.equals("true")) {
+					response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
+				} else {
+					response = HttpClientUtil.getInstance().sendHttpGet(api);						
+				}
 				returnMap.put("success", true);
 				returnMap.put("npvrIds", String.join(",", npvrIdArr));
 				returnMap.put("channelNos", String.join(",", channelNoArr));
@@ -226,6 +245,42 @@ public class OttNpvrController {
 			}
 		}
 
+		return returnMap;
+	}
+	
+	@RequestMapping("/saveActualDateTime.html")
+	@ResponseBody
+	public Map<String, Object> saveActualDateTime(HttpServletRequest request) {
+		Map<String, Object> returnMap = new HashMap<>();
+		String sportType = request.getParameter("sportType");
+		String fixtureId = request.getParameter("fixtureId");
+		String actualStartDate = request.getParameter("actualStartDate");
+		String actualStartTime = request.getParameter("actualStartTime");
+		String actualEndDate = request.getParameter("actualEndDate");
+		String actualEndTime = request.getParameter("actualEndTime");
+		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm");
+		try {
+			Date actualStartDateTime = sdf.parse(actualStartDate + " " + actualStartTime);
+			Date actualEndDateTime = sdf.parse(actualEndDate + " " + actualEndTime);
+			ottNpvrMappingService.saveActualDateTime(sportType, fixtureId, actualStartDateTime, actualEndDateTime);
+			returnMap.put("success", true);
+		} catch (ParseException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+			returnMap.put("success", false);
+		}
+		return returnMap;
+	}
+	
+	@RequestMapping("/changeOverride.html")
+	@ResponseBody
+	public Map<String, Object> changeOverride(HttpServletRequest request) {
+		Map<String, Object> returnMap = new HashMap<>();
+		String sportType = request.getParameter("sportType");
+		String fixtureId = request.getParameter("fixtureId");
+		String isOverride = request.getParameter("isOverride");
+		ottNpvrMappingService.changeOverride(sportType, fixtureId, isOverride);
+		returnMap.put("success", true);
 		return returnMap;
 	}
 	

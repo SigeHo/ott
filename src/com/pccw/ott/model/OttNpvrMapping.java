@@ -24,7 +24,8 @@ public class OttNpvrMapping implements Serializable {
 	private String fixtureId;
 	private String npvrId;
 	private Date actualStartDateTime;
-	private Date acutalEndDateTime;
+	private Date actualEndDateTime;
+	private String isOverride;
 
 	@Column(name = "id")
 	@Id
@@ -85,12 +86,21 @@ public class OttNpvrMapping implements Serializable {
 
 	@Column(name = "actual_end_date_time")
 	@Temporal(TemporalType.TIMESTAMP)
-	public Date getAcutalEndDateTime() {
-		return acutalEndDateTime;
+	public Date getActualEndDateTime() {
+		return actualEndDateTime;
 	}
 
-	public void setAcutalEndDateTime(Date acutalEndDateTime) {
-		this.acutalEndDateTime = acutalEndDateTime;
+	public void setActualEndDateTime(Date actualEndDateTime) {
+		this.actualEndDateTime = actualEndDateTime;
+	}
+
+	@Column(name = "is_override")
+	public String getIsOverride() {
+		return isOverride;
+	}
+
+	public void setIsOverride(String isOverride) {
+		this.isOverride = isOverride;
 	}
 
 }

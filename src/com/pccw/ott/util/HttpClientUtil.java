@@ -54,28 +54,28 @@ public class HttpClientUtil {
 	}
 
 	/**
-	 * ·¢ËÍ postÇëÇó
+	 * å‘é€ postè¯·æ±‚
 	 * 
 	 * @param httpUrl
-	 *            µØÖ·
+	 *            åœ°å€
 	 */
 	public String sendHttpPost(String httpUrl) {
-		HttpPost httpPost = new HttpPost(httpUrl);// ´´½¨httpPost
+		HttpPost httpPost = new HttpPost(httpUrl);// åˆ›å»ºhttpPost
 		return sendHttpPost(httpPost);
 	}
 
 	/**
-	 * ·¢ËÍ postÇëÇó
+	 * å‘é€ postè¯·æ±‚
 	 * 
 	 * @param httpUrl
-	 *            µØÖ·
+	 *            åœ°å€
 	 * @param params
-	 *            ²ÎÊı(¸ñÊ½:key1=value1&key2=value2)
+	 *            å‚æ•°(æ ¼å¼:key1=value1&key2=value2)
 	 */
 	public String sendHttpPost(String httpUrl, String params) {
-		HttpPost httpPost = new HttpPost(httpUrl);// ´´½¨httpPost
+		HttpPost httpPost = new HttpPost(httpUrl);// åˆ›å»ºhttpPost
 		try {
-			// ÉèÖÃ²ÎÊı
+			// è®¾ç½®å‚æ•°
 			StringEntity stringEntity = new StringEntity(params, "UTF-8");
 			stringEntity.setContentType("application/x-www-form-urlencoded");
 			httpPost.setEntity(stringEntity);
@@ -86,16 +86,16 @@ public class HttpClientUtil {
 	}
 
 	/**
-	 * ·¢ËÍ postÇëÇó
+	 * å‘é€ postè¯·æ±‚
 	 * 
 	 * @param httpUrl
-	 *            µØÖ·
+	 *            åœ°å€
 	 * @param maps
-	 *            ²ÎÊı
+	 *            å‚æ•°
 	 */
 	public String sendHttpPost(String httpUrl, Map<String, String> maps) {
-		HttpPost httpPost = new HttpPost(httpUrl);// ´´½¨httpPost
-		// ´´½¨²ÎÊı¶ÓÁĞ
+		HttpPost httpPost = new HttpPost(httpUrl);// åˆ›å»ºhttpPost
+		// åˆ›å»ºå‚æ•°é˜Ÿåˆ—
 		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 		for (String key : maps.keySet()) {
 			nameValuePairs.add(new BasicNameValuePair(key, maps.get(key)));
@@ -110,17 +110,17 @@ public class HttpClientUtil {
 	}
 
 	/**
-	 * ·¢ËÍ postÇëÇó£¨´øÎÄ¼ş£©
+	 * å‘é€ postè¯·æ±‚ï¼ˆå¸¦æ–‡ä»¶ï¼‰
 	 * 
 	 * @param httpUrl
-	 *            µØÖ·
+	 *            åœ°å€
 	 * @param maps
-	 *            ²ÎÊı
+	 *            å‚æ•°
 	 * @param fileLists
-	 *            ¸½¼ş
+	 *            é™„ä»¶
 	 */
 	public String sendHttpPost(String httpUrl, Map<String, String> maps, List<File> fileLists) {
-		HttpPost httpPost = new HttpPost(httpUrl);// ´´½¨httpPost
+		HttpPost httpPost = new HttpPost(httpUrl);// åˆ›å»ºhttpPost
 		MultipartEntityBuilder meBuilder = MultipartEntityBuilder.create();
 		for (String key : maps.keySet()) {
 			meBuilder.addPart(key, new StringBody(maps.get(key), ContentType.TEXT_PLAIN));
@@ -135,7 +135,7 @@ public class HttpClientUtil {
 	}
 
 	/**
-	 * ·¢ËÍPostÇëÇó
+	 * å‘é€Postè¯·æ±‚
 	 * 
 	 * @param httpPost
 	 * @return
@@ -146,10 +146,10 @@ public class HttpClientUtil {
 		HttpEntity entity = null;
 		String responseContent = null;
 		try {
-			// ´´½¨Ä¬ÈÏµÄhttpClientÊµÀı.
+			// åˆ›å»ºé»˜è®¤çš„httpClientå®ä¾‹.
 			httpClient = HttpClients.createDefault();
 			httpPost.setConfig(requestConfig);
-			// Ö´ĞĞÇëÇó
+			// æ‰§è¡Œè¯·æ±‚
 			response = httpClient.execute(httpPost);
 			entity = response.getEntity();
 			responseContent = EntityUtils.toString(entity, "UTF-8");
@@ -157,7 +157,7 @@ public class HttpClientUtil {
 			e.printStackTrace();
 		} finally {
 			try {
-				// ¹Ø±ÕÁ¬½Ó,ÊÍ·Å×ÊÔ´
+				// å…³é—­è¿æ¥,é‡Šæ”¾èµ„æº
 				if (response != null) {
 					response.close();
 				}
@@ -172,27 +172,27 @@ public class HttpClientUtil {
 	}
 
 	/**
-	 * ·¢ËÍ getÇëÇó
+	 * å‘é€ getè¯·æ±‚
 	 * 
 	 * @param httpUrl
 	 */
 	public String sendHttpGet(String httpUrl) {
-		HttpGet httpGet = new HttpGet(httpUrl);// ´´½¨getÇëÇó
+		HttpGet httpGet = new HttpGet(httpUrl);// åˆ›å»ºgetè¯·æ±‚
 		return sendHttpGet(httpGet);
 	}
 
 	/**
-	 * ·¢ËÍ getÇëÇóHttps
+	 * å‘é€ getè¯·æ±‚Https
 	 * 
 	 * @param httpUrl
 	 */
 	public String sendHttpsGet(String httpUrl) {
-		HttpGet httpGet = new HttpGet(httpUrl);// ´´½¨getÇëÇó
+		HttpGet httpGet = new HttpGet(httpUrl);// åˆ›å»ºgetè¯·æ±‚
 		return sendHttpsGet(httpGet);
 	}
 
 	/**
-	 * ·¢ËÍGetÇëÇó
+	 * å‘é€Getè¯·æ±‚
 	 * 
 	 * @param httpPost
 	 * @return
@@ -203,10 +203,10 @@ public class HttpClientUtil {
 		HttpEntity entity = null;
 		String responseContent = null;
 		try {
-			// ´´½¨Ä¬ÈÏµÄhttpClientÊµÀı.
+			// åˆ›å»ºé»˜è®¤çš„httpClientå®ä¾‹.
 			httpClient = HttpClients.createDefault();
 			httpGet.setConfig(requestConfig);
-			// Ö´ĞĞÇëÇó
+			// æ‰§è¡Œè¯·æ±‚
 			response = httpClient.execute(httpGet);
 			entity = response.getEntity();
 			responseContent = EntityUtils.toString(entity, "UTF-8");
@@ -214,7 +214,7 @@ public class HttpClientUtil {
 			e.printStackTrace();
 		} finally {
 			try {
-				// ¹Ø±ÕÁ¬½Ó,ÊÍ·Å×ÊÔ´
+				// å…³é—­è¿æ¥,é‡Šæ”¾èµ„æº
 				if (response != null) {
 					response.close();
 				}
@@ -229,7 +229,7 @@ public class HttpClientUtil {
 	}
 
 	/**
-	 * ·¢ËÍGetÇëÇóHttps
+	 * å‘é€Getè¯·æ±‚Https
 	 * 
 	 * @param httpPost
 	 * @return
@@ -240,12 +240,12 @@ public class HttpClientUtil {
 		HttpEntity entity = null;
 		String responseContent = null;
 		try {
-			// ´´½¨Ä¬ÈÏµÄhttpClientÊµÀı.
+			// åˆ›å»ºé»˜è®¤çš„httpClientå®ä¾‹.
 			PublicSuffixMatcher publicSuffixMatcher = PublicSuffixMatcherLoader.load(new URL(httpGet.getURI().toString()));
 			DefaultHostnameVerifier hostnameVerifier = new DefaultHostnameVerifier(publicSuffixMatcher);
 			httpClient = HttpClients.custom().setSSLHostnameVerifier(hostnameVerifier).build();
 			httpGet.setConfig(requestConfig);
-			// Ö´ĞĞÇëÇó
+			// æ‰§è¡Œè¯·æ±‚
 			response = httpClient.execute(httpGet);
 			entity = response.getEntity();
 			responseContent = EntityUtils.toString(entity, "UTF-8");
@@ -253,7 +253,7 @@ public class HttpClientUtil {
 			e.printStackTrace();
 		} finally {
 			try {
-				// ¹Ø±ÕÁ¬½Ó,ÊÍ·Å×ÊÔ´
+				// å…³é—­è¿æ¥,é‡Šæ”¾èµ„æº
 				if (response != null) {
 					response.close();
 				}
@@ -274,16 +274,16 @@ public class HttpClientUtil {
 		HttpEntity entity = null;
 		String responseContent = null;
 		try {
-			//ÉèÖÃ´úÀíIP¡¢¶Ë¿Ú¡¢Ğ­Òé£¨Çë·Ö±ğÌæ»»£©
+			//è®¾ç½®ä»£ç†IPã€ç«¯å£ã€åè®®ï¼ˆè¯·åˆ†åˆ«æ›¿æ¢ï¼‰
 			HttpHost proxy = new HttpHost(hostname, port, scheme);
 
-	        //°Ñ´úÀíÉèÖÃµ½ÇëÇóÅäÖÃ
+	        //æŠŠä»£ç†è®¾ç½®åˆ°è¯·æ±‚é…ç½®
 			RequestConfig defaultRequestConfig = RequestConfig.custom().setProxy(proxy).build();
 			
-			// ´´½¨Ä¬ÈÏµÄhttpClientÊµÀı.
+			// åˆ›å»ºé»˜è®¤çš„httpClientå®ä¾‹.
 			httpClient = HttpClients.custom().setDefaultRequestConfig(defaultRequestConfig).build();
 //			httpGet.setConfig(defaultRequestConfig);
-			// Ö´ĞĞÇëÇó
+			// æ‰§è¡Œè¯·æ±‚
 			response = httpClient.execute(httpGet);
 			entity = response.getEntity();
 			responseContent = EntityUtils.toString(entity, "UTF-8");
@@ -291,7 +291,7 @@ public class HttpClientUtil {
 			e.printStackTrace();
 		} finally {
 			try {
-				// ¹Ø±ÕÁ¬½Ó,ÊÍ·Å×ÊÔ´
+				// å…³é—­è¿æ¥,é‡Šæ”¾èµ„æº
 				if (response != null) {
 					response.close();
 				}
@@ -307,11 +307,11 @@ public class HttpClientUtil {
 	
 	public String readFile(String filePath) {
 		StringBuffer sb = new StringBuffer();
-		File file = new File(filePath);// ´ò¿ªÎÄ¼ş
+		File file = new File(filePath);// æ‰“å¼€æ–‡ä»¶
 		BufferedReader reader = null;
 		try {
 			FileInputStream in = new FileInputStream(file);
-			reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));// ¶ÁÈ¡ÎÄ¼ş
+			reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));// è¯»å–æ–‡ä»¶
 			String tempString = null;
 			while ((tempString = reader.readLine()) != null) {
 				sb.append(tempString);

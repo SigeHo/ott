@@ -181,5 +181,7 @@ public class Constants {
 	public static String TEST_DB = "/testDB.html";
 	
 	public static String DEFAULT_PASSWORD = "admin";
+	
+	public static String PROXY = CustomizedPropertyConfigurer.getContextProperty("api.proxy");
 
 }

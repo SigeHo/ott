@@ -1,5 +1,6 @@
 package com.pccw.ott.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.HibernateException;
@@ -12,12 +13,13 @@ import org.springframework.stereotype.Repository;
 import com.pccw.ott.model.OttNpvrMapping;
 
 @Repository("ottNpvrMappingDao")
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class OttNpvrMappingDaoImpl extends HibernateDaoSupport implements OttNpvrMappingDao {
-	
+
 	@Override
 	public List<OttNpvrMapping> findByFixtureIdAndSportType(String fixtureId, String sportType) {
-		return (List<OttNpvrMapping>) this.getHibernateTemplate().find("from OttNpvrMapping where fixtureId = ? and sportType = ?", fixtureId, sportType);
+		return (List<OttNpvrMapping>) this.getHibernateTemplate().find("from OttNpvrMapping where fixtureId = ? and sportType = ?", fixtureId,
+				sportType);
 	}
 
 	@Override
@@ -27,32 +29,67 @@ public class OttNpvrMappingDaoImpl extends HibernateDaoSupport implements OttNpv
 
 	@Override
 	public List<OttNpvrMapping> findByFixtureIdAndChannelNo(String fixtureId, int channelNo) {
-		return (List<OttNpvrMapping>) this.getHibernateTemplate().find("from OttNpvrMapping where fixtureId = ? and channelNo = ?", fixtureId, channelNo);
+		return (List<OttNpvrMapping>) this.getHibernateTemplate().find("from OttNpvrMapping where fixtureId = ? and channelNo = ?", fixtureId,
+				channelNo);
 	}
-	
+
 	@Override
 	public void batchSave(List<OttNpvrMapping> list) {
 		for (OttNpvrMapping ottNpvrMapping : list) {
 			this.getHibernateTemplate().save(ottNpvrMapping);
 		}
 	}
-	
+
 	@Override
 	public List<OttNpvrMapping> findByParameters(String sportType, String fixtureId, Integer channelNo) {
-		return (List<OttNpvrMapping>) this.getHibernateTemplate().find("from OttNpvrMapping where sportType = ? and fixtureId = ? and channelNo = ?", sportType, fixtureId, channelNo);
+		return (List<OttNpvrMapping>) this.getHibernateTemplate().find("from OttNpvrMapping where sportType = ? and fixtureId = ? and channelNo = ?",
+				sportType, fixtureId, channelNo);
 	}
-	
+
 	@Override
 	public List<OttNpvrMapping> findAll() {
 		return (List<OttNpvrMapping>) this.getHibernateTemplate().find("from OttNpvrMapping");
 	}
-	
+
 	@Override
 	public void deleteByParameters(String sportType, String fixtureId) {
 		this.getHibernateTemplate().execute(new HibernateCallback() {
 			@Override
 			public Object doInHibernate(Session session) throws HibernateException {
 				Query query = session.createQuery("delete from OttNpvrMapping where sportType = :sportType and fixtureId = :fixtureId");
+				query.setParameter("sportType", sportType);
+				query.setParameter("fixtureId", fixtureId);
+				query.executeUpdate();
+				return null;
+			}
+		});
+	}
+
+	@Override
+	public void saveActualDateTime(String sportType, String fixtureId, Date actualStartDateTime, Date actualEndDateTime) {
+		this.getHibernateTemplate().execute(new HibernateCallback() {
+			@Override
+			public Object doInHibernate(Session session) throws HibernateException {
+				String hql = "update OttNpvrMapping set actualStartDateTime = :actualStartDateTime, actualEndDateTime = :actualEndDateTime where sportType = :sportType and fixtureId = :fixtureId";
+				Query query = session.createQuery(hql);
+				query.setParameter("actualStartDateTime", actualStartDateTime);
+				query.setParameter("actualEndDateTime", actualEndDateTime);
+				query.setParameter("sportType", sportType);
+				query.setParameter("fixtureId", fixtureId);
+				query.executeUpdate();
+				return null;
+			}
+		});
+	}
+
+	@Override
+	public void updateIsOverride(String sportType, String fixtureId, String isOverride) {
+		this.getHibernateTemplate().execute(new HibernateCallback() {
+			@Override
+			public Object doInHibernate(Session session) throws HibernateException {
+				String hql = "update OttNpvrMapping set isOverride = :isOverride where sportType = :sportType and fixtureId = :fixtureId";
+				Query query = session.createQuery(hql);
+				query.setParameter("isOverride", isOverride);
 				query.setParameter("sportType", sportType);
 				query.setParameter("fixtureId", fixtureId);
 				query.executeUpdate();
