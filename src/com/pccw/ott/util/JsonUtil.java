@@ -1,7 +1,6 @@
 package com.pccw.ott.util;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -358,7 +357,8 @@ public class JsonUtil {
 	}
 
 	public static List<Map<String, String>> parseJson2SoccerLeagueList(String response) {
-		ObjectMapper mapper = new ObjectMapper();
+		/*ObjectMapper mapper = new ObjectMapper();
+		@SuppressWarnings("unused")
 		List<Map<String, String>> leagueList = new ArrayList<>();
 		try {
 			JsonNode rootNode = mapper.readTree(response);
@@ -368,7 +368,7 @@ public class JsonUtil {
 		} catch (IOException e) {
 			e.printStackTrace();
 			logger.error(e.getMessage());
-		}
+		}*/
 		return null;
 	}
 

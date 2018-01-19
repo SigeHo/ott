@@ -156,10 +156,6 @@ public class OttSnookerServiceImpl implements OttSnookerService {
 		this.saveSnookerLeauge(league);
 	}
 	
-	private void clearSnookerScoreData() {
-		ottSnookerScoreDao.deleteAll();
-	}
-	
 	private void clearSnookerRankData() {
 		ottSnookerRankDao.deleteAllSnookerRank();
 	}

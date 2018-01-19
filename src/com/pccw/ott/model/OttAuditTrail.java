@@ -1,7 +1,6 @@
 package com.pccw.ott.model;
 
 import java.io.Serializable;
-import java.sql.Clob;
 import java.util.Date;
 
 import javax.persistence.Column;

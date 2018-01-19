@@ -13,6 +13,7 @@ import javax.persistence.Table;
 @Table(name = "ott_snooker_rank_point")
 public class OttSnookerRankPoint implements Serializable {
 
+	private static final long serialVersionUID = 7633445998776600376L;
 	private Long id;
 	private Long playerId;
 	private Long pointId;

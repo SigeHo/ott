@@ -8,8 +8,6 @@ import org.hibernate.Session;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.query.Query;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.orm.hibernate5.HibernateCallback;
 import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
 import org.springframework.stereotype.Repository;
@@ -18,9 +16,8 @@ import com.pccw.ott.model.OttUser;
 
 
 @Repository("ottUserDao")
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class OttUserDaoImpl extends HibernateDaoSupport implements OttUserDao {
-
-	private static Logger logger = LoggerFactory.getLogger(OttUserDaoImpl.class);
 
 	@Override
 	public OttUser findUserByUsernameAndPassword(String username, String password) {
@@ -33,7 +30,6 @@ public class OttUserDaoImpl extends HibernateDaoSupport implements OttUserDao {
 	}
 
 	@Override
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public List<OttUser> findUserByUserName(String usernameForSearch, int first, int max) {
 		return this.getHibernateTemplate().execute(new HibernateCallback<List<OttUser>>() {
 			@Override
@@ -64,7 +60,6 @@ public class OttUserDaoImpl extends HibernateDaoSupport implements OttUserDao {
 		this.getHibernateTemplate().delete(user);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public OttUser findExactByUsername(String username) {
 		DetachedCriteria criteria = DetachedCriteria.forClass(OttUser.class);

@@ -34,10 +34,10 @@ import com.pccw.ott.util.Constants;
 import com.pccw.ott.util.CustomizedPropertyConfigurer;
 import com.pccw.ott.util.HttpClientUtil;
 import com.pccw.ott.util.JsonUtil;
-import com.sun.xml.internal.ws.api.server.SDDocumentFilter;
 
 @Controller
 @RequestMapping("/npvr")
+@SuppressWarnings("unchecked")
 public class OttNpvrController {
 
 	private static Logger logger = LoggerFactory.getLogger(OttNpvrController.class);
@@ -228,11 +228,10 @@ public class OttNpvrController {
 						api += npvrIdArr[i];
 					}
 				}
-				String response = "";
 				if (Constants.PROXY.equals("true")) {
-					response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
+					HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
 				} else {
-					response = HttpClientUtil.getInstance().sendHttpGet(api);						
+					HttpClientUtil.getInstance().sendHttpGet(api);						
 				}
 				returnMap.put("success", true);
 				returnMap.put("npvrIds", String.join(",", npvrIdArr));
@@ -262,8 +261,13 @@ public class OttNpvrController {
 		try {
 			Date actualStartDateTime = sdf.parse(actualStartDate + " " + actualStartTime);
 			Date actualEndDateTime = sdf.parse(actualEndDate + " " + actualEndTime);
-			ottNpvrMappingService.saveActualDateTime(sportType, fixtureId, actualStartDateTime, actualEndDateTime);
-			returnMap.put("success", true);
+			if (!actualEndDateTime.after(actualStartDateTime)) {
+				returnMap.put("success", false);
+				returnMap.put("msg", "Actual end date time must after start date time.");
+			} else {
+				ottNpvrMappingService.saveActualDateTime(sportType, fixtureId, actualStartDateTime, actualEndDateTime);
+				returnMap.put("success", true);	
+			}
 		} catch (ParseException e) {
 			e.printStackTrace();
 			logger.error(e.getMessage());

@@ -25,7 +25,6 @@ public class AccessRightFilter implements Filter {
 	public void destroy() {
 	}
 
-	@SuppressWarnings("unchecked")
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
 		

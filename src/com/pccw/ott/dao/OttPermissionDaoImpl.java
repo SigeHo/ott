@@ -13,9 +13,9 @@ import org.springframework.stereotype.Repository;
 import com.pccw.ott.model.OttPermission;
 
 @Repository("ottPermissionDao")
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class OttPermissionDaoImpl extends HibernateDaoSupport implements OttPermissionDao {
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public List<OttPermission> findPermissionList(String permissionName, int first, int max) {
 		DetachedCriteria criteria = DetachedCriteria.forClass(OttPermission.class);
 		if (StringUtils.isNotBlank(permissionName)) {
@@ -61,7 +61,6 @@ public class OttPermissionDaoImpl extends HibernateDaoSupport implements OttPerm
 		this.getHibernateTemplate().delete(originalPermission);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<OttPermission> findAllPermission() {
 		return (List<OttPermission>) this.getHibernateTemplate().find("from OttPermission");
