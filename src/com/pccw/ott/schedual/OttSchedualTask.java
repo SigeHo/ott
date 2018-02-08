@@ -18,6 +18,7 @@ import com.pccw.ott.model.OttSnookerPerson;
 import com.pccw.ott.model.OttSnookerRank;
 import com.pccw.ott.model.OttSnookerScore;
 import com.pccw.ott.service.OttSnookerService;
+import com.pccw.ott.util.Constants;
 import com.pccw.ott.util.CustomizedPropertyConfigurer;
 import com.pccw.ott.util.HttpClientUtil;
 import com.pccw.ott.util.JsonUtil;
@@ -60,8 +61,12 @@ public class OttSchedualTask {
 			endDate = calendar.getTime();
 			String api = CustomizedPropertyConfigurer.getContextProperty("api.snooker_fixture");
 			api += "&startDate=" + sdf.format(startDate) + "&endDate=" + sdf.format(endDate);
-			 String response = HttpClientUtil.getInstance().sendHttpPost(api);
-//			String response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
+			String response = "";
+			if (Constants.PROXY.equals("true")) {
+				response = HttpClientUtil.getInstance().sendHttpGetWithProxy(api, "10.12.251.1", 8080, "http");
+			} else {
+				response = HttpClientUtil.getInstance().sendHttpPost(api);
+			}
 			if (StringUtils.isNotBlank(response)) {
 				List<OttSnookerScore> list = JsonUtil.parseJson2SnookerScore(response, "FIXTURE");
 				if (list.size() > 0) {

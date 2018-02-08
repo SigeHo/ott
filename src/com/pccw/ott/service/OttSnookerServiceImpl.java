@@ -100,11 +100,6 @@ public class OttSnookerServiceImpl implements OttSnookerService {
 	}
 
 	@Override
-	public List<OttSnookerPoint> findSnookerPointList(String playerId) {
-		return ottSnookerRankDao.findPointByPlayerId(playerId);
-	}
-
-	@Override
 	public List<OttSnookerRank> findSnookerRankList(String playerName, int first, int max, String sort, String order) {
 		return ottSnookerRankDao.findByPlayerName(playerName, first, max, sort, order);
 	}

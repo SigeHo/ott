@@ -13,8 +13,6 @@ public interface OttSnookerRankDao {
 
 	public Long findCountByPlayerName(String playerName);
 
-	public List<OttSnookerPoint> findPointByPlayerId(String playerId);
-
 	public List<OttSnookerRank> findByPlayerName(String playerName, int first, int max, String sort, String order);
 
 	public void deleteById(Long rankId);

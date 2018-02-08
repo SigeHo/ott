@@ -21,7 +21,16 @@ public class OttUserDaoImpl extends HibernateDaoSupport implements OttUserDao {
 
 	@Override
 	public OttUser findUserByUsernameAndPassword(String username, String password) {
-		List<OttUser> list = (List<OttUser>) this.getHibernateTemplate().find("from OttUser u where u.username = ? and u.password = ?", username, password);
+		List<OttUser> list = this.getHibernateTemplate().execute(new HibernateCallback<List<OttUser>>() {
+			@Override
+			public List<OttUser> doInHibernate(Session session) throws HibernateException {
+				String hql = "from OttUser u where u.username = :username and u.password = :password";
+				Query query = session.createQuery(hql);
+				query.setParameter("username", username);
+				query.setParameter("password", password);
+				return query.list();
+			}
+		});
 		if (list.size() == 1) {
 			return list.get(0);
 		} else {
@@ -47,7 +56,7 @@ public class OttUserDaoImpl extends HibernateDaoSupport implements OttUserDao {
 
 	@Override
 	public Long findCountByUserName(String usernameForSearch) {
-		String hql = "select count(*) from OttUser ";
+		String hql = "select count(1) from OttUser ";
 		if (StringUtils.isNotBlank(usernameForSearch)) {
 			hql += "where username like '%" + usernameForSearch + "%'";
 		}

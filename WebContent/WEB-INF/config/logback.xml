@@ -61,6 +61,20 @@
 			<pattern>${ENCODER_PATTERN}</pattern>
 		</encoder>
 	</appender>
+
+	<!-- 	log4jdbc -->
+    <logger name="jdbc.sqlonly" level="ERROR">
+        <appender-ref ref="rollingFile"/>
+    </logger>
+    <logger name="jdbc.audit" level="ERROR">
+        <appender-ref ref="rollingFile"/>
+    </logger>
+    <logger name="jdbc.resultset" level="ERROR">
+        <appender-ref ref="rollingFile"/>
+    </logger>
+    <logger name="jdbc.connection" level="ERROR">
+        <appender-ref ref="rollingFile"/>
+    </logger>
 	
 	<logger name="log.sync" level="DEBUG" addtivity="false">
 		<appender-ref ref="SYNC_FILE" />

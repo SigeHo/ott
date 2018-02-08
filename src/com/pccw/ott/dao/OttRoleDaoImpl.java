@@ -13,22 +13,23 @@ import org.springframework.stereotype.Repository;
 import com.pccw.ott.model.OttRole;
 
 @Repository("ottRoleDao")
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class OttRoleDaoImpl extends HibernateDaoSupport implements OttRoleDao {
 
 	@Override
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public List<OttRole> findRoleList(String roleName, int first, int max) {
 		return this.getHibernateTemplate().execute(new HibernateCallback<List<OttRole>>() {
 			@Override
 			public List<OttRole> doInHibernate(Session session) throws HibernateException {
 				String hql = "from OttRole ";
-				if (StringUtils.isNotBlank(roleName)) {
-					hql += "where roleName like '%" + roleName + "%' ";
-				}
-
 				Query query = session.createQuery(hql);
 				query.setFirstResult(first);
 				query.setMaxResults(max);
+				if (StringUtils.isNotBlank(roleName)) {
+					hql += "where roleName like :roleName";
+					query.setParameter("roleName", "%" + roleName + "%");
+				}
+
 				return query.list();
 			}
 		});
@@ -36,22 +37,23 @@ public class OttRoleDaoImpl extends HibernateDaoSupport implements OttRoleDao {
 
 	@Override
 	public Long findCountByRoleName(String roleName) {
-		String hql = "select count(*) from OttRole ";
+		String hql = "select count(1) from OttRole ";
 		if (StringUtils.isNotBlank(roleName)) {
 			hql += "where roleName like '%" + roleName + "%'";
 		}
 		return (Long) this.getHibernateTemplate().find(hql).get(0);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public OttRole queryByRoleName(String roleName) {
-		List<OttRole> list = (List<OttRole>) this.getHibernateTemplate().find("from OttRole r where r.roleName = ?", roleName);
-		if (list.size() == 1) {
+		String hql = "from OttRole r where r.roleName like '%:roleName%'";
+		Session session = this.getHibernateTemplate().getSessionFactory().getCurrentSession();
+		Query query = session.createQuery(hql);
+		query.setParameter("roleName", roleName);
+		List<OttRole> list = query.list();
+		if (list.size() > 0)
 			return list.get(0);
-		} else {
-			return null;
-		}
+		return null;
 	}
 
 	@Override
@@ -74,7 +76,6 @@ public class OttRoleDaoImpl extends HibernateDaoSupport implements OttRoleDao {
 		this.getHibernateTemplate().delete(role);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<OttRole> findAllRole() {
 		return (List<OttRole>) this.getHibernateTemplate().find("from OttRole");

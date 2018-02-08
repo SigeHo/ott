@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -122,5 +123,4 @@ public class OttSnookerPersonDaoImpl extends HibernateDaoSupport implements OttS
 			this.getHibernateTemplate().delete(p);
 		}
 	}
-
 }

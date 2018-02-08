@@ -135,16 +135,11 @@ public class OttSnookerRankDaoImpl extends HibernateDaoSupport implements OttSno
 
 	@Override
 	public Long findCountByPlayerName(String playerName) {
-		String hql = "select count(*) from OttSnookerRank ";
+		String hql = "select count(1) from OttSnookerRank ";
 		if (StringUtils.isNotBlank(playerName)) {
 			hql += "where nameCn like '%" + playerName + "%' or nameEn like '%" + playerName + "%' or nameTr like '%" + playerName + "%'";
 		}
 		return (Long) this.getHibernateTemplate().find(hql).get(0);
-	}
-
-	@Override
-	public List<OttSnookerPoint> findPointByPlayerId(String playerId) {
-		return (List<OttSnookerPoint>) this.getHibernateTemplate().find("from OttSnookerPoint p where p.pointId in (select rp.pointId from OttSnookerRankPoint rp where rp.playerId = ?)", playerId);
 	}
 
 	@Override

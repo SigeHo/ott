@@ -56,7 +56,7 @@ public class OttSnookerLeagueDaoImpl extends HibernateDaoSupport implements OttS
 	
 	@Override
 	public Long findCountByParam(String leagueName) {
-		String hql = "select count(*) from OttSnookerLeague ";
+		String hql = "select count(1) from OttSnookerLeague ";
 		if (StringUtils.isNotBlank(leagueName)) {
 			hql += "where leagueNameCn like '%" + leagueName + "%' or leagueNameEn like '%" + leagueName + "%' or leagueNameTr like '%" + leagueName
 					+ "%' ";

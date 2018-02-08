@@ -18,19 +18,43 @@ public class OttNpvrMappingDaoImpl extends HibernateDaoSupport implements OttNpv
 
 	@Override
 	public List<OttNpvrMapping> findByFixtureIdAndSportType(String fixtureId, String sportType) {
-		return (List<OttNpvrMapping>) this.getHibernateTemplate().find("from OttNpvrMapping where fixtureId = ? and sportType = ?", fixtureId,
-				sportType);
+		return this.getHibernateTemplate().execute(new HibernateCallback<List<OttNpvrMapping>>() {
+			@Override
+			public List<OttNpvrMapping> doInHibernate(Session session) throws HibernateException {
+				String hql = "from OttNpvrMapping where fixtureId = :fixtureId and sportType = :sportType";
+				Query query = session.createQuery(hql);
+				query.setParameter("fixtureId", fixtureId);
+				query.setParameter("sportType", sportType);
+				return query.list();
+			}
+		});
 	}
 
 	@Override
 	public List<OttNpvrMapping> findByFixtureId(String fixtureId) {
-		return (List<OttNpvrMapping>) this.getHibernateTemplate().find("from OttNpvrMapping where fixtureId = ?", fixtureId);
+		return this.getHibernateTemplate().execute(new HibernateCallback<List<OttNpvrMapping>>() {
+			@Override
+			public List<OttNpvrMapping> doInHibernate(Session session) throws HibernateException {
+				String hql = "from OttNpvrMapping where fixtureId = :fixtureId";
+				Query query = session.createQuery(hql);
+				query.setParameter("fixtureId", fixtureId);
+				return query.list();
+			}
+		});
 	}
 
 	@Override
 	public List<OttNpvrMapping> findByFixtureIdAndChannelNo(String fixtureId, int channelNo) {
-		return (List<OttNpvrMapping>) this.getHibernateTemplate().find("from OttNpvrMapping where fixtureId = ? and channelNo = ?", fixtureId,
-				channelNo);
+		return this.getHibernateTemplate().execute(new HibernateCallback<List<OttNpvrMapping>>() {
+			@Override
+			public List<OttNpvrMapping> doInHibernate(Session session) throws HibernateException {
+				String hql = "from OttNpvrMapping where fixtureId = :fixtureId and channelNo = :channelNo";
+				Query query = session.createQuery(hql);
+				query.setParameter("fixtureId", fixtureId);
+				query.setParameter("channelNo", channelNo);
+				return query.list();
+			}
+		});
 	}
 
 	@Override
@@ -42,8 +66,17 @@ public class OttNpvrMappingDaoImpl extends HibernateDaoSupport implements OttNpv
 
 	@Override
 	public List<OttNpvrMapping> findByParameters(String sportType, String fixtureId, Integer channelNo) {
-		return (List<OttNpvrMapping>) this.getHibernateTemplate().find("from OttNpvrMapping where sportType = ? and fixtureId = ? and channelNo = ?",
-				sportType, fixtureId, channelNo);
+		return this.getHibernateTemplate().execute(new HibernateCallback<List<OttNpvrMapping>>() {
+			@Override
+			public List<OttNpvrMapping> doInHibernate(Session session) throws HibernateException {
+				String hql = "from OttNpvrMapping where sportType = :sportType and fixtureId = :fixtureId and channelNo = :channelNo";
+				Query query = session.createQuery(hql);
+				query.setParameter("sportType", sportType);
+				query.setParameter("fixtureId", fixtureId);
+				query.setParameter("channelNo", channelNo);
+				return query.list();
+			}
+		});
 	}
 
 	@Override

@@ -185,7 +185,7 @@ public class OttSnookerScoreDaoImpl extends HibernateDaoSupport implements OttSn
 
 	@Override
 	public Long findCountByParam(String leagueName, String scoreType) {
-		String hql = "select count(*) from OttSnookerScore ";
+		String hql = "select count(1) from OttSnookerScore ";
 		hql += "where scoreType = '" + scoreType + "' ";
 		if (StringUtils.isNotBlank(leagueName)) {
 			hql += "and leagueNameCn like '%" + leagueName + "%' or leagueNameEn like '%" + leagueName + "%' or leagueNameTr like '%" + leagueName
@@ -269,10 +269,16 @@ public class OttSnookerScoreDaoImpl extends HibernateDaoSupport implements OttSn
 	
 	@Override
 	public void deleteByMatchId(Integer matchId, String scoreType) {
-		List<OttSnookerScore> list = (List<OttSnookerScore>) this.getHibernateTemplate().find("from OttSnookerScore where scoreType = ? and matchId = ?", scoreType, matchId);
+		String hql = "delete from OttSnookerScore where scoreType = :scoreType and matchId = :matchId";
+		Session session = this.getHibernateTemplate().getSessionFactory().getCurrentSession();
+		Query query = session.createQuery(hql);
+		query.setParameter("scoreType", scoreType);
+		query.setParameter("matchId", matchId);
+		query.executeUpdate();
+		/*List<OttSnookerScore> list = (List<OttSnookerScore>) this.getHibernateTemplate().find("from OttSnookerScore where scoreType = ? and matchId = ?", scoreType, matchId);
 		if (list.size() > 0) {
 			this.getHibernateTemplate().delete(list.get(0));
-		}
+		}*/
 	}
 	
 	@Override

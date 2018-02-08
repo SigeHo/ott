@@ -41,7 +41,6 @@
 		
 		$("#fixture_dg").datagrid({
 			singleSelect : true,
-			
 		    columns : [[
 		        {field : 'fixtureId', hidden : true},
 		        {field : 'channelNos', hidden : true},
@@ -257,66 +256,72 @@
 		for (var i in validNpvrs) {
 			var validNpvr = validNpvrs[i];
 			var npvrMapping = {
-					sportType : row.sportType,
-					channelNo : validNpvr["channelNo"],
-					fixtureId : row.fixtureId,
-					npvrId : validNpvr["npvrId"]
+				sportType : row.sportType,
+				channelNo : validNpvr["channelNo"],
+				fixtureId : row.fixtureId,
+				npvrId : validNpvr["npvrId"]
 			}
 			arr.push(npvrMapping);
 		}
 		var data = {
-				"npvrMappingList" : JSON.stringify(arr),
-				"fixtureId" : row.fixtureId,
-				"sportType" : row.sportType,
+			"npvrMappingList" : JSON.stringify(arr),
+			"fixtureId" : row.fixtureId,
+			"sportType" : row.sportType,
 		}
-		$.post("${ctx}/npvr/saveNpvrIds.html", data,
-			function(response) {
-				if (response.success) {
-					$.messager.alert("", "Save NPVR IDs successfully.", "info");
-					$("#editNpvrPopup").dialog("close");
-					var updateIndex = $("#fixture_dg").datagrid("getRowIndex", row); 
-					$("#fixture_dg").datagrid("updateRow", {
-						index : updateIndex,
-						row : {
-							channelNos : response.channelNos,
-							npvrIds : response.npvrIds
-						}
-					});
-				} else if (response.msg) {
-					$.messager.alert("", response.msg, "error");
-				} else {
-					$.messager.alert("", "Failed to save NPVR IDs.", "error");
-				}
-			}, 'JSON').error(function() {
-				$.messager.alert("", "Failed to save NPVR IDs.", "error");
-		});		
-	} 
-	
+		$.post(
+				"${ctx}/npvr/saveNpvrIds.html",
+				data,
+				function(response) {
+					if (response.success) {
+						$.messager.alert("", "Save NPVR IDs successfully.",
+								"info");
+						$("#editNpvrPopup").dialog("close");
+						var updateIndex = $("#fixture_dg").datagrid(
+								"getRowIndex", row);
+						$("#fixture_dg").datagrid("updateRow", {
+							index : updateIndex,
+							row : {
+								channelNos : response.channelNos,
+								npvrIds : response.npvrIds
+							}
+						});
+					} else if (response.msg) {
+						$.messager.alert("", response.msg, "error");
+					} else {
+						$.messager.alert("", "Failed to save NPVR IDs.",
+								"error");
+					}
+				}, 'JSON').error(function() {
+			$.messager.alert("", "Failed to save NPVR IDs.", "error");
+		});
+	}
+
 	function doSearch() {
 		if ($("#searchForm").form("validate")) {
 			ajaxLoading();
 			var data = $("#searchForm").serialize();
-			$.post("${ctx}/npvr/doSearch.html", data,
-				function(response) {
-					ajaxLoadEnd();
-					if (response.success) {
-						if (response.list.length) {
-							$("#fixture_dg").datagrid("loadData", response.list);
-						} else {
-							$("#fixture_dg").datagrid("loadData", {rows : []});
-						}
-					} else if (response.msg) {
-						$.messager.alert("", response.msg, "error");
+			$.post("${ctx}/npvr/doSearch.html", data, function(response) {
+				ajaxLoadEnd();
+				if (response.success) {
+					if (response.list.length) {
+						$("#fixture_dg").datagrid("loadData", response.list);
 					} else {
-						$.messager.alert("", "Failed to search. Please try again.", "error");
+						$("#fixture_dg").datagrid("loadData", {
+							rows : []
+						});
 					}
-				}, 'JSON').error(function() {
-					ajaxLoadEnd();
+				} else if (response.msg) {
+					$.messager.alert("", response.msg, "error");
+				} else {
 					$.messager.alert("", "Failed to search. Please try again.", "error");
+				}
+			}, 'JSON').error(function() {
+				ajaxLoadEnd();
+				$.messager.alert("", "Failed to search. Please try again.", "error");
 			});
 		}
 	}
-	
+
 	function changeTvCoverage(index) {
 		var ck = $("#tvCoverageCk_" + index);
 		if (!ck.is(':checked')) {
@@ -324,8 +329,8 @@
 				if (r) {
 					var row = $("#fixture_dg").datagrid("getRows")[index];
 					var data = {
-							fixtureId : row.fixtureId,
-							sportType : row.sportType
+						fixtureId : row.fixtureId,
+						sportType : row.sportType
 					}
 					$.ajax({
 						url : '${ctx}/npvr/clearNpvrIds.html',
@@ -358,7 +363,7 @@
 			ck.prop("checked", false);
 		}
 	}
-	
+
 	function checkDateTime(row) {
 		if (!row.actualStartDate)
 			return false;
@@ -370,7 +375,7 @@
 			return false;
 		return true;
 	}
-	
+
 	function overrideDateTime(index) {
 		var ck = $("#isOverrideCk_" + index);
 		var row = $("#fixture_dg").datagrid("getRows")[index];
@@ -383,9 +388,9 @@
 			$.messager.confirm("Confirm", "Are you sure to override the match date / time?", function(r) {
 				if (r) {
 					var data = {
-							fixtureId : row.fixtureId,
-							sportType : row.sportType,
-							isOverride : "Y"
+						fixtureId : row.fixtureId,
+						sportType : row.sportType,
+						isOverride : "Y"
 					}
 					$.ajax({
 						url : '${ctx}/npvr/changeOverride.html',
@@ -402,7 +407,7 @@
 								});
 							} else {
 								if (response.msg) {
-									$.messager.alert("", response.msg, "error");	
+									$.messager.alert("", response.msg, "error");
 								} else {
 									$.messager.alert("", "Failed to override match date / time. Please try again.", "error");
 								}
@@ -427,39 +432,39 @@
 						isOverride : "N"
 					}
 					$.ajax({
-						url : '${ctx}/npvr/changeOverride.html',
-						data : data,
-						type : "post",
-						success : function(response) {
-							if (response.success) {
-								$.messager.alert("", "Clear override successfully.", "info");
-								$("#fixture_dg").datagrid("updateRow", {
-									index : index,
-									row : {
-										isOverride : "N"
+								url : '${ctx}/npvr/changeOverride.html',
+								data : data,
+								type : "post",
+								success : function(response) {
+									if (response.success) {
+										$.messager.alert("", "Clear override successfully.", "info");
+										$("#fixture_dg").datagrid("updateRow", {
+											index : index,
+											row : {
+												isOverride : "N"
+											}
+										});
+									} else {
+										if (response.msg) {
+											$.messager.alert("", response.msg, "error");
+										} else {
+											$.messager.alert("", "Failed to clear the override. Please try again.", "error");
+										}
+										ck.prop("checked", "checked");
 									}
-								});
-							} else {
-								if (response.msg) {
-									$.messager.alert("", response.msg, "error");	
-								} else {
+								},
+								error : function() {
 									$.messager.alert("", "Failed to clear the override. Please try again.", "error");
+									ck.prop("checked", "checked");
 								}
-								ck.prop("checked", "checked");
-							}
-						},
-						error : function() {
-							$.messager.alert("", "Failed to clear the override. Please try again.", "error");
-							ck.prop("checked", "checked");
-						}
-					});
+							});
 				} else {
 					ck.prop("checked", "checked");
 				}
 			});
 		}
 	}
-	
+
 	function openEditPopup(index, type) {
 		var row = $("#fixture_dg").datagrid("getRows")[index];
 		if (type == 'ID') {
@@ -470,7 +475,7 @@
 					var npvrIds = "";
 					for (var i = 0; i < npvrArr.length; i++) {
 						npvrIds += npvrArr[i] + "\n";
-		    		}
+					}
 					$("#npvrIds").textbox("setText", npvrIds);
 				}
 			}
@@ -482,67 +487,72 @@
 			$("#actualEndTime").timespinner("clear");
 			if (checkDateTime(row)) {
 				$("#actualStartDate").datebox("setValue", row.actualStartDate);
-				$("#actualStartTime").timespinner("setValue", row.actualStartTime);
+				$("#actualStartTime").timespinner("setValue",
+						row.actualStartTime);
 				$("#actualEndDate").datebox("setValue", row.actualEndDate);
 				$("#actualEndTime").timespinner("setValue", row.actualEndTime);
 			}
 			$("#editActualDatePopup").dialog("open");
 		}
 	}
-	
+
 	function copyNpvrIds(index) {
 		var fromIndex = $("input[name=copyNpvrFrom]:checked").val();
 		if (fromIndex != undefined) {
-			$.messager.confirm("Confirm", "Are you sure to copy the NPVR IDs to this fixture?", function(r) {
-				if (r) {
-					var fromRow = $("#fixture_dg").datagrid("getRows")[fromIndex];
-					var toRow = $("#fixture_dg").datagrid("getRows")[index];
-					var npvrIdArr = fromRow.npvrIds.split(",");
-					var channelNoArr = fromRow.channelNos.split(",");
-					var npvrMappingList = new Array();
-					for (var i in npvrIdArr) {
-						var npvrMapping = {
+			$.messager.confirm("Confirm", "Are you sure to copy the NPVR IDs to this fixture?",
+				function(r) {
+					if (r) {
+						ajaxLoading();
+						var fromRow = $("#fixture_dg").datagrid("getRows")[fromIndex];
+						var toRow = $("#fixture_dg").datagrid("getRows")[index];
+						var npvrIdArr = fromRow.npvrIds.split(",");
+						var channelNoArr = fromRow.channelNos.split(",");
+						var npvrMappingList = new Array();
+						for ( var i in npvrIdArr) {
+							var npvrMapping = {
 								fixtureId : toRow.fixtureId,
 								sportType : toRow.sportType,
 								channelNo : parseInt(channelNoArr[i]),
 								npvrId : npvrIdArr[i]
+							}
+							npvrMappingList.push(npvrMapping);
 						}
-						npvrMappingList.push(npvrMapping);
-					}
-					var data = {
+						var data = {
 							"npvrMappingList" : JSON.stringify(npvrMappingList),
 							"fixtureId" : toRow.fixtureId,
 							"sportType" : toRow.sportType
-					}
-					$.ajax({
-						url : "${ctx}/npvr/saveNpvrIds.html",
-						data : data,
-						type : "post",
-						success : function(response) {
-							if (response.success) {
-								$.messager.alert("", "Copy NPVR IDs successfully.", "info");
-								$("#fixture_dg").datagrid("updateRow", {
-									index : index,
-									row : {
-										channelNos : fromRow.channelNos,
-										npvrIds : fromRow.npvrIds
-									}
-								});
-							} else {
-								$.messager.alert("", response.msg, "error");
-							}
-						},
-						error : function() {
-							$.messager.alert("", "Failed to copy NPVR IDs.", "error");
 						}
-					});
+						$.ajax({
+							url : "${ctx}/npvr/saveNpvrIds.html",
+							data : data,
+							type : "post",
+							success : function(response) {
+								ajaxLoadEnd();
+								if (response.success) {
+									$.messager.alert("", "Copy NPVR IDs successfully.", "info");
+									$("#fixture_dg").datagrid("updateRow", {
+										index : index,
+										row : {
+											channelNos : fromRow.channelNos,
+											npvrIds : fromRow.npvrIds
+										}
+									});
+								} else {
+									$.messager.alert("", response.msg, "error");
+								}
+							},
+							error : function() {
+								ajaxLoadEnd();
+								$.messager.alert("", "Failed to copy NPVR IDs.", "error");
+							}
+						});
+					}
 				}
-			});
+			);
 		} else {
 			$.messager.alert("", "Please choose the NPVR IDs to copy from.", "info");
 		}
 	}
-	
 </script>
 
 </head>

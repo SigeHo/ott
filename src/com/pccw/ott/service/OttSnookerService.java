@@ -42,7 +42,6 @@ public interface OttSnookerService {
 
 	public Long findSnookerRankListSize(String playerName);
 
-	public List<OttSnookerPoint> findSnookerPointList(String playerId);
 
 	public List<OttSnookerRank> findSnookerRankList(String playerName, int first, int max, String sort, String order);
 
